@@ -16,10 +16,13 @@ module.exports = async function (fastify) {
         hasher: fastify.hasher
       });
 
-      reply.code(200).send({
-        userId: result.userId,
-        message: "Login realizado com sucesso"
-      });
+      if (result.status === "2FA_REQUIRED") {
+        return reply.code(200).send({
+          userId: result.userId,
+          status: "2FA_REQUIRED",
+          message: "Autenticação de dois fatores necessária"
+        });
+      }
 
     } catch (err) {
       reply.code(401).send({ error: err.message });

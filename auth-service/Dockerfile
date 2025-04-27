@@ -3,15 +3,20 @@ FROM node:20.18.1
 
 WORKDIR /app
 
-# Copia apenas os arquivos de dependência primeiro (para build cache funcionar)
+# Primeiro, instala utilitários do sistema que podem ser necessários
+RUN apt-get update && apt-get install -y sqlite3
+
+# Copia os arquivos de dependências
 COPY package*.json ./
 
-# Instala dependências DENTRO do container (aqui já compila o sqlite3 certo)
+# Instala os pacotes npm
 RUN npm install
 
-# Agora copia o resto dos arquivos da aplicação
+# Copia o restante do código da aplicação
 COPY . .
 
+# Expõe a porta 4000
 EXPOSE 4000
 
+# Comando para iniciar o servidor
 CMD ["node", "src/server.js"]
