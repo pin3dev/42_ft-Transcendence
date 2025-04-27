@@ -1,0 +1,66 @@
+services:
+#  frontend:
+#    build: 
+#      context: ./frontend
+#    container_name: transcendence_frontend
+#    networks:
+#      - external_network # rede externa para acesso público
+#    environment:
+#      - NODE_ENV=production
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#
+#  nginx:
+#    build:
+#      context: ./nginx
+#      dockerfile: Dockerfile
+#    container_name: transcendence_nginx
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./nginx/conf.d:/etc/nginx/conf.d
+#      - ./frontend/dist:/usr/share/nginx/html:ro
+#    networks:
+#      - external_network # rede externa para acesso público
+#    depends_on:
+#      - frontend
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    networks:
+      - internal_network # rede interna para comunicação entre serviços
+      - external_network # rede externa para acesso público
+    ports:
+      - "3000:3000"  # acessível publicamente com port 3000 exposta ao host/acesso publico
+    depends_on:
+      - auth-service
+      # adicionar aqui todos os outros serviços internos que serão acessados/chamados pelo gateway
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    networks:
+      - internal_network # rede interna para comunicação entre serviços
+    expose:
+      - "4000"  # exposto apenas internamente para a network, não ao host
+    volumes:
+      - auth-data:/app/data # isso aqui deve ser modificado para usar /goinfre no intra da 42
+
+networks:
+  internal_network:
+    name: internal_network
+    driver: bridge
+
+  external_network:
+    name: external_network
+    driver: bridge
+
+
+volumes:
+  auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
+    name: auth-data
