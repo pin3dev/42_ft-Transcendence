@@ -7,12 +7,17 @@ async function loginUser(email, password, { userRepo, hasher }) {
     throw new Error("Usuário não encontrado");
   }
 
-  const user = new User({
-    id: userData.id,
-    email: userData.email,
-    passwordHash: userData.password,
-    twoFASecret: userData.twoFASecret
-  });
+  const user = new User(
+    userData.email,           
+    userData.password,        
+    userData.twoFASecret      
+  );
+  user.setId(userData.id);
+
+  /*console.log("ID: ", user.id);
+  console.log("Email: ", user.email);
+  console.log("Password enviado:", password);
+  console.log("Hash salvo no banco:", user.passwordHash);*/
 
   const senhaCorreta = await hasher.compare(password, user.passwordHash);
 
