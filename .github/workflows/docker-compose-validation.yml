@@ -1,0 +1,61 @@
+name: Validate Docker Compose Services
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+  push:
+    branches: [ "main", "develop" ]
+
+jobs:
+  docker-compose-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Tools
+      run: |
+        set +x
+        sudo apt-get update > /dev/null 2>&1
+        sudo apt-get install -y netcat-openbsd curl > /dev/null 2>&1
+        curl -L https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -o /usr/local/bin/yq > /dev/null 2>&1
+        chmod +x /usr/local/bin/yq
+        echo "✅ Ferramentas instaladas!"
+
+    - name: Docker Compose Up
+      run: |
+        set +x
+        echo "🚀 Subindo containers..."
+        docker compose up -d > /dev/null 2>&1
+        echo "✅ Containers rodando."
+
+    - name: Wait for containers to be ready
+      run: |
+        set +x
+        echo "⏳ Esperando containers ficarem prontos..."
+        sleep 15
+        echo "✅ Containers prontos."
+
+    - name: Run validation script
+      run: |
+        set +x
+        echo "🏃‍♂️ Rodando validação de serviços..."
+        bash .github/scripts/validate_services.sh
+        echo "✅ Validação finalizada!"
+
+    - name: Upload Relatório de Validação
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-compose-validation-report
+        path: validation_report.md
+
+    - name: Cleanup
+      if: always()
+      run: |
+        set +x
+        echo "🧹 Limpando ambiente..."
+        docker rm -f test_container > /dev/null 2>&1 || true
+        docker compose down > /dev/null 2>&1
+        echo "✅ Cleanup completo."
