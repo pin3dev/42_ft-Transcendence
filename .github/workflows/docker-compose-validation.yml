@@ -6,8 +6,20 @@ on:
   push:
     branches: [ "main", "develop" ]
 
+
 jobs:
+  block-main-changes:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Block changes to main branch
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "🚫 Modificações na branch 'main' são proibidas."
+          exit 1
+        fi
+
   docker-compose-validation:
+    needs: block-main-changes
     runs-on: ubuntu-latest
 
     steps:
