@@ -15,6 +15,13 @@ RUN npm install
 # Copia o restante do código da aplicação
 COPY . .
 
+# 🔐 Cria diretório de chaves se não existir (DEVE SER SUBSTITUIDO EM PRODUÇÃO POR PASSAGEM DE CHAVES POR DOCKER SECRETS)
+RUN mkdir -p keys
+
+# 🔐 Gera par de chaves automaticamente se não existirem (DEVE SER SUBSTITUIDO EM PRODUÇÃO POR PASSAGEM DE CHAVES POR DOCKER SECRETS)
+RUN test -f keys/private.key || openssl genpkey -algorithm RSA -out keys/private.key -pkeyopt rsa_keygen_bits:2048
+RUN test -f keys/public.key || openssl rsa -pubout -in keys/private.key -out keys/public.key
+
 # Expõe a porta 4000
 EXPOSE 4000
 
