@@ -91,8 +91,10 @@ const registerBody = {
       type: "object",
       properties: {
         message: { type: "string" },
-        userId: { type: "number" }
-      }
+        userId: { type: "number" },
+        token: { type: "string" } // 🔥 Adicionado aqui
+      },
+      required: ["message", "userId", "token"] // 🔥 Garante que sempre venha o token
     },
     401: {
       type: "object",
@@ -101,6 +103,7 @@ const registerBody = {
       }
     }
   };
+  
 
     
   module.exports = {
