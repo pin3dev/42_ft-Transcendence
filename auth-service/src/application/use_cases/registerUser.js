@@ -1,5 +1,6 @@
 const User = require("../../domain/entities/user"); // Entidade
 const speakeasy = require("speakeasy"); // Para gerar o segredo TOTP
+// const { publishEvent, EventTypes } = require("@transcendence/event-bus"); // Importa o EventBus
 
 async function registerUser(email, password, { userRepo, hasher }) {
   const existing = await userRepo.findByEmail(email);
@@ -19,6 +20,12 @@ async function registerUser(email, password, { userRepo, hasher }) {
 
   const saved = await userRepo.save(user);
   user.setId(saved.lastID); // Define ID depois de salvar
+
+  // Após salvar o usuário no banco, publica o evento
+  // await publishEvent(EventTypes.USER_REGISTERED, {
+  //   userId: user.id,
+  //   email: user.email
+  // }, "auth-service");
 
   return {
     userId: user.id,
