@@ -2,7 +2,7 @@
 set -e
 
 echo "📝 Criando relatório de validação..."
-echo "porra"
+
 # Cria container de teste com curl já instalado
 docker run -d --name test_container --network internal_network curlimages/curl sleep infinity > /dev/null 2>&1
 docker network connect external_network test_container > /dev/null 2>&1
@@ -35,9 +35,9 @@ for service in $SERVICES; do
   if [ "$service" == "api-gateway" ]; then
     echo "🌐 Testando /health do API Gateway via HTTP..."
 
-    # Captura o IP real do container do api-gateway na rede Docker
-    API_GATEWAY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' api-gateway)
-    echo "🌐 IP do api-gateway: $API_GATEWAY_IP"
+    # ✅ Captura apenas o IP da internal_network
+    API_GATEWAY_IP=$(docker inspect -f '{{.NetworkSettings.Networks.internal_network.IPAddress}}' api-gateway)
+    echo "🌐 IP do api-gateway (internal_network): $API_GATEWAY_IP"
 
     http_code=$(docker exec test_container curl -s -o /dev/null -w "%{http_code}" http://$API_GATEWAY_IP:$EXPOSE_PORT/health)
 
