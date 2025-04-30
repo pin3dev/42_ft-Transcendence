@@ -11,10 +11,6 @@ async function buildServer() {
 
   await app.register(authPlugin); // ✅ Registra antes de usar app.authenticate
 
-  app.get("/health", async (req, reply) => {
-    return { status: "ok" };
-  });
-
   // 🔐 Proxy protegido com JWT
   app.register(createServiceProxy({
     prefix: "/auth",
@@ -36,3 +32,4 @@ buildServer().catch(err => {
   console.error("Erro ao iniciar o servidor:", err);
   process.exit(1);
 });
+

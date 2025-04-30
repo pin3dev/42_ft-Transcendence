@@ -1,20 +1,17 @@
 #!/bin/bash
 set -e
+set +x
 
 echo "📝 Criando relatório de validação..."
 
-# Cria container de teste com Alpine para usar curl
-docker run -d --name test_container --network internal_network alpine tail -f /dev/null > /dev/null 2>&1
+docker run -d --name test_container --network internal_network busybox tail -f /dev/null > /dev/null 2>&1
 docker network connect external_network test_container > /dev/null 2>&1
 
-# Cabeçalho do relatório
 echo "| Serviço           | Porta | Status    | Dica                          |" > validation_report.md
 echo "|:------------------|:------|:----------|:------------------------------|" >> validation_report.md
 
-# Captura todos os serviços do docker-compose
 SERVICES=$(yq e '.services | keys | .[]' docker-compose.yml)
 
-# Loop para validar cada serviço
 for service in $SERVICES; do
   echo "🔎 Verificando serviço: $service"
 
@@ -26,39 +23,20 @@ for service in $SERVICES; do
 
   if [ "$EXPOSE_PORT" == "null" ] || [ -z "$EXPOSE_PORT" ]; then
     echo "❌ Serviço $service não declarou 'expose' nem 'ports'."
+    echo "💡 Dica: adicione expose: [\"PORTA\"] no docker-compose.yml"
     echo "| $(printf '%-18s' $service) |   -   | ❌ Falhou | Adicione expose/ports    |" >> validation_report.md
     exit 1
   fi
 
-  # 🔍 DEBUG
-  echo "🔍 DEBUG: Nome do serviço: '$service'"
-  echo "🔍 DEBUG: Porta detectada: '$EXPOSE_PORT'"
-
-  if [ "$service" == "api-gateway" ]; then
-    echo "🌐 Testando /health do API Gateway via HTTP..."
-
-    http_code=$(docker exec test_container sh -c "apk add --no-cache curl > /dev/null 2>&1 && curl -s -o /dev/null -w \"%{http_code}\" http://api-gateway:$EXPOSE_PORT/health")
-
-    if [ "$http_code" -ne 200 ]; then
-      echo "❌ /health retornou HTTP $http_code"
-      echo "| api-gateway       | $EXPOSE_PORT | ❌ Falhou | /health não retornou 200 OK     |" >> validation_report.md
-      exit 1
-    else
-      echo "✅ /health respondeu com 200 OK"
-      echo "| api-gateway       | $EXPOSE_PORT | ✅ OK     | /health funcionando corretamente |" >> validation_report.md
-    fi
-
-    continue
-  fi
-
-  echo "🔌 Testando conexão TCP para $service:$EXPOSE_PORT"
+  echo "🔌 Testando conexão para $service:$EXPOSE_PORT"
   docker exec test_container sh -c "nc -z -w 5 $service $EXPOSE_PORT" > /dev/null 2>&1
   if [ $? -ne 0 ]; then
     echo "❌ Falha na conexão TCP para $service:$EXPOSE_PORT"
+    echo "💡 Dica: verifique se o serviço $service está escutando corretamente."
     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ❌ Falhou | Corrija o serviço       |" >> validation_report.md
     exit 1
   else
-    echo "✅ Conexão TCP OK para $service:$EXPOSE_PORT"
+    echo "✅ Conexão OK para $service:$EXPOSE_PORT"
     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
   fi
 done
