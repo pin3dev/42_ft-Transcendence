@@ -38,7 +38,7 @@ services:
       - "3000:3000"  # acessível publicamente com port 3000 exposta ao host/acesso publico
     depends_on:
       - auth-service
-      # - event-bus  
+      - event-bus 
       # adicionar aqui todos os outros serviços internos que serão acessados/chamados pelo gateway
 
   auth-service:
@@ -50,16 +50,20 @@ services:
     expose:
       - "4000"  # exposto apenas internamente para a network, não ao host
     volumes:
-      - auth-data:/app/data # isso aqui deve ser modificado para usar /goinfre no intra da 42
+      - auth-data:/app/data # não precisa ser modificado, vamos usar VM
+      - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
+    depends_on:
+      - event-bus  
 
-  # event-bus:
-  #   build:
-  #     context: ./event-bus
-  #   container_name: event-bus
-  #   networks:
-  #     - internal_network
-  #   expose:
-  #     - "6379"  # exposto apenas internamente para a network, não ao host
+  event-bus:
+    build:
+      context: ./event-bus
+    container_name: event-bus
+    networks:
+      - internal_network
+    expose:
+      - "6379"  # exposto apenas internamente para a network, não ao host
+
 
 networks:
   internal_network:
