@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Fastify = require("fastify");
 const corsPlugin = require("./plugins/cors");
+const authPlugin = require("./plugins/authPlugin"); // JWT
 const createServiceProxy = require("./proxy/serviceProxy");
 
 async function buildServer() {
@@ -8,16 +9,18 @@ async function buildServer() {
 
   await app.register(corsPlugin);
 
+  await app.register(authPlugin); // ✅ Registra antes de usar app.authenticate
+
   app.register(createServiceProxy({
     prefix: "/auth",
-    target: "http://auth-service:4000"
+    target: "http://auth-service:4000",
+    onRequest: app.authenticate // ✅ Agora isso funciona corretamente
   }));
 
   await app.ready();
   console.log("📦 Rotas disponíveis:");
   console.log(app.printRoutes());
 
-  // ⬇️ ESSENCIAL: inicia o servidor
   await app.listen({ port: 3000, host: "0.0.0.0" });
   console.log("🚀 API Gateway rodando na porta 3000");
 }

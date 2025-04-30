@@ -16,6 +16,7 @@ async function start() {
   // 🔐 Lê as chaves
   const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8");
   const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8");
+  
 
   // 🔑 Registra o plugin JWT corretamente
   app.register(fastifyJwt, {

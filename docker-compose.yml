@@ -40,6 +40,9 @@ services:
       - auth-service
       # - event-bus  
       # adicionar aqui todos os outros serviços internos que serão acessados/chamados pelo gateway
+    volumes:
+      - ./api-gateway:/app
+      - shared-keys:/app/keys
 
   auth-service:
     build:
@@ -51,6 +54,7 @@ services:
       - "4000"  # exposto apenas internamente para a network, não ao host
     volumes:
       - auth-data:/app/data # isso aqui deve ser modificado para usar /goinfre no intra da 42
+      - shared-keys:/app/keys
 
   # event-bus:
   #   build:
@@ -70,7 +74,10 @@ networks:
     name: external_network
     driver: bridge
 
-
 volumes:
-  auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
-    name: auth-data
+  auth-data:
+  shared-keys:
+
+#volumes:
+# auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
+#    name: auth-data
