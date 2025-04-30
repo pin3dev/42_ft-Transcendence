@@ -40,3 +40,19 @@ for service in $SERVICES; do
     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
   fi
 done
+
+# ✅ Validação funcional da rota /health
+echo "🔍 Verificando rota de saúde do API Gateway..."
+docker exec test_container sh -c "
+  apk add --no-cache curl > /dev/null &&
+  curl -sf http://api-gateway:3000/health
+"
+
+if [ $? -ne 0 ]; then
+  echo "❌ Falha ao acessar /health no api-gateway"
+  echo "| api-gateway       | 3000 | ❌ Falhou | Verifique se a rota /health existe |" >> validation_report.md
+  exit 1
+else
+  echo "✅ Rota /health acessível!"
+  echo "| api-gateway       | 3000 | ✅ OK     | /health funcionando                |" >> validation_report.md
+fi
