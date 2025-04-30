@@ -5,7 +5,7 @@ set -e
 echo "📝 Criando relatório de validação..."
 
 # Cria container de teste conectado às redes internas e externas
-docker run -d --name test_container --network internal_network busybox tail -f /dev/null > /dev/null 2>&1
+docker run -d --name test_container --network internal_network alpine tail -f /dev/null > /dev/null 2>&1
 docker network connect external_network test_container > /dev/null 2>&1
 
 # Cabeçalho do relatório
