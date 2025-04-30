@@ -33,6 +33,9 @@ for service in $SERVICES; do
   fi
 
   # ✅ Verificação especial para o API Gateway via HTTP (não TCP)
+  echo "🔍 DEBUG: Nome do serviço: '$service'"
+  echo "🔍 DEBUG: Porta detectada: '$EXPOSE_PORT'"
+  
   if [ "$service" == "api-gateway" ]; then
     echo "🌐 Testando /health do API Gateway via HTTP..."
     docker exec test_container sh -c "
