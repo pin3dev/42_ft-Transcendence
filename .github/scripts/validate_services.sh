@@ -3,41 +3,41 @@ set -e
 
 echo "📝 Criando relatório de validação..."
 
-# Cria container de teste com Alpine para usar curl
-docker run -d --name test_container --network internal_network alpine tail -f /dev/null > /dev/null 2>&1
+# 🧪 Container de teste com imagem que já possui curl
+docker run -d --name test_container --network internal_network curlimages/curl sleep infinity > /dev/null 2>&1
 docker network connect external_network test_container > /dev/null 2>&1
 
 # Cabeçalho do relatório
 echo "| Serviço           | Porta | Status    | Dica                          |" > validation_report.md
 echo "|:------------------|:------|:----------|:------------------------------|" >> validation_report.md
 
-# Captura todos os serviços do docker-compose
+# Lista os serviços do docker-compose.yml
 SERVICES=$(yq e '.services | keys | .[]' docker-compose.yml)
 
-# Loop para validar cada serviço
 for service in $SERVICES; do
   echo "🔎 Verificando serviço: $service"
 
+  # Tenta capturar a porta pelo expose
   EXPOSE_PORT=$(yq e ".services.\"$service\".expose[0]" docker-compose.yml)
 
+  # Se não tiver expose, tenta ports
   if [ "$EXPOSE_PORT" == "null" ] || [ -z "$EXPOSE_PORT" ]; then
     EXPOSE_PORT=$(yq e ".services.\"$service\".ports[0]" docker-compose.yml | cut -d':' -f2)
   fi
 
   if [ "$EXPOSE_PORT" == "null" ] || [ -z "$EXPOSE_PORT" ]; then
-    echo "❌ Serviço $service não declarou 'expose' nem 'ports'."
+    echo "❌ Serviço $service não declarou expose nem ports."
     echo "| $(printf '%-18s' $service) |   -   | ❌ Falhou | Adicione expose/ports    |" >> validation_report.md
     exit 1
   fi
 
-  # 🔍 DEBUG
   echo "🔍 DEBUG: Nome do serviço: '$service'"
   echo "🔍 DEBUG: Porta detectada: '$EXPOSE_PORT'"
 
   if [ "$service" == "api-gateway" ]; then
     echo "🌐 Testando /health do API Gateway via HTTP..."
 
-    http_code=$(docker exec test_container sh -c "apk add --no-cache curl > /dev/null 2>&1 && curl -s -o /dev/null -w \"%{http_code}\" http://api-gateway:$EXPOSE_PORT/health")
+    http_code=$(docker exec test_container curl -s -o /dev/null -w "%{http_code}" http://api-gateway:$EXPOSE_PORT/health)
 
     if [ "$http_code" -ne 200 ]; then
       echo "❌ /health retornou HTTP $http_code"
