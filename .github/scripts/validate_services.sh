@@ -2,8 +2,8 @@
 set -e
 
 echo "📝 Criando relatório de validação..."
-
-# 🧪 Container de teste com imagem que já possui curl
+echo "porra"
+# Cria container de teste com curl já instalado
 docker run -d --name test_container --network internal_network curlimages/curl sleep infinity > /dev/null 2>&1
 docker network connect external_network test_container > /dev/null 2>&1
 
@@ -11,16 +11,14 @@ docker network connect external_network test_container > /dev/null 2>&1
 echo "| Serviço           | Porta | Status    | Dica                          |" > validation_report.md
 echo "|:------------------|:------|:----------|:------------------------------|" >> validation_report.md
 
-# Lista os serviços do docker-compose.yml
+# Lista todos os serviços do docker-compose
 SERVICES=$(yq e '.services | keys | .[]' docker-compose.yml)
 
 for service in $SERVICES; do
   echo "🔎 Verificando serviço: $service"
 
-  # Tenta capturar a porta pelo expose
+  # Detecta a porta exposta
   EXPOSE_PORT=$(yq e ".services.\"$service\".expose[0]" docker-compose.yml)
-
-  # Se não tiver expose, tenta ports
   if [ "$EXPOSE_PORT" == "null" ] || [ -z "$EXPOSE_PORT" ]; then
     EXPOSE_PORT=$(yq e ".services.\"$service\".ports[0]" docker-compose.yml | cut -d':' -f2)
   fi
@@ -37,7 +35,11 @@ for service in $SERVICES; do
   if [ "$service" == "api-gateway" ]; then
     echo "🌐 Testando /health do API Gateway via HTTP..."
 
-    http_code=$(docker exec test_container curl -s -o /dev/null -w "%{http_code}" http://api-gateway:$EXPOSE_PORT/health)
+    # Captura o IP real do container do api-gateway na rede Docker
+    API_GATEWAY_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' api-gateway)
+    echo "🌐 IP do api-gateway: $API_GATEWAY_IP"
+
+    http_code=$(docker exec test_container curl -s -o /dev/null -w "%{http_code}" http://$API_GATEWAY_IP:$EXPOSE_PORT/health)
 
     if [ "$http_code" -ne 200 ]; then
       echo "❌ /health retornou HTTP $http_code"
@@ -62,4 +64,5 @@ for service in $SERVICES; do
     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
   fi
 done
+
 
