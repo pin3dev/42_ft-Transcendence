@@ -29,15 +29,31 @@ for service in $SERVICES; do
   fi
 
   echo "🔌 Testando conexão para $service:$EXPOSE_PORT"
-  docker exec test_container sh -c "nc -z -w 5 $service $EXPOSE_PORT" > /dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    echo "❌ Falha na conexão TCP para $service:$EXPOSE_PORT"
-    echo "💡 Dica: verifique se o serviço $service está escutando corretamente."
-    echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ❌ Falhou | Corrija o serviço       |" >> validation_report.md
-    exit 1
-  else
-    echo "✅ Conexão OK para $service:$EXPOSE_PORT"
-    echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
-  fi
-done
+#   docker exec test_container sh -c "nc -z -w 5 $service $EXPOSE_PORT" > /dev/null 2>&1
+#   if [ $? -ne 0 ]; then
+#     echo "❌ Falha na conexão TCP para $service:$EXPOSE_PORT"
+#     echo "💡 Dica: verifique se o serviço $service está escutando corretamente."
+#     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ❌ Falhou | Corrija o serviço       |" >> validation_report.md
+#     exit 1
+#   else
+#     echo "✅ Conexão OK para $service:$EXPOSE_PORT"
+#     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
+#   fi
+# done
+  max_retries=15
+  attempt=1
 
+  until docker exec test_container sh -c "nc -z -w 2 $service $EXPOSE_PORT" > /dev/null 2>&1; do
+    if [ $attempt -ge $max_retries ]; then
+      echo "❌ Falha na conexão TCP para $service:$EXPOSE_PORT"
+      echo "💡 Dica: verifique se o serviço $service está escutando corretamente."
+      echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ❌ Falhou | Corrija o serviço       |" >> validation_report.md
+      exit 1
+    fi
+    echo "⏳ Tentativa $attempt de $max_retries. Esperando $service..."
+    attempt=$((attempt+1))
+    sleep 2
+  done
+
+  echo "✅ Conexão OK para $service:$EXPOSE_PORT"
+  echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |
