@@ -13,7 +13,7 @@ echo "|:------------------|:------|:----------|:------------------------------|"
 SERVICES=$(yq e '.services | keys | .[]' docker-compose.yml)
 
 for service in $SERVICES; do
-  echo "🔎 TESTANDO Verificando serviço: $service"
+  echo "🔎 Verificando serviço: $service"
 
   EXPOSE_PORT=$(yq e ".services.\"$service\".expose[0]" docker-compose.yml)
 
