@@ -40,3 +40,4 @@ for service in $SERVICES; do
     echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
   fi
 done
+
