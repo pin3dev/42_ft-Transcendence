@@ -68,6 +68,17 @@ services:
     expose:
       - "6379"  # exposto apenas internamente para a network, não ao host
 
+  user-mgmt:
+    build:
+      context: ./user-mgmt
+    container_name: user-mgmt
+    networks:
+      - internal_network
+    expose:
+      - "5000"  # exposto apenas internamente para a network, não ao host
+    volumes:
+      - user-mgmt:/app/data # não precisa ser modificado, vamos usar VM
+      - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
 
 
 networks:
@@ -80,6 +91,7 @@ networks:
     driver: bridge
 
 volumes:
+  user-mgmt:
   auth-data:
   shared-keys:
 

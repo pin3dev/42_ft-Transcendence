@@ -36,6 +36,11 @@ async function buildServer() {
   console.log("TEM AUTHENTICATE?", typeof app.authenticate);
 
   app.register(createServiceProxy({
+    prefix: "/user",
+    target: "http://user-mgmt:5000"
+  }));
+
+  app.register(createServiceProxy({
     prefix: "/auth/public",
     target: "http://auth-service:4000"
   }));
