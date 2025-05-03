@@ -2,7 +2,7 @@ const { twoFABody, twoFAResponse } = require("../schemas/userSchemas");
 const speakeasy = require("speakeasy");
 
 module.exports = async function (fastify) {
-  fastify.post("/2fa/verify", {
+  fastify.post("/auth/public/2fa/verify", {
     schema: {
       body: twoFABody,
       response: twoFAResponse

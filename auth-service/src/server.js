@@ -2,6 +2,7 @@ const Fastify = require("fastify");
 const registerRoutes = require("./api/routes/register");
 const loginRoutes = require("./api/routes/login");
 const twoFARoutes = require("./api/routes/2fa");
+const testeRoutes = require("./api/routes/teste");
 
 const userRepo = require("./infrastructure/db/userRepoSqlite");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
@@ -34,6 +35,7 @@ async function start() {
   app.register(registerRoutes);
   app.register(loginRoutes);
   app.register(twoFARoutes);
+  app.register(testeRoutes);
 
   try {
     await app.listen({ port: 4000, host: '0.0.0.0' });
