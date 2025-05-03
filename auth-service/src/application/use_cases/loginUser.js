@@ -1,4 +1,4 @@
-const User = require("../../domain/entities/user"); // agora usamos a entidade
+const User = require("../../domain/entities/user"); 
 
 async function loginUser(email, password, { userRepo, hasher }) {
   const userData = await userRepo.findByEmail(email);
@@ -13,11 +13,6 @@ async function loginUser(email, password, { userRepo, hasher }) {
     userData.twoFASecret      
   );
   user.setId(userData.id);
-
-  /*console.log("ID: ", user.id);
-  console.log("Email: ", user.email);
-  console.log("Password enviado:", password);
-  console.log("Hash salvo no banco:", user.passwordHash);*/
 
   const senhaCorreta = await hasher.compare(password, user.passwordHash);
 
