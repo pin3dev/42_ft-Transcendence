@@ -1,84 +1,47 @@
-# 🌐 API Gateway
+# 📡 API Gateway
 
-### 🌳 Estrutura
+Este serviço atua como ponto de entrada para o sistema baseado em microsserviços. Ele roteia e consolida requisições HTTP direcionadas aos serviços internos, facilitando a comunicação centralizada e segura.
 
-    - PLUGINS/
+## ⚙️ Configurações
 
-        - **Configura o CORS** (`cors.js`), permitindo que o frontend (SPA) se comunique com o backend sem bloqueio de origem cruzada.</br>
+Todas as requisições HTTP feitas pelo frontend para os serviços internos devem ser enviadas exclusivamente por meio do `api-gateway`. As rotas públicas estão disponíveis na porta `3000`. Para acessar rotas privadas, também pela porta `3000`, é obrigatório incluir um token JWT válido no cabeçalho da requisição.
 
-        - **Define middleware de autenticação** (`authMiddleware.js`) com JWT RS256 para proteger rotas privadas de forma reutilizável (futuramente).</br>
+## 🔗 Serviços Integrados
 
-    - PROXY/
+- **auth-service (Serviço de Autenticação)** – Responsável por login, registro, verificação de autenticação em dois fatores (2FA) e emissão de tokens JWT.  
+- **user-management (Gestão de Usuários)** – Responsável pelo gerenciamento de perfis de usuários (CRUD).
 
-        - **Cria função genérica de proxy reverso** (`serviceProxy.js`), permitindo que o Gateway redirecione requisições para serviços como `user-service`, `presence-service`, etc.</br>
+## 🛣️ Rotas Disponíveis
 
-    - ROUTES/
+Abaixo estão listadas todas as rotas disponíveis por meio do API Gateway, organizadas por serviço.
 
-        - **Define as rotas públicas** (`auth.js`) que são expostas diretamente para o frontend, e fazem ponte para os microsserviços.</br>
+### 🔐 Auth Service
 
-        - (Futuramente) **Define rotas privadas** com autenticação ativada e verificação de JWT.</br>
+| Tipo | Método | Rota | Ação | Request | Response |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| 🌐 Pública | POST | `/auth/register` | Cria um novo usuário | Body: `{ "email": "usuario@email.com", "password": "senha123" }` | `201 Created` ou `400 Bad Request` |
+| 🌐 Pública | POST | `/auth/login` | Autentica um usuário e inicia o 2FA | Body: `{ "email": "usuario@email.com", "password": "senha123" }` | `200 OK` com `{ status: string }` ou `401 Unauthorized` |
+| 🌐 Pública | POST   | `/auth/2fa/verify` | Valida o código 2FA e emite token JWT | Body: `{ "userId": 123, "2faToken": "123456" }` | `200 OK` com `{ nomeUser: string }` ou `400 Bad Request` |
 
-    - MAIN/
-
-        - **Inicializa o SERVIDOR Fastify** (`server.js`), injeta plugins (CORS, Auth), registra rotas e configura redirecionamentos.</br>
-
----
-
-### 💡 Conceito
-
-```plaintext
-📁 plugins/         → Plugins reutilizáveis (ex: CORS, autenticação JWT)
-📁 proxy/           → Redirecionamento genérico para microsserviços
-📁 routes/          → Rotas públicas e privadas
-📄 server.js        → Ponto de entrada do serviço
-```
-
----
 <!--
-### 🔁 Funcionalidade
-
-- Atende requisições do frontend via `http://localhost:3000`.
-- Encaminha chamadas como `/auth/register` para o `auth-service`.
-- Já está preparado para:
-  - Autenticação com JWT
-  - Adição de novos serviços via proxy reverso
-  - CORS controlado
-  - Organização limpa e modular
-
+> 💡 *Sugestões de padronização futuras:*  
+> - Padronizar nomes das rotas.  
+> - Alterar o nome do campo `token` do corpo do 2FA para `2faToken`.
 -->
 
-### 💻 Testes
+---
 
-##### Para iniciar o serviço
+### 👤 User Management
 
-```bash
-cd api-gateway
-npm install  # necessário apenas na primeira vez
-node src/server.js
-```
-
->[!IMPORTANT] O gateway iniciará em: `http://localhost:3000`
+| Tipo | Método | Rota | Ação | Request | Response |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| 🔐 Privada | GET | `/user/me` | Retorna os dados do perfil do usuário autenticado | Header: `Authorization: Bearer <tokenJWT>` | `200 OK`, `403 Forbidden` ou `404 Not Found` |
 
 ---
 
-##### TTeste de requisição HTTP pelo CURL
+> [!IMPORTANT]  
+> O API Gateway é responsável apenas por rotear requisições e validar o token JWT. Toda lógica de autorização, permissões e regras de negócio é tratada individualmente por cada microsserviço.
 
-```bash
-curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"email": "teste@example.com", "password": "123456"}'
-```
+> [!WARNING]  
+> O serviço de eventos (**event-bus**) utiliza Redis para comunicação interna entre microsserviços e **não expõe endpoints públicos** via o API Gateway.
 
----
-
-#### Test de requisição HTTP pelo Postman
-
-- URL: `http://localhost:3000/auth/register`
-- Método: `POST`
-- Headers: `Content-Type: application/json`
-- Body (raw / JSON):
-```json
-{
-  "email": "teste@example.com",
-  "password": "123456"
-}
-```
----
