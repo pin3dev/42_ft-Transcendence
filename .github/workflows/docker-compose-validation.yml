@@ -26,6 +26,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Create .env from GitHub Secrets
+      run: |
+        echo "PRIVATE_KEY_BASE64=${{ secrets.PRIVATE_KEY_BASE64 }}" > .env
+        echo "PUBLIC_KEY_BASE64=${{ secrets.PUBLIC_KEY_BASE64 }}" >> .env
+
     - name: Install Tools
       run: |
         set +x
