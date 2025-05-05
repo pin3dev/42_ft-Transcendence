@@ -1,6 +1,6 @@
 class User {
   constructor(email, passwordHash, twoFASecret = null) {
-    this.id = null; // será atribuído depois
+    this.id = null; 
     this.email = email;
     this.passwordHash = passwordHash;
     this.twoFASecret = twoFASecret;
@@ -11,7 +11,7 @@ class User {
   }
 
   requiresTwoFA() {
-    return !!this.twoFASecret; // Verifica se o usuário tem 2FA habilitado
+    return !!this.twoFASecret; 
   }
 }
 

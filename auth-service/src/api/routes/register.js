@@ -2,7 +2,7 @@ const { registerBody, registerResponse } = require("../schemas/userSchemas");
 const { registerUser } = require("../../application/use_cases/registerUser");
 
 module.exports = async function (fastify) {
-  fastify.post("/register", {
+  fastify.post("/auth/public/register", {
     schema: {
       body: registerBody,
       response: registerResponse
@@ -19,7 +19,7 @@ module.exports = async function (fastify) {
       reply.code(201).send({
         userId: result.userId,
         message: "Usuário criado com sucesso",
-        otpauthUrl: result.otpauthUrl // incluído para frontend gerar QR Code
+        otpauthUrl: result.otpauthUrl 
       });
 
     } catch (err) {

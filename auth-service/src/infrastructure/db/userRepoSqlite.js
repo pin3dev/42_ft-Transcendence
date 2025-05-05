@@ -1,10 +1,8 @@
-const db = require("./sqlite"); // Importa a instância do banco SQLite
-const util = require("util"); // Usado para converter funções callback em promises
+const db = require("./sqlite"); 
+const util = require("util"); 
 
-const get = util.promisify(db.get).bind(db); // Transforma db.get em uma função que retorna Promise
-const run = util.promisify(db.run).bind(db); // Transforma db.run em uma função que retorna Promise
-
-// Busca usuário por email no banco de dados
+const get = util.promisify(db.get).bind(db); 
+const run = util.promisify(db.run).bind(db); 
 
 async function findByEmail(email) {
   return await get("SELECT * FROM users WHERE email = ?", [email]);
@@ -13,8 +11,6 @@ async function findByEmail(email) {
 async function save(user) {
   return await new Promise((resolve, reject) => {
     db.run(
-      //"INSERT INTO users (email, password) VALUES (?, ?)",
-      //[user.email, user.passwordHash],
       "INSERT INTO users (email, password, twoFASecret) VALUES (?, ?, ?)",
       [user.email, user.passwordHash, user.twoFASecret],
       function (err) {
@@ -32,5 +28,5 @@ async function findById(id) {
 module.exports = {
   findByEmail,
   save,
-  findById // ← exporta a função nova
+  findById 
 };

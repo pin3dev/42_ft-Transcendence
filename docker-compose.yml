@@ -40,6 +40,9 @@ services:
       - auth-service
       - event-bus 
       # adicionar aqui todos os outros serviços internos que serão acessados/chamados pelo gateway
+    volumes:
+      - ./api-gateway:/app
+      - shared-keys:/app/keys
 
   auth-service:
     build:
@@ -51,6 +54,7 @@ services:
       - "4000"  # exposto apenas internamente para a network, não ao host
     volumes:
       - auth-data:/app/data # não precisa ser modificado, vamos usar VM
+      - shared-keys:/app/keys
       - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
     depends_on:
       - event-bus  
@@ -64,6 +68,18 @@ services:
     expose:
       - "6379"  # exposto apenas internamente para a network, não ao host
 
+  user-mgmt:
+    build:
+      context: ./user-mgmt
+    container_name: user-mgmt
+    networks:
+      - internal_network
+    expose:
+      - "5000"  # exposto apenas internamente para a network, não ao host
+    volumes:
+      - user-mgmt:/app/data # não precisa ser modificado, vamos usar VM
+      - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
+
 
 networks:
   internal_network:
@@ -74,7 +90,11 @@ networks:
     name: external_network
     driver: bridge
 
-
 volumes:
-  auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
-    name: auth-data
+  user-mgmt:
+  auth-data:
+  shared-keys:
+
+#volumes:
+# auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
+#    name: auth-data

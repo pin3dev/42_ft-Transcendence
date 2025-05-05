@@ -1,4 +1,3 @@
-// Schema para validação automática do corpo da requisição POST /register
 const registerBody = {
     type: "object",
     required: ["email", "password"],
@@ -8,14 +7,13 @@ const registerBody = {
     }
   };
   
-  // Schema para validar estrutura da resposta (sucesso e erro)
   const registerResponse = {
     201: {
       type: "object",
       properties: {
         userId: { type: "number" },
         message: { type: "string" },
-        otpauthUrl: { type: "string" } // <- novo
+        otpauthUrl: { type: "string" }
       }
     },
     400: {
@@ -36,13 +34,6 @@ const registerBody = {
   };
   
   const loginResponse = {
-    // 200: {
-    //   type: "object",
-    //   properties: {
-    //     userId: { type: "number" },
-    //     message: { type: "string" }
-    //   }
-    // },
     200: {
       oneOf: [
         {
@@ -92,9 +83,9 @@ const registerBody = {
       properties: {
         message: { type: "string" },
         userId: { type: "number" },
-        token: { type: "string" } // 🔥 Adicionado aqui
+        token: { type: "string" } 
       },
-      required: ["message", "userId", "token"] // 🔥 Garante que sempre venha o token
+      required: ["message", "userId", "token"] 
     },
     401: {
       type: "object",
@@ -104,13 +95,11 @@ const registerBody = {
     }
   };
   
-
-    
   module.exports = {
     registerBody,
     registerResponse,
     loginBody,
     loginResponse,
-    twoFABody, // criado para ser usado na rota 2fa
-    twoFAResponse // criado para ser usado na rota 2fa
+    twoFABody, 
+    twoFAResponse 
   };
