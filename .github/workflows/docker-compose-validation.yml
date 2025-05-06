@@ -26,11 +26,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Create .env from GitHub Secrets
-      run: |
-        echo "PRIVATE_KEY_BASE64=${{ secrets.PRIVATE_KEY_BASE64 }}" > .env
-        echo "PUBLIC_KEY_BASE64=${{ secrets.PUBLIC_KEY_BASE64 }}" >> .env
-
     - name: Install Tools
       run: |
         set +x
@@ -41,15 +36,17 @@ jobs:
         echo "✅ Ferramentas instaladas!"
 
     - name: Docker Compose Up
+      env:
+        PRIVATE_KEY_BASE64: ${{ secrets.PRIVATE_KEY_BASE64 }}
+        PUBLIC_KEY_BASE64: ${{ secrets.PUBLIC_KEY_BASE64 }}
       run: |
         set +x
         echo "🚀 Subindo containers..."
-        docker compose up -d > /dev/null 2>&1
+        docker compose up -d
         echo "✅ Containers rodando."
 
     - name: Wait for containers to be ready
       run: |
-        set +x
         echo "⏳ Esperando containers ficarem prontos..."
         sleep 15
         echo "✅ Containers prontos."
