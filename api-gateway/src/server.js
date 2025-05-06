@@ -32,12 +32,12 @@ async function buildServer() {
   //console.log("TEM AUTHENTICATE?", typeof app.authenticate);
 
   app.register(createServiceProxy({
-    prefix: "/auth/public",
+    prefix: "/auth",
     target: "http://auth-service:4000"
   }));
 
   app.register(createServiceProxy({
-    prefix: "/auth/private",
+    prefix: "/teste",
     target: "http://auth-service:4000",
     onRequest: async (request, reply) => {
       await app.authenticate(request, reply);

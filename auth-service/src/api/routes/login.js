@@ -2,7 +2,7 @@ const { loginBody, loginResponse } = require("../schemas/userSchemas");
 const { loginUser } = require("../../application/use_cases/loginUser");
 
 module.exports = async function (fastify) {
-  fastify.post("/auth/public/login", {
+  fastify.post("/auth/login", {
     schema: {
       body: loginBody,
       response: loginResponse
