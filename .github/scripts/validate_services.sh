@@ -81,7 +81,7 @@ for service in $SERVICES; do
   echo "⏱️ Aguardando $service:$EXPOSE_PORT estar disponível..."
 
   for attempt in $(seq 1 $MAX_RETRIES); do
-    if docker exec test_container sh -c "nc -z -w 2 $service $EXPOSE_PORT" > /dev/null 2>&1; then
+    if docker exec test_container sh -c "nc -z -v -w 2 $service $EXPOSE_PORT"; then
       echo "✅ Conexão OK para $service:$EXPOSE_PORT"
       echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ✅ OK     |                              |" >> validation_report.md
       break
