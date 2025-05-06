@@ -47,7 +47,7 @@ set -e
 
 echo "📝 Criando relatório de validação..."
 
-# Inicia um container auxiliar na rede para testar conexões TCP
+# Inicia o container auxiliar para testes de conexão
 docker run -d --name test_container --network internal_network busybox tail -f /dev/null > /dev/null
 docker network connect external_network test_container > /dev/null
 
@@ -56,14 +56,14 @@ echo "|:------------------|:------|:----------|:------------------------------|"
 
 SERVICES=$(yq e '.services | keys | .[]' docker-compose.yml)
 
-MAX_RETRIES=10
+MAX_RETRIES=20
 WAIT_SECONDS=3
 HAS_ERROR=0
 
 for service in $SERVICES; do
   echo "🔎 Verificando serviço: $service"
 
-  # Tenta extrair a porta exposta
+  # Tenta obter a porta exposta
   EXPOSE_PORT=$(yq e ".services.\"$service\".expose[0]" docker-compose.yml)
   if [ "$EXPOSE_PORT" == "null" ] || [ -z "$EXPOSE_PORT" ]; then
     PORT_RAW=$(yq e ".services.\"$service\".ports[0]" docker-compose.yml)
@@ -91,6 +91,8 @@ for service in $SERVICES; do
       echo "❌ Falha na conexão TCP para $service:$EXPOSE_PORT"
       echo "💡 Dica: verifique se o serviço está escutando corretamente."
       echo "| $(printf '%-18s' $service) | $EXPOSE_PORT | ❌ Falhou | Serviço não responde         |" >> validation_report.md
+      echo "🪵 Logs recentes do container $service:"
+      docker logs $service || echo "(sem logs)"
       HAS_ERROR=1
     else
       echo "🔁 Tentativa $attempt falhou. Repetindo em $WAIT_SECONDS segundos..."
@@ -99,5 +101,5 @@ for service in $SERVICES; do
   done
 done
 
-# Finaliza
 exit $HAS_ERROR
+
