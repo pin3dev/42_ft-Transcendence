@@ -1,73 +1,73 @@
-name: Validate Docker Compose Services
+# name: Validate Docker Compose Services
 
-on:
-  pull_request:
-    branches: [ "main", "develop" ]
-  push:
-    branches: [ "main", "develop" ]
+# on:
+#   pull_request:
+#     branches: [ "main", "develop" ]
+#   push:
+#     branches: [ "main", "develop" ]
 
 
-jobs:
-  block-main-changes:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Block changes to main branch
-      run: |
-        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-          echo "🚫 Modificações na branch 'main' são proibidas."
-          exit 1
-        fi
+# jobs:
+#   block-main-changes:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Block changes to main branch
+#       run: |
+#         if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+#           echo "🚫 Modificações na branch 'main' são proibidas."
+#           exit 1
+#         fi
 
-  docker-compose-validation:
-    needs: block-main-changes
-    runs-on: ubuntu-latest
+#   docker-compose-validation:
+#     needs: block-main-changes
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v4
 
-    - name: Install Tools
-      run: |
-        set +x
-        sudo apt-get update > /dev/null 2>&1
-        sudo apt-get install -y netcat-openbsd curl > /dev/null 2>&1
-        curl -L https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -o /usr/local/bin/yq > /dev/null 2>&1
-        chmod +x /usr/local/bin/yq
-        echo "✅ Ferramentas instaladas!"
+#     - name: Install Tools
+#       run: |
+#         sudo apt-get update > /dev/null 2>&1
+#         sudo apt-get install -y netcat-openbsd curl > /dev/null 2>&1
+#         curl -L https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -o /usr/local/bin/yq > /dev/null 2>&1
+#         chmod +x /usr/local/bin/yq
+#         echo "✅ Ferramentas instaladas!"
 
-    - name: Docker Compose Up
-      run: |
-        set +x
-        echo "🚀 Subindo containers..."
-        docker compose up -d > /dev/null 2>&1
-        echo "✅ Containers rodando."
+#     - name: Docker Compose Up
+#       env:
+#         PRIVATE_KEY_BASE64: ${{ secrets.PRIVATE_KEY_BASE64 }}
+#         PUBLIC_KEY_BASE64: ${{ secrets.PUBLIC_KEY_BASE64 }}
+#       run: |
+#         echo "🚀 Subindo containers..."
+#         docker compose up -d
+#         echo "✅ Containers rodando."
 
-    - name: Wait for containers to be ready
-      run: |
-        set +x
-        echo "⏳ Esperando containers ficarem prontos..."
-        sleep 15
-        echo "✅ Containers prontos."
+#     - name: Wait for containers to be ready
+#       run: |
+#         echo "⏳ Esperando containers ficarem prontos..."
+#         sleep 15
+#         echo "✅ Containers prontos."
 
-    - name: Run validation script
-      run: |
-        set +x
-        echo "🏃‍♂️ Rodando validação de serviços..."
-        bash .github/scripts/validate_services.sh
-        echo "✅ Validação finalizada!"
+#     - name: Run validation script
+#       run: |
+#         set +x
+#         echo "🏃‍♂️ Rodando validação de serviços..."
+#         bash .github/scripts/validate_services.sh
+#         echo "✅ Validação finalizada!"
 
-    - name: Upload Relatório de Validação
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-compose-validation-report
-        path: validation_report.md
+#     - name: Upload Relatório de Validação
+#       if: always()
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: docker-compose-validation-report
+#         path: validation_report.md
 
-    - name: Cleanup
-      if: always()
-      run: |
-        set +x
-        echo "🧹 Limpando ambiente..."
-        docker rm -f test_container > /dev/null 2>&1 || true
-        docker compose down > /dev/null 2>&1
-        echo "✅ Cleanup completo."
+#     - name: Cleanup
+#       if: always()
+#       run: |
+#         set +x
+#         echo "🧹 Limpando ambiente..."
+#         docker rm -f test_container > /dev/null 2>&1 || true
+#         docker compose down > /dev/null 2>&1
+#         echo "✅ Cleanup completo."

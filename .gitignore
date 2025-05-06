@@ -2,6 +2,8 @@ node_modules/
 .DS_Store
 data/
 *.sqlite
-.env
 npm-debug.log
+.env
 keys/
+secrets/
+*.b64

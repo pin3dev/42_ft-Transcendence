@@ -31,31 +31,35 @@ services:
     build:
       context: ./api-gateway
     container_name: api-gateway
+    environment:
+      - PUBLIC_KEY_BASE64=${PUBLIC_KEY_BASE64}
     networks:
-      - internal_network # rede interna para comunicação entre serviços
-      - external_network # rede externa para acesso público
+      - internal_network
+      - external_network
     ports:
-      - "3000:3000"  # acessível publicamente com port 3000 exposta ao host/acesso publico
+      - "3000:3000"
     depends_on:
       - auth-service
       - event-bus 
-      # adicionar aqui todos os outros serviços internos que serão acessados/chamados pelo gateway
     volumes:
       - ./api-gateway:/app
-      - shared-keys:/app/keys
+      # - shared-keys:/app/keys
 
   auth-service:
     build:
       context: ./auth-service
     container_name: auth-service
+    environment:
+      - PRIVATE_KEY_BASE64=${PRIVATE_KEY_BASE64}
+      - PUBLIC_KEY_BASE64=${PUBLIC_KEY_BASE64}
     networks:
-      - internal_network # rede interna para comunicação entre serviços
+      - internal_network
     expose:
-      - "4000"  # exposto apenas internamente para a network, não ao host
+      - "4000"
     volumes:
-      - auth-data:/app/data # não precisa ser modificado, vamos usar VM
-      - shared-keys:/app/keys
-      - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
+      - auth-data:/app/data 
+      - ./packages/event-bus:/app/packages/event-bus:ro 
+      # - shared-keys:/app/keys
     depends_on:
       - event-bus  
 
@@ -66,7 +70,7 @@ services:
     networks:
       - internal_network
     expose:
-      - "6379"  # exposto apenas internamente para a network, não ao host
+      - "6379" 
 
   user-mgmt:
     build:
@@ -75,10 +79,10 @@ services:
     networks:
       - internal_network
     expose:
-      - "5000"  # exposto apenas internamente para a network, não ao host
+      - "5000" 
     volumes:
-      - user-mgmt:/app/data # não precisa ser modificado, vamos usar VM
-      - ./packages/event-bus:/app/packages/event-bus:ro # isso monta o diretório do event-bus no auth-service, permitindo que o auth-service acesse o event-bus
+      - user-mgmt:/app/data 
+      - ./packages/event-bus:/app/packages/event-bus:ro 
 
 
 networks:
@@ -92,9 +96,8 @@ networks:
 
 volumes:
   user-mgmt:
+    name: user-mgmt
   auth-data:
-  shared-keys:
+    name: auth-data
+  # shared-keys:
 
-#volumes:
-# auth-data: # isso aqui deve ser modificado para usar /goinfre no intra da 42
-#    name: auth-data
