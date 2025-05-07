@@ -27,10 +27,13 @@
 
 const { handleUserRegistered } = require("./events/handler");
 const Fastify = require("fastify");
-const profileRoutes = require("./api/routes/profileRoutes");
+const profileRoutes = require("./api/routes/profile");
+const userRepo = require("./infrastructure/db/profileRepository");
+
 
 const fastify = Fastify({ logger: true });
 
+fastify.decorate("userRepo", userRepo);
 fastify.register(profileRoutes);
 
 fastify.listen({ port: 5000, host: "0.0.0.0" }, (err) => {

@@ -36,13 +36,23 @@ async function buildServer() {
     target: "http://auth-service:4000"
   }));
 
+  // app.register(createServiceProxy({
+  //   prefix: "/teste",
+  //   target: "http://auth-service:4000",
+  //   onRequest: async (request, reply) => {
+  //     await app.authenticate(request, reply);
+  //     request.headers['x-user-id'] = request.user.userId;
+  //     request.headers['x-user-email'] = request.user.email;
+  //   }
+  // }));
+
   app.register(createServiceProxy({
-    prefix: "/teste",
-    target: "http://auth-service:4000",
+    prefix: "/user",
+    target: "http://user-mgmt:5000",
     onRequest: async (request, reply) => {
       await app.authenticate(request, reply);
       request.headers['x-user-id'] = request.user.userId;
-      request.headers['x-user-email'] = request.user.email;
+      request.headers['x-user-email'] = request.user.email; //ver se precisa manter isso já que não ta sendo usado
     }
   }));
   

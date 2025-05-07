@@ -62,7 +62,7 @@ const registerBody = {
       }
     }
   };
-
+// mudar nome da var de "token" para "jwt"
   const twoFABody = {
     type: "object",
     required: ["userId", "token"], 
@@ -76,7 +76,7 @@ const registerBody = {
       }
     }
   };
-  
+  // mudar o nome da var de "token" para "otp"
   const twoFAResponse = {
     200: {
       type: "object",
