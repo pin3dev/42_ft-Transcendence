@@ -21,7 +21,7 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
 
 | Tipo | Método | Rota | Descrição |
 |:--:|:--:|:--:|:--:|
-| 🔐 Privada | GET    | `/user/me`*   | Retorna os dados do perfil do usuário autenticado   |
+| 🔐 Privada | GET    | `/user/profile`*   | Retorna os dados do perfil do usuário autenticado   |
 | 🔐 Privada | PUT    | `/user/:id`*  | Atualiza os dados do usuário (próprio ou admin)     |
 | 🔐 Privada | DELETE | `/user/:id`*  | Remove a conta do usuário (próprio ou admin)        |
 
