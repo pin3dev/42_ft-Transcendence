@@ -25,8 +25,14 @@ async function findById(id) {
   return await get("SELECT * FROM users WHERE id = ?", [id]);
 }
 
+async function deleteByIdAndEmail(id) {
+  return await run("DELETE FROM users WHERE id = ?", [id]);
+}
+
+
 module.exports = {
   findByEmail,
   save,
-  findById 
+  findById,
+  deleteByIdAndEmail,
 };
