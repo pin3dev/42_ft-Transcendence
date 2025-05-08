@@ -48,6 +48,9 @@
 
 
 const getUserProfile = require("../../application/getUserProfile");
+const deleteUserProfile = require("../../application/deleteUserProfile");
+const updateUserProfile = require("../../application/updateUserProfile");
+
 const { getUserMeResponse, gatewayHeaders } = require("../schemas/profileSchemas");
 
 module.exports = async function (fastify) {
@@ -72,4 +75,36 @@ module.exports = async function (fastify) {
       return reply.code(status).send({ error: err.message });
     }
   });
+
+  fastify.put('/user/profile', {
+    schema: {
+      headers: gatewayHeaders,
+    },
+    handler: async (request, reply) => {
+      try {
+        console.log('PUT body:', request.body);
+        const userId = request.headers['x-user-id'];
+        const result = await updateUserProfile(userId, request.body);
+        reply.send(result);
+      } catch (err) {
+        reply.status(err.statusCode || 500).send({ error: err.message });
+      }
+    }
+  });
+
+  fastify.delete('/user/profile', {
+    schema: {
+      headers: gatewayHeaders,
+    },
+    handler: async (request, reply) => {
+      try {
+        const userId = request.headers['x-user-id'];
+        await deleteUserProfile(userId);
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(err.statusCode || 500).send({ error: err.message });
+      }
+    }
+  });
+  
 };

@@ -22,10 +22,26 @@ async function findById(userId) {
   return await get("SELECT * FROM user_profiles WHERE user_id = ?", [userId]);
 }
 
+async function update(userId, { name, avatarUrl }) {
+  await run(`
+    UPDATE user_profiles
+    SET name = ?, avatar_url = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = ?
+  `, [name, avatarUrl, userId]);
+
+  return await findById(userId);
+}
+
+async function deleteProfile(userId) {
+  return run(`DELETE FROM user_profiles WHERE user_id = ?`, [userId]);
+}
+
 module.exports = {
   save,
   nameExists,
   findById,
+  update,
+  delete: deleteProfile,
 };
 
 
