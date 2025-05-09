@@ -9,10 +9,11 @@ async function deleteUserProfile(userId) {
     error.statusCode = 404;
     throw error;
   }
-  // await publishEvent(EventTypes.USER_DELETED, {
-  //   userId: user.id,
-  //   email: user.email
-  // }, "user-mgmt");
+  
+  await publishEvent(EventTypes.USER_DELETED, {
+    userId: existing.user_id,
+    email: existing.email
+  }, "user-mgmt");
 
   await profileRepository.delete(userId);
 

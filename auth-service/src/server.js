@@ -10,6 +10,8 @@ const testeRoutes = require("./api/routes/teste");
 
 const userRepo = require("./infrastructure/db/userRepoSqlite");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
+const { handleUserDeleted } = require("./events/handler");
+
 
 const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8");
 const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8");
@@ -33,6 +35,7 @@ async function start() {
   app.register(loginRoutes);
   app.register(twoFARoutes);
   app.register(testeRoutes);
+  handleUserDeleted();
 
   try {
     await app.listen({ port: 4000, host: '0.0.0.0' });
