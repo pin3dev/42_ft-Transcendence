@@ -35,26 +35,15 @@ const registerBody = {
   
   const loginResponse = {
     200: {
-      oneOf: [
-        {
-          type: "object",
-          properties: {
-            userId: { type: "number" },
-            message: { type: "string" }
-          },
-          required: ["userId", "message"]
-        },
-        {
           type: "object",
           properties: {
             userId: { type: "number" },
             status: { type: "string", enum: ["2FA_REQUIRED"] },
-            message: { type: "string" }
+            message: { type: "string" },
+            otpauthUrl: { type: "string" }
           },
           required: ["userId", "status"]
-        }
-      ]
-    },
+        },
     401: {
       type: "object",
       properties: {

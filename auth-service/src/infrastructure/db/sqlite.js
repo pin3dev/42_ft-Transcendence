@@ -18,7 +18,8 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      twoFASecret TEXT NOT NULL
+      twoFASecret TEXT NOT NULL,
+      first2FALoginDone BOOLEAN DEFAULT 0
     )
   `);
 });

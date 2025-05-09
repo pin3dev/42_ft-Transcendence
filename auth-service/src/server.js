@@ -17,7 +17,7 @@ const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), 
 const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8");
 
 async function start() {
-  const app = Fastify({ logger: true });
+  const app = Fastify();
 
   app.register(fastifyJwt, {
     secret: {
