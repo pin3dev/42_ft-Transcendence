@@ -20,7 +20,8 @@ module.exports = async function (fastify) {
         return reply.code(200).send({
           userId: result.userId,
           status: "2FA_REQUIRED",
-          message: "Autenticação de dois fatores necessária"
+          message: "Autenticação de dois fatores necessária",
+          ...(result.otpauthUrl && { otpauthUrl: result.otpauthUrl })
         });
       }
 

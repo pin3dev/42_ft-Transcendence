@@ -11,6 +11,7 @@ module.exports = async function (fastify) {
     const { userId, token } = request.body;
 
     const user = await fastify.userRepo.findById(userId);
+
     if (!user || !user.twoFASecret) {
       return reply.code(401).send({ error: "2FA não configurado" });
     }
@@ -23,6 +24,10 @@ module.exports = async function (fastify) {
 
     if (!valid) {
       return reply.code(401).send({ error: "Código inválido" });
+    }
+
+    if(!user.first2FALoginDone) {
+      await fastify.userRepo.markFirst2FALoginDone(user.id);
     }
 
     const jwtToken = await fastify.jwt.sign({
