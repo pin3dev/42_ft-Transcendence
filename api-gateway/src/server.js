@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const createServiceProxy = require("./proxy/serviceProxy");
 const publicKey = fs.readFileSync("/app/keys/public.key");
+const { getCache } = require("../packages/event-bus/src/index.js"); 
 
 async function buildServer() {
   const app = Fastify();
@@ -23,11 +24,20 @@ async function buildServer() {
     try {
       await request.jwtVerify(); 
       //console.log("request user:", request.user)
+      const isDeleted = await getCache(`delUser:${request.user.userId}`);
+
+      if (isDeleted) {
+        const error = new Error("Usuário excluído");
+        error.statusCode = 401;
+        throw error;
+      }
     } catch (err) {
       //console.log("JWT FALHOU:", err.name, err.message);
-      reply.code(401).send({ error: "Token inválido ou ausente" });
+      reply.code(401).send(err);
     }
   });
+
+
 
   //console.log("TEM AUTHENTICATE?", typeof app.authenticate);
 

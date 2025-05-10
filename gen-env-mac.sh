@@ -1,6 +1,28 @@
 #!/bin/bash
 
+set -e
+
 mkdir -p secrets
+
+# Detecta o sistema operacional
+OS="$(uname -s)"
+
+# Define o comando correto para base64
+case "$OS" in
+  Darwin)
+    BASE64_CMD="base64"
+    ;;
+  Linux)
+    BASE64_CMD="base64 -w 0"
+    ;;
+  CYGWIN*|MINGW*|MSYS*)
+    BASE64_CMD="base64 -w 0"
+    ;;
+  *)
+    echo "❌ Sistema operacional não suportado: $OS"
+    exit 1
+    ;;
+esac
 
 # Gera chaves se não existirem
 if [ ! -f secrets/private.key ]; then
