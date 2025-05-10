@@ -1,5 +1,5 @@
 const profileRepository = require("../infrastructure/db/profileRepository");
-const { publishEvent, EventTypes } = require("../../packages/event-bus/src/index.js"); 
+const { publishEvent, EventTypes, setCache } = require("../../packages/event-bus/src/index.js"); 
 
 async function deleteUserProfile(userId) {
   const existing = await profileRepository.findById(userId);
@@ -15,8 +15,8 @@ async function deleteUserProfile(userId) {
     email: existing.email
   }, "user-mgmt");
 
+  await setCache(`delUser:${existing.user_id}`, true, null);
   await profileRepository.delete(userId);
-
 }
 
 module.exports = deleteUserProfile;

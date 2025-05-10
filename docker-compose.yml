@@ -43,6 +43,7 @@ services:
       - event-bus 
     volumes:
       - ./api-gateway:/app
+      - ./packages/event-bus:/app/packages/event-bus:ro 
       # - shared-keys:/app/keys
 
   auth-service:
@@ -71,6 +72,8 @@ services:
       - internal_network
     expose:
       - "6379" 
+    volumes:
+      - redis-data:/data
 
   user-mgmt:
     build:
@@ -81,7 +84,7 @@ services:
     expose:
       - "5000" 
     volumes:
-      - user-mgmt:/app/data 
+      - user-data:/app/data 
       - ./packages/event-bus:/app/packages/event-bus:ro 
 
 
@@ -95,9 +98,11 @@ networks:
     driver: bridge
 
 volumes:
-  user-mgmt:
-    name: user-mgmt
+  user-data:
+    name: user-data
   auth-data:
     name: auth-data
+  redis-data:
+    name: redis-data
   # shared-keys:
 
