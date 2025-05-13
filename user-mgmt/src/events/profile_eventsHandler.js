@@ -1,7 +1,6 @@
-const { subscribeToEvent, EventTypes } = require("../../packages/event-bus/src/index.js");
-
-const UserProfile = require("../domain/userProfile.js");
-const profileRepo = require("../infrastructure/db/profileRepository.js");
+const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
+const UserProfile = require("../domain/UserProfile.js");
+const profileRepo = require("../infrastructure/db/profile_repository.js");
 
 function handleUserRegistered() {
   subscribeToEvent(EventTypes.USER_REGISTERED, async (event) => {

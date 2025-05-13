@@ -17,7 +17,7 @@ O `event-bus` é um serviço interno que atua como barramento de eventos para os
 ## 🧱 Tecnologias Utilizadas
 
 - **Node.js**
-- **Redis** (pub/sub)
+- **Redis** (pub/sub, cache)
 - **Docker** (via Docker Compose)
 
 ---
@@ -28,8 +28,8 @@ Exemplos de eventos tratados:
 
 | Evento | Emissor | Destinatário(s) | Descrição |
 |:--:|:--:|:--:|:--:|
-| `user.registered` | auth-service | user-management | Após novo registro, sinaliza criação de perfil |
-| `user.updated` | user-management  | auth-service (opcional)  | Atualização de dados do usuário |
+| `user.registered` | auth-service | user-mgmt | Após novo registro, sinaliza criação de perfil |
+| `user.deleted` | user-mgmt  | auth-service  | Remoção de dados do usuário |
 
 ---
 
@@ -90,13 +90,13 @@ Para integrar serviços com o `event-bus` (publicar/assinar eventos):
 
 ```yaml
 volumes:
-  - ./packages/event-bus:/app/packages/event-bus:ro
+  - ./pckg/redis:/app/pckg/redis:ro 
 ```
 
 ### 2. Importar os utilitários do `event-bus`
 
 ```js  
-const { EventTypes, buildEvent, publishEvent, subscribeToEvent } = require("../../../packages/event-bus/src/index.js");
+const { EventTypes, buildEvent, publishEvent, subscribeToEvent } = require("../../../pckg/redis/modules.js");
 ```  
 
 ### 3. Publicar e Assinar eventos
@@ -118,12 +118,13 @@ subscribeToEvent(EventTypes.TYPE, (event) => {
 
 ```bash
 packages/
-├── event-bus/
-│   ├── publisher.js        # Publica eventos no Redis
-│   ├── subscriber.js       # Escuta eventos via Redis
-│   ├── eventBuilder.js     # Cria estrutura padronizada de eventos
-│   ├── eventTypes.js       # Define os tipos/canais de eventos disponíveis
-│   └── index.js            # Exporta os módulos principais para uso externo
+├── redis/
+│    ├── src/   
+│    │    ├── cache.js            # Funções de get e set de cache no event-bus
+│    │    ├── connect.js          # Servidor de comunicação entre funções e serviço event-bus
+│    │    ├── events.js           # Funções de publicação e subscrição de eventos no event-bus
+│    │    └── eventsHelper.js     # Canais de eventos e Função de criação de Evento
+│    └── modules.js               # Exporta os módulos para uso externo
 └── ...
 ```
 

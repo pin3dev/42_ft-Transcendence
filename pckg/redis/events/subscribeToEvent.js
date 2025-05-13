@@ -1,14 +1,15 @@
 const Redis = require("ioredis");
+// const { EventTypes } = require("./eventsHelper.js");
 
-const subscriber = new Redis({
+const eventCnn = new Redis({
   host: "event-bus",
   port: 6379
 });
 
 function subscribeToEvent(channel, callback) {
-  subscriber.subscribe(channel);
+    eventCnn.subscribe(channel);
 
-  subscriber.on("message", (receivedChannel, message) => {
+    eventCnn.on("message", (receivedChannel, message) => {
     if (receivedChannel === channel) {
       const event = JSON.parse(message);
       callback(event);

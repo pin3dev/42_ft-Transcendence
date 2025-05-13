@@ -1,9 +1,12 @@
-node_modules/
-.DS_Store
-data/
-*.sqlite
-npm-debug.log
+# Arquivos
 .env
+.sqlite
+.DS_Store
+*.b64
+
+# Diretórios
+npm-debug.log
+node_modules/
+data/
 keys/
 secrets/
-*.b64

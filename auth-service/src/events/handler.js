@@ -1,4 +1,4 @@
-const { subscribeToEvent, EventTypes } = require("../../packages/event-bus/src/index.js");
+const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
 
 const userRepo = require("../infrastructure/db/userRepoSqlite.js");
 

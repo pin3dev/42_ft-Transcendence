@@ -41,10 +41,10 @@ services:
     depends_on:
       - auth-service
       - event-bus 
+      - user-mgmt
     volumes:
       - ./api-gateway:/app
-      - ./packages/event-bus:/app/packages/event-bus:ro 
-      # - shared-keys:/app/keys
+      - ./pckg/redis:/app/pckg/redis:ro 
 
   auth-service:
     build:
@@ -57,12 +57,11 @@ services:
       - internal_network
     expose:
       - "4000"
-    volumes:
-      - auth-data:/app/data 
-      - ./packages/event-bus:/app/packages/event-bus:ro 
-      # - shared-keys:/app/keys
     depends_on:
       - event-bus  
+    volumes:
+      - auth-data:/app/data 
+      - ./pckg/redis:/app/pckg/redis:ro 
 
   event-bus:
     build:
@@ -73,7 +72,7 @@ services:
     expose:
       - "6379" 
     volumes:
-      - redis-data:/data
+      - event-data:/data
 
   user-mgmt:
     build:
@@ -85,8 +84,7 @@ services:
       - "5000" 
     volumes:
       - user-data:/app/data 
-      - ./packages/event-bus:/app/packages/event-bus:ro 
-
+      - ./pckg/redis:/app/pckg/redis:ro 
 
 networks:
   internal_network:
@@ -102,7 +100,7 @@ volumes:
     name: user-data
   auth-data:
     name: auth-data
-  redis-data:
-    name: redis-data
+  event-data:
+    name: event-data
   # shared-keys:
 

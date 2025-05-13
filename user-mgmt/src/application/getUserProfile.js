@@ -1,7 +1,7 @@
-const profileRepository  = require("../infrastructure/db/profileRepository");
+const profileRepo  = require("../infrastructure/db/profile_repository");
 
 async function getUserProfile(userId) {
-  const profile = await profileRepository.findById(userId);
+  const profile = await profileRepo.findById(userId);
 
   if (!profile) {
     const error = new Error("User profile not found");
@@ -11,7 +11,7 @@ async function getUserProfile(userId) {
 
   return {
     name: profile.name,
-    avatarUrl: profile.avatar_url,
+    avatar_url: profile.avatar_url,
   };
 }
 

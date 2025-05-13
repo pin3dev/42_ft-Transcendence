@@ -4,7 +4,6 @@ const util = require("util");
 const run = util.promisify(db.run).bind(db);
 const get = util.promisify(db.get).bind(db);
 
-
 async function save(profile) {
   return run(`
     INSERT INTO user_profiles (user_id, name, avatar_url, updated_at)
@@ -22,12 +21,12 @@ async function findById(userId) {
   return await get("SELECT * FROM user_profiles WHERE user_id = ?", [userId]);
 }
 
-async function update(userId, { name, avatarUrl }) {
+async function update(userId, { name, avatar_url }) {
   await run(`
     UPDATE user_profiles
     SET name = ?, avatar_url = ?, updated_at = CURRENT_TIMESTAMP
     WHERE user_id = ?
-  `, [name, avatarUrl, userId]);
+  `, [name, avatar_url, userId]);
 
   return await findById(userId);
 }
