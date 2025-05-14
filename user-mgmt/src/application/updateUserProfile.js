@@ -1,7 +1,7 @@
-const profileRepository = require("../infrastructure/db/profileRepository");
+const profileRepo = require("../infrastructure/db/profile_repository");
 
-async function updateUserProfile(userId, { name, avatarUrl }) {
-  const existing = await profileRepository.findById(userId);
+async function updateUserProfile(userId, { name, avatar_url }) {
+  const existing = await profileRepo.findById(userId);
 
   if (!existing) {
     const error = new Error("User profile not found");
@@ -9,11 +9,11 @@ async function updateUserProfile(userId, { name, avatarUrl }) {
     throw error;
   }
 
-  const updated = await profileRepository.update(userId, { name, avatarUrl });
+  const updated = await profileRepo.update(userId, { name, avatar_url });
   console.log('UPDATED ROW:', updated);
   return {
     name: updated.name,
-    avatarUrl: updated.avatar_url,
+    avatar_url: updated.avatar_url,
   };
 }
 

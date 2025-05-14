@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const createServiceProxy = require("./proxy/serviceProxy");
 const publicKey = fs.readFileSync("/app/keys/public.key");
-const { getCache } = require("../packages/event-bus/src/index.js"); 
+const { getCache } = require("../pckg/redis/modules.js"); 
 
 async function buildServer() {
   const app = Fastify();

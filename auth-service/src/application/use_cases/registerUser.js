@@ -1,6 +1,6 @@
 const User = require("../../domain/entities/user"); 
 const speakeasy = require("speakeasy"); 
-const { publishEvent, EventTypes } = require("../../../packages/event-bus/src/index.js"); 
+const { publishEvent, EventTypes } = require("../../../pckg/redis/modules.js"); 
 
 async function registerUser(email, password, { userRepo, hasher }) {
   const existing = await userRepo.findByEmail(email);

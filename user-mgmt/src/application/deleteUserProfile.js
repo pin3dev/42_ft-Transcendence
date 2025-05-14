@@ -1,8 +1,8 @@
-const profileRepository = require("../infrastructure/db/profileRepository");
-const { publishEvent, EventTypes, setCache } = require("../../packages/event-bus/src/index.js"); 
+const profileRepo = require("../infrastructure/db/profile_repository");
+const { publishEvent, EventTypes, setCache } = require("../../pckg/redis/modules.js"); 
 
 async function deleteUserProfile(userId) {
-  const existing = await profileRepository.findById(userId);
+  const existing = await profileRepo.findById(userId);
 
   if (!existing) {
     const error = new Error("User profile not found");
@@ -16,7 +16,7 @@ async function deleteUserProfile(userId) {
   }, "user-mgmt");
 
   await setCache(`delUser:${existing.user_id}`, true, null);
-  await profileRepository.delete(userId);
+  await profileRepo.delete(userId);
 }
 
 module.exports = deleteUserProfile;

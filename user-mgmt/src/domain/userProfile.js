@@ -1,24 +1,3 @@
-// class UserProfile {
-//     constructor({ userId, name, avatarUrl }) {
-//       this.userId = userId;
-//       this.name = name;
-//       this.avatarUrl = avatarUrl;
-//       this.updatedAt = new Date().toISOString();
-//     }
-  
-//     static generateNameFromEmail(email) {
-//       return email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-//     }
-  
-//     static create({ userId, email }) {
-//       const name = UserProfile.generateNameFromEmail(email);
-//       const avatarUrl = "/avatars/default.jpg"; // caminho relativo/local
-//       return new UserProfile({ userId, name, avatarUrl });
-//     }
-//   }
-  
-//   module.exports = UserProfile;
-
 class UserProfile {
   constructor({ userId, name, avatarUrl }) {
     this.userId = userId;
