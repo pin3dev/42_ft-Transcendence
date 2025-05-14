@@ -4,13 +4,17 @@
 const { handleUserRegistered } = require("./events/profile_eventsHandler");
 const Fastify = require("fastify");
 const profileRoutes = require("./api/routes/profileRoutes");
+const friendRoutes = require("./api/routes/friendRoutes");
 const profileRepo = require("./infrastructure/db/profile_repository");
+const friendRepo = require("./infrastructure/db/friends_repository");
 
 
 const fastify = Fastify({ logger: true });
 
 fastify.decorate("profileRepo", profileRepo);
+fastify.decorate("friendRepo", friendRepo);
 fastify.register(profileRoutes);
+fastify.register(friendRoutes);
 
 fastify.listen({ port: 5000, host: "0.0.0.0" }, (err) => {
   if (err) {

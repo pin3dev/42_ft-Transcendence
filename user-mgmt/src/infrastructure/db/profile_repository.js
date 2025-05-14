@@ -1,4 +1,4 @@
-const db = require("./sqlite");
+const db = require("./profile_sqlite");
 const util = require("util");
 
 const run = util.promisify(db.run).bind(db);

@@ -1,4 +1,4 @@
-const { gateway_headers, error_responses } = require("./commonSchemas");
+const { gateway_headers, error_responses } = require("./common_schemas");
 
 // 📦 GET /user/profile
 const getUser_schema = {
