@@ -89,32 +89,32 @@ const removeFriend_schema = {
   },
 };
 
-// const rejectFriend_schema = {
-//   headers: gateway_headers,
-//   body: {
-//     type: "object",
-//     required: ["sender_id"],
-//     properties: {
-//       sender_id: { type: "string" },
-//     },
-//   },
-//   response: {
-//     200: {
-//       type: "object",
-//       properties: {
-//         message: { type: "string" },
-//       },
-//     },
-//     400: error_responses[400],
-//     401: error_responses[401],
-//   },
-// };
-
+// DELETE /user/friends/remove
+const rejectFriend_schema = {
+  headers: gateway_headers,
+  body: {
+    type: "object",
+    required: ["sender_id"],
+    properties: {
+      sender_id: { type: "string" },
+    },
+  },
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        message: { type: "string" },
+      },
+    },
+    400: error_responses[400],
+    401: error_responses[401],
+  },
+};
 
 module.exports = {
   sendFriend_schema,
   acceptFriend_schema,
   getFriends_schema,
   removeFriend_schema,
-  // rejectFriend_schema,
+  rejectFriend_schema,
 };
