@@ -11,6 +11,11 @@ async function acceptFriend(user_id, sender_id) {
     throw new Error("A solicitação já foi processada.");
   }
 
+  // Verifica se o usuário que está aceitando a solicitação é o destinatário
+  if (relation.user_id !== sender_id || relation.friend_id !== user_id) {
+    throw new Error("Você não pode aceitar uma solicitação que não foi enviada a você.");
+  }
+
   await updateStatus(sender_id, user_id, "ACCEPTED");
 }
 

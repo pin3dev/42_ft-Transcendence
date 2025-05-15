@@ -1,6 +1,6 @@
 const { gateway_headers, error_responses } = require("./common_schemas");
 
-// ✉️ POST /friends/request
+// ✉️ POST /user/friends/request
 const sendFriend_schema = {
   headers: gateway_headers,
   body: {
@@ -22,7 +22,7 @@ const sendFriend_schema = {
   },
 };
 
-// ✅ POST /friends/accept
+// ✅ POST /user/friends/request
 const acceptFriend_schema = {
   headers: gateway_headers,
   body: {
@@ -44,7 +44,32 @@ const acceptFriend_schema = {
   },
 };
 
+// GET /user/friends
+const getFriends_schema = {
+  headers: gateway_headers,
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        friends: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              friend_id: { type: "string" },
+              since: { type: "string", format: "date-time" },
+            },
+          },
+        },
+      },
+    },
+    401: error_responses[401],
+    500: error_responses[500],
+  },
+};
+
 module.exports = {
   sendFriend_schema,
   acceptFriend_schema,
+  getFriends_schema,
 };
