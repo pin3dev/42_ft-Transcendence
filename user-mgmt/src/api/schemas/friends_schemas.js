@@ -68,8 +68,53 @@ const getFriends_schema = {
   },
 };
 
+const removeFriend_schema = {
+  headers: gateway_headers,
+  body: {
+    type: "object",
+    required: ["target_id"],
+    properties: {
+      target_id: { type: "string" },
+    },
+  },
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        message: { type: "string" },
+      },
+    },
+    400: error_responses[400],
+    401: error_responses[401],
+  },
+};
+
+// const rejectFriend_schema = {
+//   headers: gateway_headers,
+//   body: {
+//     type: "object",
+//     required: ["sender_id"],
+//     properties: {
+//       sender_id: { type: "string" },
+//     },
+//   },
+//   response: {
+//     200: {
+//       type: "object",
+//       properties: {
+//         message: { type: "string" },
+//       },
+//     },
+//     400: error_responses[400],
+//     401: error_responses[401],
+//   },
+// };
+
+
 module.exports = {
   sendFriend_schema,
   acceptFriend_schema,
   getFriends_schema,
+  removeFriend_schema,
+  // rejectFriend_schema,
 };

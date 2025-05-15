@@ -44,9 +44,17 @@ async function listAccepted(userId) {
   );
 }
 
+async function deleteRelation(userId, friendId) {
+  return run(
+    `DELETE FROM friends WHERE user_id = ? AND friend_id = ?`,
+    [userId, friendId]
+  );
+}
+
 module.exports = {
   findRelation,
   createRelation,
   updateStatus,
   listAccepted,
+  deleteRelation,
 };
