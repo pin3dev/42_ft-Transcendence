@@ -4,7 +4,7 @@ Este serviço atua como ponto de entrada para o sistema baseado em microsserviç
 
 ## ⚙️ Configurações
 
-Todas as requisições HTTP feitas pelo frontend para os serviços internos devem ser enviadas exclusivamente por meio do `api-gateway`. As rotas públicas estão disponíveis na porta `3000`. Para acessar rotas privadas, também pela porta `3000`, é obrigatório incluir um token JWT válido no cabeçalho da requisição.
+Todas as requisições HTTP feitas pelo frontend para os serviços internos devem ser enviadas exclusivamente por meio do `api-gateway`. As rotas públicas estão disponíveis na porta `1025`. Para acessar rotas privadas, também pela porta `1025`, é obrigatório incluir um token JWT válido no cabeçalho da requisição.
 
 ## 🔗 Serviços Integrados
 

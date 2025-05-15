@@ -17,7 +17,7 @@ Este serviço é responsável pela gestão de perfis de usuários no sistema. El
 
 ## 🔗 Rotas (expostas via API Gateway)
 
-As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `3000`. Exemplo: `http://localhost:3000/user/...`
+As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `1025`. Exemplo: `http://localhost:1025/user/...`
 
 | Tipo | Método | Rota | Descrição |
 |:--:|:--:|:--:|:--:|

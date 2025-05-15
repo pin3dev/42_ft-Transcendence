@@ -17,7 +17,7 @@ Este serviço é responsável pela autenticação de usuários no sistema. Ele r
 
 ## 🔗 Rotas (expostas via API Gateway)
 
-As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `3000`. Exemplo: `http://localhost:3000/auth/...`
+As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `1025`. Exemplo: `http://localhost:1025/auth/...`
 
 | Tipo       | Método | Rota               | Descrição                                     |
 |------------|--------|--------------------|-----------------------------------------------|
