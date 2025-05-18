@@ -1,0 +1,70 @@
+import * as http from 'http';
+import * as path from 'path';
+import * as fs from 'fs';
+import { WebSocket, WebSocketServer } from 'ws';
+import { WebSocketUserSession} from './WebSocketUserSession';
+
+import { API } from './API';
+
+const api = new API();
+
+const clients = new Map<WebSocket, WebSocketUserSession>();
+
+const HTTP_PORT = 3000;
+const WS_PORT = 3001;
+
+const server = http.createServer((req, res) => {
+
+  // Serve arquivos estáticos da pasta public
+  let urlPath = req.url ?? '/'; // Se req.url for undefined, assume '/'
+  let filePath = path.join(__dirname, '../public', urlPath === '/' ? 'index.html' : urlPath);
+  let ext = path.extname(filePath);
+  let contentType = 'text/html';
+
+  switch(ext) {
+    case '.js': contentType = 'application/javascript'; break;
+    case '.css': contentType = 'text/css'; break;
+  }
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      res.writeHead(404);
+      res.end('Not Found');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+  });
+});
+
+const wss = new WebSocketServer({ port: WS_PORT});
+
+wss.on('connection', (ws) => {
+
+	clients.set(ws, new WebSocketUserSession(ws));
+
+    ws.on('message', (message) => {
+
+		let wsSession = clients.get(ws);
+
+		if (!wsSession) return;
+
+        api.message(wsSession, message);
+    });
+
+	ws.on('close', () =>{
+
+		let wsSession = clients.get(ws);
+
+		if (!wsSession) return;
+
+		api.close(wsSession);
+
+		clients.delete(ws);
+	});
+
+});
+
+server.listen(HTTP_PORT, () => {
+  console.log(`Server listening on http://localhost:${HTTP_PORT}`);
+});

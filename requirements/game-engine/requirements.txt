@@ -1,0 +1,142 @@
+-------------------------------------- PLAYER VS PLAYER -------------------------------------- 
+
+Um jogador nunca pode esperar por uma partida para sempre! Uma vez que ele pediu para iniciar um match, ele não pode esperar para sempre
+Uma partida precisa de dois jogadores
+Uma partida precisa esperar a confirmação dos dois jogadores para começar
+O jogo deve rodar em backend
+
+-------------------------------------- LOGICA DO MATCH --------------------------------------------------
+
+1) JOGADOR JOAO MANDA MENSAGEM: {MATCH_CREATE}
+
+    2) SERVIDOR RECEBE A MENSAGEM, E COLOCA O JOAO NA FILA DE ESPERA
+
+    3) SERVIDOR MANDA  A MENSAGEM PARA O JOAO { WAITING_PLAYERS }
+
+    [...] tempo indefinido esperando um outro jogador
+
+4) JOGADOR MARIA MANDA A MENSAGEM: {MATCH_CREATE}
+
+    5) SERVIDOR CRIA A PARTIDA
+
+    6)   SERVIDOR MANDA A MENSAGEM  { WAITING_OK } para o JOAO e para a MARIA
+    6.1) SERVIDOR FICAR ESPERANDO O { MATCH_START } da MARIA e do JOAO
+
+    7) SERVIDOR RECEBE OS DOIS { MATCH_START } DOS JOGADORES
+
+    8) SERVIDOR ENVIA A MENSAGEM { GAME_FULL } ESSA MENSAGEM SÓ SERÁ ENVIADA UMA VEZ, ELA SEMPRE VAI CONTER TODAS AS INFORMACOES DA PARTIDA E SERA ENVIADA PARA O JOAO E PARA A MARIA
+
+    9) SERVIDOR MANDA A MENSAGEM DE  CONTAGEM REGRESSIVA A CADA 1 SEGUNDO
+        {COUNT_DOWN, [TIME]}
+        {COUNT_DOWN, [TIME]}
+        ...
+        {COUNT_DOWN, [TIME]}
+       Essa mensagem pode ser enviada N vezes, ou seja, se a contagem regressiva for de 3 segundos, ela poderá ser enviada 3 vezes, se a contagem regressiva for 5 ela será enviada 5 vezes
+
+9) APÓS O "COUNT_DOWN" o servidor pode mandar vários tipos de mensagem! elas serão:
+   { PLAYER_LOSE }
+   { PLAYER_WIN }
+   { MATCH_ABORTED }
+   { GAME_STATUS }
+
+----------------------------------------- MENSAGENS --------------------------------------------------
+
+
+MENSAGENS:
+  from frontend to server:
+      { type: MATCH_CREATE }     //pedido do jogador para criar uma nova partida
+      { type: MATCH_START }      //resposta do jogador para a mensagem ESPERANDO_OK do Servidor
+      { type: PADDLE_UP }        //Evento de barrinha para baixo
+      { type: PADDLE_DOWN }      //Evento de barrinha para cima
+      { type: PLAYER_RESIGNS }   //pedido do jogador para abandonar a partida/desistir da partida
+
+  from server to frontend:
+      { type: WAITING_PLAYERS }     // avisa ao jogador que ele está esperando 1 ou mais jogadores!
+
+      { type: WAITING_OK }          // avisa os dois jogadores para que ele confirmem o inicio da partida
+
+      { type: COUNT_DOWN, [TIME] }  // avisa uma "contagem regressiva" essa mensagem é enviada a cada 1 segundo, antes do inicio da partida "é tipo um 3,2,1, vai!"
+
+      { type: PLAYER_LOSE }         // avisa que o jogador perdeu
+
+      { type: PLAYER_WIN }          // avisa que o jogador ganhou
+
+      { type: MATCH_ABORTED }       // avisa que a partida foi abortada
+
+      { type: GAME_FULL    // essa mensagem é enviada somente 1 vez, ela vai mandar todas informações necessárias antes do inicio da partida
+        id: 123456789      // o id da partida
+        field_width: 800   // o tamanho width(largura) da quadra
+        field_height: 600  // o tamanho heigth(altura) da quadra
+        paddle_height: 75  // A altura (height) das barrinhas dos jogadores é contada a partir do canto superior esquerdo da barra
+        paddle_width: 5    // A largura (width) das barrinhas dos jogadores é contada a partir do canto superior esquerdo da barra
+        paddle_player_1_height_position: 200 // posição (height) do canto superior esquerdo da barrinha do jogador 1
+        paddle_player_1_width_position: 10   // posição (width) do canto superior esquerdo da barrinha do jogador 1
+        paddle_player_2_height_position: 200 // posição (height) do canto superior esquerdo da barrinha do jogador 2
+        paddle_player_2_width_position: 10   // posição (width) do canto superior esquerdo da barrinha do jogador 2
+        ball_size: 10  // o valor do diametro da bolinha
+        ball_height_position: 89 // posicao height do raio da bolinha
+        ball_width_position: 300 // posicao width  do raio da bolinha
+        scoreboard_player_1: 0   // placar do jogador 1
+        scoreboard_player_2: 0   // placar do jogador 2
+      }
+
+      { type: GAME_STATUS
+          paddle_player_1_height_position: 200 // posição (height) do canto superior esquerdo da barrinha do jogador 1
+          paddle_player_2_height_position: 200 // posição (height) do canto superior esquerdo da barrinha do jogador 2
+          ball_height_position: 89 // posicao height do raio da bolinha
+          ball_width_position: 300 // posicao width  do raio da bolinha
+          scoreboard_player_1: 0   // placar do jogador 1
+          scoreboard_player_2: 0   // placar do jogador 2
+      }
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+deve usar node.js, não usar frameworks
+deve ter um HTML, CSS e JS do lado do cliente, o cliente deve conseguir mover os paddles, a cada ponto marcado o placar deve mudar
+Os botões de MATCH_START soh pode aparecer assim que o segundo jogador aceitar uma partida
+
+quero a estrutura do projeto em arquivo
+os comandos no terminal para rodar o servidor
+os arquivos de configuracao prontos
+o jogo deve rodar
+
+
+
+-------------------------------------------------------------------------------------------------------
+
+Quero uma explicação de como rodar o jogo.
+
+
+
+
+-------------------------------------- LOGICA DO SERVIDOR (mensageria) --------------------------------------------------
+
+1) O servidor vai receber uma conexao pelo socket
+2) O cliente ai ter que enviar na primeira mensagem uma mensagem type: AUTHENTICATION
+    2.1) Se o valor for inválido retornar AUTHENTICATION_INVALID
+
+
+CREATE_MATCH_GLOBAL
+    3) Vai receber a mensagem CREATE_MATCH_GLOBAL
+
+    4) O servidor vai verificar no arrayList JOGADORES_ESPERANDO_UMA_PARTIDA [atomica]
+        se houver nao houver jogador dentro do array jogador:
+            ele vai colocar o jogador dentro da lista e o TIMESTAMP de quando ele entrou na fila
+        se houver um jogador, ele vai remover o jogador da fila.
+    
+    5) Vai criar o GAME
+    	vai colocar esse no arrayList: GAMES_MATCH_GLOBAL
+    	
+    
+    
+
+----- IDEIAS -----
+
+O socket enviar as mensagens e elas servirem apra tudo!!
+
+
+
+
+

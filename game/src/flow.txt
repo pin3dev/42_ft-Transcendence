@@ -1,0 +1,55 @@
+
+cliente para servidor:
+    GAME_CREATE_GLOBAL_MATCH // procurar uma partida de jogo online
+      // nao pode criar um partida se ele estiver esperando um player, ou ja estiver dentro de uma partida!
+      // retornar o GAME_TYPE_NOT_APPLICABLE
+    GAME_ABORT               // abortar a partida (desiste de uma partida, ou sai da espera da fila)
+    GAME_PADDLE_UP           // manda subir o paddle
+    GAME_PADDLE_DOWN         // manda descer o paddle
+    GAME_START_MATCH         // resposta para a pergunta do servidor, Eai?! Vamos comecar
+
+servidor para cliente:
+    GAME_WAITING_NEW_PLAYER  // avisa o cliente que o o servidor estah esperando um novo cliente!
+    GAME_COUNT_DOWN          // faz a contagem regressiva
+    GAME_PLAYER_WIN          // avisa o cliente que ele venceu
+    GAME_PLAYER_LOSE         // avisa o cliente que ele perdeu
+    GAME_CAN_START           // avisa o cliente se pode comecar
+    GAME_FULL                // avisa o jogo completo para o cliente
+    GAME_STATUS              // mensagem que eh enviada a todo o momento para o cliente
+    GAME_ABORTED             // enviado aos cliente quando o tempo de espera do GAME_START_MATCH passa de X segundos
+    GAME_TYPE_NOT_APPLICABLE // quando o cliente manda um tipo que nao faz parte do contexto atual, tipo mandar um GAME_PADDLE_DOWN se estar em um game
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
