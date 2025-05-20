@@ -103,7 +103,7 @@ const { EventTypes, buildEvent, publishEvent, subscribeToEvent } = require("../.
 
 ```js  
 publishEvent(EventTypes.TYPE, {
-    userId: user.id,
+    user_id: user.id,
     email: user.email
   }, "issue-service");
 

@@ -1,4 +1,4 @@
-const User = require("../../domain/entities/user"); 
+const User = require("../domain/User"); 
 const speakeasy = require("speakeasy");
 
 async function loginUser(email, password, { userRepo, hasher }) {
@@ -36,8 +36,8 @@ async function loginUser(email, password, { userRepo, hasher }) {
 
     const response = {
       status: "2FA_REQUIRED",
-      userId: user.id,
-      ...(otpauthUrl && { otpauthUrl })
+      user_id: user.id,
+      ...(otpauthUrl && { qr_code: otpauthUrl })
     };
 
     console.log("Resposta final do loginUser:", response);

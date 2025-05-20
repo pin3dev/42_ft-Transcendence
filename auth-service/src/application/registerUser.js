@@ -1,6 +1,6 @@
-const User = require("../../domain/entities/user"); 
+const User = require("../domain/User.js"); 
 const speakeasy = require("speakeasy"); 
-const { publishEvent, EventTypes } = require("../../../pckg/redis/modules.js"); 
+const { publishEvent, EventTypes } = require("../../pckg/redis/modules.js"); 
 
 async function registerUser(email, password, { userRepo, hasher }) {
   const existing = await userRepo.findByEmail(email);
@@ -20,13 +20,13 @@ async function registerUser(email, password, { userRepo, hasher }) {
   user.setId(saved.lastID); 
 
   await publishEvent(EventTypes.USER_REGISTERED, {
-    userId: user.id,
+    user_id: user.id,
     email: user.email
   }, "auth-service");
 
   return {
-    userId: user.id,
-    otpauthUrl: secret.otpauth_url 
+    user_id: user.id,
+    qr_code: secret.otpauth_url 
   };
 }
 

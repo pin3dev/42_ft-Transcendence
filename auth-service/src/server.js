@@ -3,12 +3,13 @@ const path = require("path");
 const fs = require("fs");
 const fastifyJwt = require("@fastify/jwt");
 
-const registerRoutes = require("./api/routes/register");
-const loginRoutes = require("./api/routes/login");
-const twoFARoutes = require("./api/routes/2fa");
-const testeRoutes = require("./api/routes/teste");
+// const registerRoutes = require("./api/routes/register");
+// const loginRoutes = require("./api/routes/login");
+// const twoFARoutes = require("./api/routes/2fa");
+// const testeRoutes = require("./api/routes/teste");
+const auth_routes = require("./api/routes/auth_routes");
 
-const userRepo = require("./infrastructure/db/userRepoSqlite");
+const userRepo = require("./infrastructure/db/user_repository");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { handleUserDeleted } = require("./events/handler");
 
@@ -17,7 +18,7 @@ const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), 
 const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8");
 
 async function start() {
-  const app = Fastify();
+  const app = Fastify({ logger: true });
 
   app.register(fastifyJwt, {
     secret: {
@@ -31,10 +32,10 @@ async function start() {
   app.decorate("userRepo", userRepo);
   app.decorate("hasher", hasher);
 
-  app.register(registerRoutes);
-  app.register(loginRoutes);
-  app.register(twoFARoutes);
-  app.register(testeRoutes);
+  app.register(auth_routes);
+  // app.register(loginRoutes);
+  // app.register(twoFARoutes);
+  // app.register(testeRoutes);
   handleUserDeleted();
 
   try {

@@ -11,7 +11,7 @@ async function deleteUserProfile(userId) {
   }
   
   await publishEvent(EventTypes.USER_DELETED, {
-    userId: existing.user_id,
+    user_id: existing.user_id,
     email: existing.email
   }, "user-mgmt");
 
