@@ -17,13 +17,18 @@ Este serviço é responsável pela gestão de perfis de usuários no sistema. El
 
 ## 🔗 Rotas (expostas via API Gateway)
 
-As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `3000`. Exemplo: `http://localhost:3000/user/...`
+As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta `1025`. Exemplo: `http://localhost:1025/user/...`
 
 | Tipo | Método | Rota | Descrição |
 |:--:|:--:|:--:|:--:|
 | 🔐 Privada | GET    | `/user/profile` | Retorna os dados do perfil do usuário autenticado   |
-| 🔐 Privada | PUT    | `/user/profile`  | Atualiza os dados do usuário (próprio ou admin)     |
-| 🔐 Privada | DELETE | `/user/profile`  | Remove a conta do usuário (próprio ou admin)        |
+| 🔐 Privada | PUT    | `/user/profile` | Atualiza os dados do usuário (próprio ou admin)     |
+| 🔐 Privada | DELETE | `/user/profile` | Remove a conta do usuário (próprio ou admin)        |
+| 🔐 Privada | GET    | `/user/friends` | Retorna lista de amigos do usuário solicitante |
+| 🔐 Privada | POST   | `/user/friends/send` | Envia solicitação de amizade para target_id |
+| 🔐 Privada | POST   | `/user/friends/accept` | Aceita requisições que amizade recebidas pelo usuário |
+| 🔐 Privada | POST   | `/user/friends/remove` | Remove amizade já estabelecida |
+| 🔐 Privada | DELETE | `/user/friends/reject` | Rejeita requisições de amizade recebidas pelo usuário |
 
 > Veja a documentação do [`api-gateway`](../api-gateway/README.md) para detalhes completos dos requests/responses esperados.
 

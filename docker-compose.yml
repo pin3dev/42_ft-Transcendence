@@ -37,7 +37,7 @@ services:
       - internal_network
       - external_network
     ports:
-      - "3000:3000"
+      - "1025:1025"
     depends_on:
       - auth-service
       - event-bus 
