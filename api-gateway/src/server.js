@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const Fastify = require("fastify");
 //const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
