@@ -43,7 +43,7 @@ services:
       - event-bus 
       - user-mgmt
     volumes:
-      - ./api-gateway:/app
+      # - ./api-gateway:/app
       - ./pckg/redis:/app/pckg/redis:ro 
 
   auth-service:

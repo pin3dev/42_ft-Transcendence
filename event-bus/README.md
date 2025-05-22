@@ -8,17 +8,9 @@ O `event-bus` é um serviço interno que atua como barramento de eventos para os
 
 ## 🔧 Como funciona
 
-- Os microsserviços (como `auth-service`, `user-management`) **publicam eventos** no Redis (por exemplo, `user.registered`, `auth.success`, etc.).
-- O `event-bus` **ouve todos os canais de eventos** relevantes e os **redistribui** aos serviços interessados.
+- Os microsserviços (como `auth-service`, `user-management`) **publicam eventos** no Redis utilizando a função `publishEvent` (por exemplo, `user.registered`, `user.deleted`, etc.).
+- O `event-bus` **ouve canais de eventos** relevantes através da função `subscribeToEvent` e os **redistribui** aos serviços interessados.
 - Ele atua como um **roteador de mensagens internas**, garantindo que eventos sejam propagados corretamente entre os serviços.
-
----
-
-## 🧱 Tecnologias Utilizadas
-
-- **Node.js**
-- **Redis** (pub/sub, cache)
-- **Docker** (via Docker Compose)
 
 ---
 
@@ -33,15 +25,60 @@ Exemplos de eventos tratados:
 
 ---
 
-<!--
-## ⚙️ Configuração
+## 🔁 Funções Disponíveis
 
-O serviço utiliza variáveis de ambiente para se conectar ao Redis:
+### 1. **Publicar Eventos**
 
-```env
-REDIS_HOST=redis
-REDIS_PORT=6379
--->
+A função `publishEvent` é usada para publicar eventos em um canal específico no Redis.
+
+```javascript
+const { publishEvent } = require("./pckg/redis/modules.js");
+
+publishEvent("user.registered", {
+  user_id: 123,
+  email: "usuario@email.com"
+}, "auth-service");
+```
+
+### 2. **Assinar Eventos**
+
+A função `subscribeToEvent` é usada para escutar eventos de um canal específico no Redis.
+
+```javascript
+const { subscribeToEvent } = require("./pckg/redis/modules.js");
+
+subscribeToEvent("user.registered", (event) => {
+  console.log("Evento recebido:", event);
+});
+```
+
+### 3. **Gerenciar Cache**
+
+O `event-bus` também fornece funções para gerenciar cache no Redis:
+
+- **`setCache`**: Define um valor no cache com ou sem TTL.
+  ```javascript
+  const { setCache } = require("./pckg/redis/modules.js");
+
+  setCache("user:123", { name: "John Doe" }, 3600); // TTL de 1 hora
+  ```
+
+- **`getCache`**: Recupera um valor do cache.
+  ```javascript
+  const { getCache } = require("./pckg/redis/modules.js");
+
+  const user = await getCache("user:123");
+  console.log(user);
+  ```
+
+- **`deleteCache`**: Remove um valor do cache.
+  ```javascript
+  const { deleteCache } = require("./pckg/redis/modules.js");
+
+  deleteCache("user:123");
+  ```
+
+---
 
 ## 🧪 Comandos para Teste
 
@@ -82,53 +119,64 @@ docker exec -it event-bus redis-cli
 
 ---
 
-## 🔁 Implementação do Redis em Serviços Internos
-
-Para integrar serviços com o `event-bus` (publicar/assinar eventos):
-
-### 1. Montar bind volume no `docker-compose.yml`
-
-```yaml
-volumes:
-  - ./pckg/redis:/app/pckg/redis:ro 
-```
-
-### 2. Importar os utilitários do `event-bus`
-
-```js  
-const { EventTypes, buildEvent, publishEvent, subscribeToEvent } = require("../../../pckg/redis/modules.js");
-```  
-
-### 3. Publicar e Assinar eventos
-
-```js  
-publishEvent(EventTypes.TYPE, {
-    userId: user.id,
-    email: user.email
-  }, "issue-service");
-
-subscribeToEvent(EventTypes.TYPE, (event) => {
-  //...
-});
-```
-
----
-
 ## 📁 Estrutura do Projeto
 
 ```bash
 packages/
 ├── redis/
-│    ├── src/   
-│    │    ├── cache.js            # Funções de get e set de cache no event-bus
-│    │    ├── connect.js          # Servidor de comunicação entre funções e serviço event-bus
-│    │    ├── events.js           # Funções de publicação e subscrição de eventos no event-bus
-│    │    └── eventsHelper.js     # Canais de eventos e Função de criação de Evento
-│    └── modules.js               # Exporta os módulos para uso externo
+│    ├── cache/            # Funções de cache no Redis
+│    │    ├── cache.js            # Exporta funções de cache
+│    │    ├── setCache.js         # Define valores no cache
+│    │    ├── getCache.js         # Recupera valores do cache
+│    │    └── deleteCache.js      # Remove valores do cache
+│    ├── events/           # Funções de eventos no Redis
+│    │    ├── events.js           # Exporta funções de eventos
+│    │    ├── publishEvent.js     # Publica eventos
+│    │    ├── subscribeToEvent.js # Assina eventos
+│    │    └── eventsHelper.js     # Helper para eventos
+│    └── modules.js        # Exporta todos os módulos
 └── ...
 ```
 
 ---
 
-> \[!NOTE]
-> O `event-bus` deve estar sempre em execução no ambiente para garantir a propagação correta de eventos. Ele é a espinha dorsal da comunicação assíncrona entre os serviços.
+## 🗂️ Configuração de Volumes no Docker Compose
+
+O cache e os eventos do Redis são gerenciados por meio de um volume compartilhado configurado no `docker-compose.yml`:
+
+### Cache
+O volume `event-data` é usado para armazenar os dados do cache do Redis:
+
+```yaml
+volumes:
+  event-data:
+    name: event-data
+```
+
+Este volume é montado no container do `event-bus` para garantir que os dados do cache sejam persistidos:
+
+```yaml
+services:
+  event-bus:
+    build:
+      context: ./event-bus
+    container_name: event-bus
+    networks:
+      - internal_network
+    expose:
+      - "6379"
+    volumes:
+      - event-data:/data
+```
+
+### Eventos
+Os eventos publicados e assinados não são armazenados diretamente no Redis. Em vez disso, as funções padrão para eventos e cache são compartilhadas entre os serviços por meio do volume:
+
+```yaml
+volumes:
+  - ./pckg/redis:/app/pckg/redis:ro
+```
+
+Isso permite que todos os serviços (`api-gateway`, `auth-service`, `user-mgmt`) utilizem as mesmas funções para publicar e assinar eventos, garantindo consistência e reutilização de código.
+
+> **Nota:** Certifique-se de que o volume `event-data` e o volume compartilhado `./pckg/redis` estejam configurados corretamente para evitar problemas de sincronização.

@@ -22,7 +22,6 @@ iclean: stop
 
 vclean: iclean
 	docker compose -f docker-compose.yml down --rmi all -v
-	@sudo rm -rf home
 
 fclean: vclean
 	docker system prune -af

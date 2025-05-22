@@ -4,10 +4,10 @@ const profileRepo = require("../infrastructure/db/profile_repository.js");
 
 function handleUserRegistered() {
   subscribeToEvent(EventTypes.USER_REGISTERED, async (event) => {
-    const { userId, email } = event.data;
+    const { user_id, email } = event.data;
 
     try {
-      const profile = await UserProfile.create({ userId, email }, profileRepo.nameExists);
+      const profile = await UserProfile.create({ user_id, email }, profileRepo.nameExists);
       await profileRepo.save(profile);
       console.log(`[user-mgmt] Perfil criado para ${profile.name}`);
     } catch (err) {

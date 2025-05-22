@@ -1,6 +1,6 @@
 class UserProfile {
-  constructor({ userId, name, avatarUrl }) {
-    this.userId = userId;
+  constructor({ user_id, name, avatarUrl }) {
+    this.userId = user_id;
     this.name = name;
     this.avatarUrl = avatarUrl;
     this.updatedAt = new Date().toISOString();
@@ -22,12 +22,12 @@ class UserProfile {
     return name;
   }
 
-  static async create({ userId, email }, checkNameExists) {
+  static async create({ user_id, email }, checkNameExists) {
     const baseName = this.slugifyEmail(email);
     const name = await this.generateUniqueName(baseName, checkNameExists);
     const avatarUrl = "/avatars/default.jpg"; // ou um caminho relativo no volume
 
-    return new UserProfile({ userId, name, avatarUrl });
+    return new UserProfile({ user_id, name, avatarUrl });
   }
 }
 

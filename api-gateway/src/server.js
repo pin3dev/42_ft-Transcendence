@@ -24,13 +24,22 @@ async function buildServer() {
     try {
       await request.jwtVerify(); 
       //console.log("request user:", request.user)
-      const isDeleted = await getCache(`delUser:${request.user.userId}`);
+      
+      // Ivany: aplicação de cache
+      // const isDeleted = await getCache(`delUser:${request.user.userId}`);
+
+      const { user_id } = request.user;
+      if (!user_id) {
+        return reply.code(401).send({ error: "Token inválido: user_id ausente" });
+      }
+      const isDeleted = await getCache(`delUser:${user_id}`);
 
       if (isDeleted) {
         const error = new Error("Usuário excluído");
         error.statusCode = 401;
         throw error;
       }
+
     } catch (err) {
       //console.log("JWT FALHOU:", err.name, err.message);
       reply.code(401).send(err);
@@ -61,7 +70,7 @@ async function buildServer() {
     target: "http://user-mgmt:5000",
     onRequest: async (request, reply) => {
       await app.authenticate(request, reply);
-      request.headers['x-user-id'] = request.user.userId;
+      request.headers['x-user-id'] = request.user.user_id;
       request.headers['x-user-email'] = request.user.email; //ver se precisa manter isso já que não ta sendo usado
     }
   }));
