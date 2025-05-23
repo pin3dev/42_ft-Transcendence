@@ -1,31 +1,18 @@
 services:
-#  frontend:
-#    build: 
-#      context: ./frontend
-#    container_name: transcendence_frontend
-#    networks:
-#      - external_network # rede externa para acesso público
-#    environment:
-#      - NODE_ENV=production
-#    volumes:
-#      - ./frontend:/app
-#      - /app/node_modules
-#
-#  nginx:
-#    build:
-#      context: ./nginx
-#      dockerfile: Dockerfile
-#    container_name: transcendence_nginx
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#      - ./nginx/conf.d:/etc/nginx/conf.d
-#      - ./frontend/dist:/usr/share/nginx/html:ro
-#    networks:
-#      - external_network # rede externa para acesso público
-#    depends_on:
-#      - frontend
+  frontend:
+    build:
+      context: ./Front
+      dockerfile: Dockerfile
+    volumes:
+      - ./Front:/frontend
+      - /frontend/node_modules
+    ports:
+      - "3000:3000"
+    command: dev
+    depends_on:
+      - api-gateway
+    networks:
+      - external_network
 
   api-gateway:
     build:
