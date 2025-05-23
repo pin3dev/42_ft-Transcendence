@@ -1,0 +1,263 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 180 100% 50%;
+    --primary-foreground: 210 20% 10%;
+
+    --secondary: 300 100% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 15%;
+    --muted-foreground: 210 20% 80%;
+
+    --accent: 120 100% 54%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 5% 26%;
+    --input: 240 5% 26%;
+    --ring: 180 100% 50%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 300 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 120 100% 54%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 240 5% 26%;
+    --sidebar-ring: 180 100% 50%;
+    
+    --arcade-grid: linear-gradient(rgba(39, 39, 39, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(39, 39, 39, 0.5) 1px, transparent 1px);
+  }
+}
+
+@font-face {
+  font-family: 'Arcade';
+  src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  font-display: swap;
+}
+
+@layer base {
+  .border-border{
+    @apply border border-gray-200;
+  }
+
+  body {
+    @apply bg-arcade-dark text-foreground;
+    background-size: 30px 30px;
+    background-image: var(--arcade-grid);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+
+  h1 {
+    @apply text-4xl sm:text-5xl md:text-6xl;
+  }
+  
+  h2 {
+    @apply text-3xl sm:text-4xl;
+  }
+  
+  button, .btn {
+    @apply transition-all duration-200;
+  }
+}
+
+/* Custom Animations */
+@keyframes glow {
+  0%, 100% { 
+    text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF, 0 0 15px #00FFFF;
+  }
+  50% { 
+    text-shadow: 0 0 20px #00FFFF, 0 0 25px #00FFFF, 0 0 30px #00FFFF;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-neon {
+  0%, 100% { 
+    box-shadow: 0 0 5px #D946EF, 0 0 10px #D946EF;
+  }
+  50% { 
+    box-shadow: 0 0 15px #D946EF, 0 0 20px #D946EF;
+  }
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Utility classes */
+.neon-text {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.neon-border {
+  @apply border-2 border-neon-blue;
+  animation: pulse-neon 2s infinite;
+}
+
+.arcade-container {
+  @apply border-2 border-neon-purple rounded-md p-4 bg-opacity-80 backdrop-blur-sm;
+}
+
+.bg-neon-gradient {
+  background: linear-gradient(45deg, #00FFFF, #8B5CF6, #D946EF);
+  background-size: 200% 200%;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s infinite;
+}
+
+.animate-gradient-flow {
+  animation: gradient-flow 5s ease infinite;
+}
+
+/* Color utilities that would normally be in Tailwind config */
+.bg-arcade-dark {
+  background-color: #0A0A0A;
+}
+
+.bg-arcade-darker {
+  background-color: #000000;
+}
+
+.bg-arcade-darkPurple {
+  background: linear-gradient(60deg, #067a7a, #442f74, #853192);
+}
+
+.bgp-arcade-darkPurple {
+  /* Suas outras classes Tailwind (min-h-screen flex flex-col) */
+  position: relative; /* Essencial para posicionar o ::before */
+  overflow: hidden;   /* Essencial para cortar o ::before que é maior */
+  /* Cor de fundo de fallback, caso o gradiente não funcione ou demore */
+  background-color: #230a5c;
+  /* Garante que o conteúdo fique acima do pseudo-elemento */
+  z-index: 0;
+}
+
+.bgp-arcade-darkPurple::before {
+  content: "";
+  position: absolute;
+  top: -100%;  /* Metade do excesso de tamanho */
+  left: -100%; /* Metade do excesso de tamanho */
+  width: 300%;  /* Maior que o pai para cobrir durante a rotação */
+  height: 300%; /* Maior que o pai para cobrir durante a rotação */
+  z-index: -1;  /* Coloca o pseudo-elemento atrás do conteúdo do .bgp-arcade-darkPurple */
+
+  background: linear-gradient(
+    0deg, /* O ângulo aqui pode ser fixo, pois vamos rotacionar o pseudo-elemento */
+    #ff00ff,
+    #000000,
+    #000000
+  );
+  animation: rotatePseudoGradient 2s linear infinite;
+}
+
+/* Sua animação atual, mas agora ela rotaciona o ::before */
+@keyframes rotatePseudoGradient {
+0% {
+  transform: rotate(0deg);
+}
+100% {
+  transform: rotate(360deg);
+}
+}
+.bg-arcade-darker-creator{
+  background-color: #e100ff2d;
+
+}
+
+.text-neon-blue{
+  color: #00FFFF;
+  background-color: #000000;
+}
+
+.bg-neon-blue {
+  color: #000000;
+  background-color: #00FFFF;
+}
+
+.text-neon-purple, .bg-neon-purple {
+  color: #000000;
+  background-color: #8B5CF6;
+}
+
+.text-neon-pink {
+  color: #D946EF;
+  background-color: #000000;
+}
+
+.bg-neon-pink{
+  color: #000000;
+  background-color: #D946EF;
+}
+
+.text-neon-green{
+  color: #39FF14;
+  background-color: #000000;
+}
+
+.bg-neon-green {
+  color: #000000;
+  background-color: #39FF14;
+}
+
+.text-neon-orange{
+  color: #F97316;
+  background-color: #000000;
+}
+
+.bg-neon-orange {
+  color: #000000;
+  background-color: #F97316;
+}
+
+.border-neon-blue {
+  border-color: #00FFFF;
+}
+
+.border-neon-purple {
+  border-color: #8B5CF6;
+}
+
+.border-neon-pink {
+  border-color: #D946EF;
+}
+
+.border-neon-green {
+  border-color: #39FF14;
+}
+
+.border-neon-orange {
+  border-color: #F97316;
+}
