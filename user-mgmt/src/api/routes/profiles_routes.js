@@ -9,7 +9,7 @@ module.exports = async function (fastify) {
     handler: getUser_controller,
   });
 
-  fastify.put("/user/profile", {
+  fastify.patch("/user/profile", {
     schema: updateUser_schema,
     handler: updateUser_controller,
   });

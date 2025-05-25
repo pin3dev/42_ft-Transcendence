@@ -16,7 +16,7 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS user_profiles (
       user_id TEXT PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
-      avatar_url TEXT,
+      avatar_path TEXT,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
