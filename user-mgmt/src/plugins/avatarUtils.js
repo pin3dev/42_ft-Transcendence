@@ -34,10 +34,17 @@ function saveAvatar(file, userId) {
       // Se o arquivo foi salvo em um caminho temporário, copiar de lá
       console.log(`Copiando de arquivo temporário: ${file.filepath}`);
       fs.copyFileSync(file.filepath, filepath);
-    } else if (file.data && Buffer.isBuffer(file.data)) {
+      console.log("Arquivo copiado com sucesso");
+    } else if (file.data) {
       // Se temos o conteúdo do arquivo como Buffer
       console.log('Salvando a partir de buffer de dados');
       fs.writeFileSync(filepath, file.data);
+      console.log("Arquivo salvo com sucesso a partir do buffer");
+    } else if (file._buf) {
+      // Alguns plugins armazenam o buffer em _buf
+      console.log('Salvando a partir de _buf');
+      fs.writeFileSync(filepath, file._buf);
+      console.log("Arquivo salvo com sucesso a partir de _buf");
     } else {
       // Não foi possível identificar como salvar o arquivo
       console.error('Formato de arquivo não reconhecido:', file);

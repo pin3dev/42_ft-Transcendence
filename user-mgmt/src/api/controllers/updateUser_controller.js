@@ -1,5 +1,6 @@
 const updateUserProfile = require("../../application/updateUserProfile");
 const fs = require('fs');
+const path = require('path');
 
 async function updateUser_controller(request, reply) {
   const userId = request.headers["x-user-id"];
@@ -29,12 +30,32 @@ async function updateUser_controller(request, reply) {
     if (request.body.avatar && request.body.avatar.filename) {
       console.log(`Avatar recebido: ${request.body.avatar.filename}`);
       
-      // Com attachFieldsToBody: true, o avatar estará em request.body.avatar
-      data.avatar = {
-        filename: request.body.avatar.filename,
-        mimetype: request.body.avatar.mimetype,
-        filepath: request.body.avatar.filepath
-      };
+      try {
+        // Converter o arquivo para buffer
+        const fileBuffer = await request.body.avatar.toBuffer();
+        
+        // Salvar o buffer em um arquivo temporário para o processamento
+        const tmpDir = path.join(__dirname, '../../../tmp');
+        if (!fs.existsSync(tmpDir)) {
+          fs.mkdirSync(tmpDir, { recursive: true });
+        }
+        
+        const tempFilePath = path.join(tmpDir, `temp-${Date.now()}-${request.body.avatar.filename}`);
+        fs.writeFileSync(tempFilePath, fileBuffer);
+        
+        console.log(`Arquivo temporário criado em: ${tempFilePath}`);
+        
+        // Com attachFieldsToBody: true, o avatar estará em request.body.avatar
+        data.avatar = {
+          filename: request.body.avatar.filename,
+          mimetype: request.body.avatar.mimetype,
+          filepath: tempFilePath,
+          size: fileBuffer.length
+        };
+      } catch (fileError) {
+        console.error("Erro ao processar arquivo:", fileError);
+        return reply.code(400).send({ error: "Erro ao processar o arquivo enviado" });
+      }
     }
     
     console.log("Dados extraídos com sucesso:", data);
