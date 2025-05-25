@@ -29,12 +29,12 @@ export function renderRegister(): void {
 
     // Renderiza o formulário dentro do container com todos os callbacks atualizados
     renderRegisterForm(formContainer, {
-      onLoginSuccess: (token) => {
+      onRegisterSuccess: () => {
         // Armazena o token JWT (para uso posterior em chamadas API)
-        localStorage.setItem('authToken', token);
+        //localStorage.setItem('authToken', token);
         
         // Mostra feedback visual
-        showToast('Cadastro realizado com sucesso!', 'success');
+        showToast('Registro realizado com sucesso!', 'success');
         
         // Redireciona para a página inicial
         window.location.hash = '#/';
@@ -42,17 +42,17 @@ export function renderRegister(): void {
         // Se estiver usando um roteador SPA:
         // router.navigate('/');
       },
-      onLoginError: (error) => {
+      onRegisterError: (error) => {
         console.error('Erro no login:', error);
         showToast(error, 'error');
       },
-      on2FASuccess: () => {
+      //on2FASuccess: () => {
         // Callback adicional para quando a 2FA for verificada
-        showToast('Verificação em duas etapas concluída!', 'success');
+       // showToast('Verificação em duas etapas concluída!', 'success');
         
         // O token já foi tratado no onLoginSuccess,
         // esta função é opcional para feedback adicional
-      }
+      //}
     });
     
     // Adiciona o formulário ao main

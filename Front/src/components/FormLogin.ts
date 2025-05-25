@@ -6,15 +6,16 @@ interface FormLoginConfig {
   parentElement?: HTMLElement;
   onLoginSuccess?: () => void;
   onLoginError?: (error: string) => void;
+  //on2FASuccess?: (userId: number, qrCode?: string) => void;
 }
 
 // Classe principal do componente
 export class FormLogin {
   private formElement: HTMLDivElement;
-  private emailInput: HTMLInputElement;
-  private passwordInput: HTMLInputElement;
-  private togglePasswordButton: HTMLDivElement;
-  private loginForm: HTMLFormElement;
+  private emailInput!: HTMLInputElement;
+  private passwordInput!: HTMLInputElement;
+  private togglePasswordButton!: HTMLDivElement;
+  private loginForm!: HTMLFormElement;
 
   constructor(private config: FormLoginConfig = {}) {
     this.formElement = this.createFormStructure();
@@ -248,9 +249,9 @@ export class FormLogin {
       
       // 2. Verificar se precisa de 2FA
       if (loginResponse.requires2FA) {
-        this.show2FAPopup();
+        //this.show2FAPopup();
       } else {
-        this.config.onLoginSuccess?.(loginResponse.token);
+        this.config.onLoginSuccess?.();
       }
     } catch (error) {
       this.config.onLoginError?.(error instanceof Error ? error.message : 'Erro desconhecido');
@@ -262,7 +263,7 @@ export class FormLogin {
   }
 
   private async sendLoginRequest(email: string, password: string): Promise<{ requires2FA: boolean; token?: string }> {
-    const response = await fetch('1025/auth/login', {
+    const response = await fetch('http://localhost:1025/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -279,7 +280,7 @@ export class FormLogin {
     return await response.json();
   }
 
-  private show2FAPopup(): void {
+  /*private show2FAPopup(): void {
     // Cria overlay
     const overlay = document.createElement('div');
     overlay.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50';
@@ -316,9 +317,9 @@ export class FormLogin {
       submitButton.innerHTML = '<span class="loading-spinner"></span>';
 
       try {
-        await this.verify2FACode(code);
+        //await this.verify2FACode(code);
         overlay.remove();
-        this.config.on2FASuccess?.();
+        //this.config.on2FASuccess?.();
       } catch (error) {
         showToast('Código inválido', 'error');
       } finally {
@@ -344,7 +345,7 @@ export class FormLogin {
     });
   }
 
-  private async verify2FACode(code: string): Promise<void> {
+private async verify2FACode(code: string): Promise<void> {
     const response = await fetch('http://localhost:3000/auth/2fa/verify', {
       method: 'POST',
       headers: {
@@ -359,7 +360,7 @@ export class FormLogin {
 
     const data = await response.json();
     this.config.onLoginSuccess?.(data.token);
-  }
+  }*/
   
 
   // Cria divisão "ou continue com"
@@ -461,9 +462,12 @@ export class FormLogin {
     // Form submission
     this.loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.handleLogin();
-    });
-
+        // Captura o botão de envio
+    const submitButton = this.loginForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+    if (submitButton) {
+      this.handleLogin(submitButton);
+    }
+  });
   }
 
   // // Manipula o login normal

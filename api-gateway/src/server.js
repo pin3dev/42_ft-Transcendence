@@ -1,6 +1,6 @@
 // require("dotenv").config();
 const Fastify = require("fastify");
-//const corsPlugin = require("./plugins/cors");
+const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
 const fs = require("fs");
 const path = require("path");
@@ -11,7 +11,20 @@ const { getCache } = require("../pckg/redis/modules.js");
 async function buildServer() {
   const app = Fastify();
 
-  //await app.register(corsPlugin);
+  await app.register(corsPlugin);
+
+  app.addHook("onRequest", async (request, reply) => {
+    console.log(`[API Gateway] Requisição recebida: ${request.method} ${request.url}`);
+    console.log(`[API Gateway] Headers:`, request.headers);
+  });
+
+  app.addHook("onSend", async (request, reply, payload) => {
+    reply.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    reply.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    reply.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    reply.header("Access-Control-Allow-Credentials", "true");
+    return payload;
+  });
 
   await app.register(jwt, {
     secret: async () => publicKey,  
@@ -54,6 +67,8 @@ async function buildServer() {
     prefix: "/auth",
     target: "http://auth-service:4000"
   }));
+
+  
 
   // app.register(createServiceProxy({
   //   prefix: "/teste",
