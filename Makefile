@@ -38,4 +38,6 @@ ils:
 nls:
 	docker networks ls
 
+re: fclean all
+
 .SILENT:
