@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@fastify/jwt": "^8.0.1",
+    "docker": "^1.0.0",
+    "docker-compose": "^1.2.0",
     "dotenv": "^16.5.0"
   }
 }
