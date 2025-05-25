@@ -4,18 +4,17 @@ import { showToast } from '../utils/toast';
 // Interface para tipagem do componente
 interface FormRegisterConfig {
   parentElement?: HTMLElement;
-  onLoginSuccess?: () => void;
-  onLoginError?: (error: string) => void;
+  onRegisterSuccess?: () => void;
+  onRegisterError?: (error: string) => void;
 }
 
 // Classe principal do componente
 export class FormRegister {
   private formElement: HTMLDivElement;
-  private nicknameInput: HTMLInputElement;
-  private emailInput: HTMLInputElement;
-  private passwordInput: HTMLInputElement;
-  private togglePasswordButton: HTMLDivElement;
-  private RegisterForm: HTMLFormElement;
+  private emailInput!: HTMLInputElement;
+  private passwordInput!: HTMLInputElement;
+  private togglePasswordButton!: HTMLDivElement;
+  private RegisterForm!: HTMLFormElement;
 
   constructor(private config: FormRegisterConfig = {}) {
     this.formElement = this.createFormStructure();
@@ -84,9 +83,6 @@ export class FormRegister {
     form.id = 'login-form';
     form.className = 'space-y-4';
 
-    // Adiciona campo de nickname
-    form.appendChild(this.createNicknameInput());
-
     // Adiciona campo de email
     form.appendChild(this.createEmailInput());
 
@@ -102,33 +98,6 @@ export class FormRegister {
 
 
     return form;
-  }
-
-  private createNicknameInput(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'space-y-1';
-
-    const label = document.createElement('label');
-    label.htmlFor = 'nickname';
-    label.className = 'text-sm text-gray-300';
-    label.textContent = 'Nickname';
-
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'relative';
-
-    // Input de email
-    this.nicknameInput = document.createElement('input');
-    this.nicknameInput.id = 'nickname';
-    this.nicknameInput.type = 'nickname';
-    this.nicknameInput.placeholder = 'igenial';
-    this.nicknameInput.className = 'flex h-10 w-full rounded-md border border-neon-blue bg-arcade-dark px-3 pl-9 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:border-neon-green disabled:cursor-not-allowed disabled:opacity-50 md:text-sm text-white';
-    this.nicknameInput.required = true;
-
-    inputContainer.appendChild(this.nicknameInput);
-    container.appendChild(label);
-    container.appendChild(inputContainer);
-
-    return container;
   }
 
   // Cria campo de email
@@ -224,9 +193,8 @@ export class FormRegister {
   private async handleRegister(button: HTMLButtonElement): Promise<void> {
     const email = this.emailInput.value;
     const password = this.passwordInput.value;
-    const nickname = this.nicknameInput.value;
 
-    if (!email || !password || !nickname) {
+    if (!email || !password) {
       showToast('Por favor, preencha todos os campos!', 'error');
       return;
     }
@@ -237,17 +205,17 @@ export class FormRegister {
 
     try {
       // 1. Fazer login inicial
-      const RegisterResponse = await this.sendRegisterRequest(nickname, email, password);
+      const RegisterResponse = await this.sendRegisterRequest(email, password);
       
       // 2. Verificar se precisa de 2FA
       if (RegisterResponse) {
-        showToast('Login bem-sucedido!', 'success');
-        this.config.onLoginSuccess?.();
+        this.config.onRegisterSuccess?.();
       } else {
-        showToast('Não foi possivel cadastrar', 'error');
+        showToast('Não foi possível realizar o registro', 'error');
       }
     } catch (error) {
-      this.config.onLoginError?.(error instanceof Error ? error.message : 'Erro desconhecido');
+      console.error('Erro no registro:', error);
+      showToast(error instanceof Error ? error.message : 'Erro desconhecido', 'error');
     } finally {
       // Restaura o botão
       button.disabled = false;
@@ -255,7 +223,8 @@ export class FormRegister {
     }
   }
 
-  private async sendRegisterRequest(nickname: string, email: string, password: string) {
+  private async sendRegisterRequest(email: string, password: string) {
+    console.log('Enviando dados para registro:', { email, password });
     const response = await fetch('http://localhost:1025/auth/register', {
       method: 'POST',
       headers: {
@@ -263,14 +232,23 @@ export class FormRegister {
       },
       body: JSON.stringify({ email, password }),
     });
-    console.log(JSON.stringify(response));
-    console.log(JSON.stringify({ email, password }));
 
     if (!response.ok) {
-      throw new Error('Credenciais inválidas');
+      const error = await response.json();
+      console.error('Erro recebido do backend:', error);
+      if (error.error && error.error.includes("Email já cadastrado")) {
+        throw new Error('Este e-mail já está registrado. Por favor, use outro.');
+      }
+      throw new Error(error.message || 'Erro ao registrar');
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    console.log('User ID:', data.user_id);
+    console.log('Message:', data.message);
+    console.log('QR Code:', data.qr_code);
+
+    return data;
   }
 
 
@@ -359,7 +337,13 @@ export class FormRegister {
     // Form submission
     this.RegisterForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.handleRegister();
+      // Captura o botão de envio
+      const submitButton = this.RegisterForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+      // Chama handleRegister com o botão
+      if (submitButton) {
+        this.handleRegister(submitButton);
+    }
     });
 
   }
