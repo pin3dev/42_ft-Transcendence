@@ -7,6 +7,7 @@ interface FormLoginConfig {
   parentElement?: HTMLElement;
   onLoginSuccess?: (response?: any) => void; // Permite um argumento opcional
   onLoginError?: (error: string) => void;
+  //on2FASuccess?: (userId: number, qrCode?: string) => void;
 }
 
 // Classe principal do componente
