@@ -1,14 +1,14 @@
 // src/pages/LoginPages.ts
-
 import { renderLoginForm } from '../components/FormLogin';
 import { createFooter } from '../components/Footer';
 import { createNavbar } from '../components/Navbar';
 import { showToast } from '../utils/toast';
+import { render2FAPage } from './2faPage';
 
 export function renderLogin(): void {
   const root = document.getElementById('root');
   if (!root) return;
-  
+
   // Limpa o conteúdo anterior (se necessário)
   root.innerHTML = '';
 
@@ -18,52 +18,54 @@ export function renderLogin(): void {
 
   // Adiciona a navbar
   container.appendChild(createNavbar());
-  
+
   // Cria o elemento main que vai conter o formulário
   const main = document.createElement('main');
   main.className = 'flex-grow container mx-auto px-4 py-8 flex justify-center items-center';
-  
+
   // Cria um container específico para o formulário
   const formContainer = document.createElement('div');
   formContainer.className = 'w-full max-w-lg';
-  
+
   // Renderiza o formulário dentro do container com todos os callbacks atualizados
   renderLoginForm(formContainer, {
-    onLoginSuccess: () => {
-      // Armazena o token JWT (para uso posterior em chamadas API)
-      //localStorage.setItem('authToken', token);
-      
-      // Mostra feedback visual
-      showToast('Credenciais corretas. Autenticação de dois fatores necessária!', 'success');
-      
-      // Redireciona para a página inicial
-      window.location.hash = '#/';
-      
-      // Se estiver usando um roteador SPA:
-      // router.navigate('/');
+    onLoginSuccess: async (response) => {
+      console.log('Resposta do backend:', response); // Verifique a resposta no console
+  
+      if (!response) {
+        console.error('Resposta de login está indefinida.');
+        return;
+      }
+  
+      // Armazena o user_id no localStorage
+      localStorage.setItem('user_id', response.user_id);
+  
+      // Verifica se o backend exige 2FA
+      if (response.status === '2FA_REQUIRED') {
+        showToast('Autenticação de dois fatores necessária!', 'info');
+  
+        // Redireciona para a página de 2FA com ou sem QR Code
+        render2FAPage(response.qr_code || null); // Passa null se qr_code não estiver presente
+      } else {
+        showToast('Login bem-sucedido!', 'success');
+        window.location.hash = '#/'; // Redireciona para a página inicial
+      }
     },
     onLoginError: (error) => {
       console.error('Erro no login:', error);
       showToast(error, 'error');
-    },
-    //on2FASuccess: () => {
-      // Callback adicional para quando a 2FA for verificada
-     // showToast('Verificação em duas etapas concluída!', 'success');
-      
-      // O token já foi tratado no onLoginSuccess,
-      // esta função é opcional para feedback adicional
-    //}
+    }
   });
-  
+
   // Adiciona o formulário ao main
   main.appendChild(formContainer);
-  
+
   // Adiciona o main ao container principal
   container.appendChild(main);
-  
+
   // Adiciona o footer
   container.appendChild(createFooter());
-  
+
   // Insere tudo no DOM
   root.appendChild(container);
 

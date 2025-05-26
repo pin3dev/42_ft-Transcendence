@@ -1,5 +1,6 @@
 const User = require("../domain/User"); 
 const speakeasy = require("speakeasy");
+const QRCode = require("qrcode");
 
 async function loginUser(email, password, { userRepo, hasher }) {
   const userData = await userRepo.findByEmail(email);
@@ -24,7 +25,8 @@ async function loginUser(email, password, { userRepo, hasher }) {
 
   if (user.requiresTwoFA()) {
     let otpauthUrl = null;
-
+    let qrCodeImage = null;
+    
     if (!userData.first2FALoginDone) {
       console.log("Primeira vez com 2FA, gerando QR para:", user.email);
       otpauthUrl = speakeasy.otpauthURL({
@@ -32,12 +34,14 @@ async function loginUser(email, password, { userRepo, hasher }) {
         label: `Transcendence:${user.email}`,
         encoding: "base32"
       });
+
+      qrCodeImage = await QRCode.toDataURL(otpauthUrl);
     }
 
     const response = {
       status: "2FA_REQUIRED",
       user_id: user.id,
-      ...(otpauthUrl && { qr_code: otpauthUrl })
+      ...(qrCodeImage && { qr_code: qrCodeImage }),
     };
 
     console.log("Resposta final do loginUser:", response);

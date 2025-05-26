@@ -23,6 +23,7 @@
     "bcrypt": "^5.1.1",
     "fastify": "^5.2.2",
     "ioredis": "^5.6.1",
+    "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
     "sqlite3": "^5.1.7"
   },

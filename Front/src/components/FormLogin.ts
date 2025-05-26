@@ -1,10 +1,11 @@
 // src/components/FormLogin.ts
 import { showToast } from '../utils/toast';
+import { render2FAPage } from '../pages/2faPage';
 
 // Interface para tipagem do componente
 interface FormLoginConfig {
   parentElement?: HTMLElement;
-  onLoginSuccess?: () => void;
+  onLoginSuccess?: (response?: any) => void; // Permite um argumento opcional
   onLoginError?: (error: string) => void;
   //on2FASuccess?: (userId: number, qrCode?: string) => void;
 }
@@ -233,27 +234,29 @@ export class FormLogin {
   private async handleLogin(button: HTMLButtonElement): Promise<void> {
     const email = this.emailInput.value;
     const password = this.passwordInput.value;
-
+  
     if (!email || !password) {
       showToast('Por favor, preencha todos os campos!', 'error');
       return;
     }
-
+  
     // Mostra estado de loading
     button.disabled = true;
     button.innerHTML = '<span class="loading-spinner"></span>';
-
+  
     try {
-      // 1. Fazer login inicial
+      // Fazer login inicial
       const loginResponse = await this.sendLoginRequest(email, password);
-      
-      // 2. Verificar se precisa de 2FA
+      console.log('Resposta do login:', loginResponse);
+  
+      // Verificar se precisa de 2FA
       if (loginResponse.requires2FA) {
-        //this.show2FAPopup();
+        render2FAPage(loginResponse.qr_code);
       } else {
-        this.config.onLoginSuccess?.();
+        this.config.onLoginSuccess?.(loginResponse); // Passa o loginResponse como argumento
       }
     } catch (error) {
+      console.error('Erro no login:', error);
       this.config.onLoginError?.(error instanceof Error ? error.message : 'Erro desconhecido');
     } finally {
       // Restaura o botão
@@ -262,7 +265,8 @@ export class FormLogin {
     }
   }
 
-  private async sendLoginRequest(email: string, password: string): Promise<{ requires2FA: boolean; token?: string }> {
+  private async sendLoginRequest(email: string, password: string): Promise<{ requires2FA: boolean; token?: string; qr_code?: string }> {
+    console.log('Enviando requisição de login:', { email, password });
     const response = await fetch('http://localhost:1025/auth/login', {
       method: 'POST',
       headers: {
@@ -270,14 +274,16 @@ export class FormLogin {
       },
       body: JSON.stringify({ email, password }),
     });
-    console.log(JSON.stringify(response));
-    console.log(JSON.stringify({ email, password }));
+    console.log('Resposta do servidor:', response);
 
     if (!response.ok) {
       throw new Error('Credenciais inválidas');
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('Dados retornados pelo servidor:', data);
+
+    return data;
   }
 
   /*private show2FAPopup(): void {
@@ -463,7 +469,7 @@ private async verify2FACode(code: string): Promise<void> {
     this.loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
         // Captura o botão de envio
-    const submitButton = this.loginForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const submitButton = this.loginForm.querySelector('button[type="submit"]') as HTMLButtonElement;
     if (submitButton) {
       this.handleLogin(submitButton);
     }
