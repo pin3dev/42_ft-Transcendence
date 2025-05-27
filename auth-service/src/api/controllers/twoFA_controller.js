@@ -23,7 +23,8 @@ async function twoFA_controller(request, reply) {
     await request.server.userRepo.markFirst2FALoginDone(user.id);
   }
 
-  const jwtToken = await request.server.jwt.sign(
+  // Gera o token JWT
+  const jwtToken = await reply.jwtSign(
     {
       user_id: user.id,
       email: user.email
@@ -31,11 +32,18 @@ async function twoFA_controller(request, reply) {
     { expiresIn: "1h" }
   );
 
-  return reply.code(200).send({
-    user_id: user.id,
-    jwt: jwtToken,
-    message: "2FA verificado com sucesso"
-  });
+  // Define o cookie com o token JWT
+  reply
+    .setCookie('jwt', jwtToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false, // em produção, mude para true com HTTPS
+      path: '/',
+      maxAge: 3600 // 1 hora
+    })
+    .code(200)
+    .send({ message: "2FA verificado com sucesso" });
 }
 
 module.exports = { twoFA_controller };
+

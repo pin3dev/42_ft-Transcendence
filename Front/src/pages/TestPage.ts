@@ -1,15 +1,8 @@
-// TestPage.ts
-import { getCookie } from '../utils/cookieUtils';
+// src/pages/TestPage.ts
 import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 async function testProtectedRoute() {
   try {
-    const token = getCookie('jwt');
-    if (!token) {
-      alert('Token JWT ausente. Faça login novamente.');
-      return;
-    }
-
     const response = await fetchWithAuth('http://localhost:1025/teste', {
       method: 'GET',
     });
@@ -28,19 +21,24 @@ async function testProtectedRoute() {
 }
 
 export function renderTestPage(): void {
-    const root = document.getElementById('root');
-    if (!root) return;
-  
-    root.innerHTML = '';
-  
-    const container = document.createElement('div');
-    container.className = 'min-h-screen flex flex-col bg-arcade-dark';
-  
-    const button = document.createElement('button');
-    button.textContent = 'Testar Rota Protegida';
-    button.className = 'bg-blue-500 text-white px-4 py-2 rounded';
-    button.onclick = testProtectedRoute;
-  
-    container.appendChild(button);
-    root.appendChild(container);
-  }
+  const root = document.getElementById('root');
+  if (!root) return;
+
+  root.innerHTML = '';
+
+  const container = document.createElement('div');
+  container.className = 'min-h-screen flex flex-col items-center justify-center bg-arcade-dark';
+
+  const title = document.createElement('h1');
+  title.textContent = 'Página de Teste da Rota Protegida';
+  title.className = 'text-white text-2xl mb-4';
+
+  const button = document.createElement('button');
+  button.textContent = 'Testar Rota Protegida';
+  button.className = 'bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded transition';
+  button.onclick = testProtectedRoute;
+
+  container.appendChild(title);
+  container.appendChild(button);
+  root.appendChild(container);
+}
