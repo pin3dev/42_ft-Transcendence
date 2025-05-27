@@ -4,6 +4,7 @@ import { renderLogin } from '../pages/LoginPage';
 import { renderHowToPlayPage } from '../pages/HowToPlayPage';
 import { renderGamePage } from '../pages/GamePage';
 import { renderRegister } from '../pages/RegisterPage';
+import { renderTestPage } from '../pages/TestPage';
 
 // Definição das rotas disponíveis
 const routes: Record<string, () => void> = {
@@ -12,7 +13,8 @@ const routes: Record<string, () => void> = {
   '/Login': renderLogin,
   '/ComoJogar': renderHowToPlayPage,
   '/Game': renderGamePage,
-  '/Register': renderRegister
+  '/Register': renderRegister,
+  '/Test': renderTestPage
 };
 
 // Função para renderizar a página baseada na rota atual

@@ -68,17 +68,18 @@ async function buildServer() {
     target: "http://auth-service:4000"
   }));
 
+  app.register(createServiceProxy({
+    prefix: "/teste", // Prefixo da rota protegida
+    target: "http://user-mgmt:5000", // Serviço de destino
+    onRequest: async (request, reply) => {
+      // Autentica o token JWT
+      await app.authenticate(request, reply);
   
-
-  // app.register(createServiceProxy({
-  //   prefix: "/teste",
-  //   target: "http://auth-service:4000",
-  //   onRequest: async (request, reply) => {
-  //     await app.authenticate(request, reply);
-  //     request.headers['x-user-id'] = request.user.userId;
-  //     request.headers['x-user-email'] = request.user.email;
-  //   }
-  // }));
+      // Adiciona informações do usuário autenticado nos headers
+      request.headers['x-user-id'] = request.user.user_id;
+      request.headers['x-user-email'] = request.user.email;
+    }
+  }));
 
   app.register(createServiceProxy({
     prefix: "/user",

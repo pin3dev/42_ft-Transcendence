@@ -1,6 +1,7 @@
 import { createFooter } from '../components/Footer';
 import { createNavbar } from '../components/Navbar';
 import { showToast } from '../utils/toast';
+import { setCookie } from '../utils/cookieUtils'; // Importa a função para manipular cookies
 
 export function render2FAPage(qrCode?: string | null): void {
     const root = document.getElementById('root');
@@ -103,15 +104,28 @@ function render2FAInput(container?: HTMLElement): void {
         }
   
         const data = await response.json();
-        showToast('Autenticação concluída com sucesso!', 'success');
-        
-        localStorage.removeItem('user_id');
-        
-        window.location.hash = '#/';
-      } catch (error) {
-        showToast(error instanceof Error ? error.message : 'Erro desconhecido.', 'error');
+      console.log('Resposta do backend após 2FA:', data);
+
+      // Armazena o token JWT no cookie
+      if (data.jwt) {
+        setCookie('jwt', data.jwt, { expires: 3600, path: '/' }); // Expira em 1 hora
+        console.log('Token JWT armazenado no cookie:', data.jwt);
+      } else {
+        throw new Error('Token JWT ausente na resposta do backend.');
       }
-    });
+
+      showToast('Autenticação concluída com sucesso!', 'success');
+
+      // Remove o user_id do localStorage
+      localStorage.removeItem('user_id');
+
+      // Redireciona para a página de teste
+      window.location.href = '/Test';
+    } catch (error) {
+      console.error('Erro ao verificar o código 2FA:', error);
+      showToast(error instanceof Error ? error.message : 'Erro desconhecido.', 'error');
+    }
+  });
   
     container.appendChild(input);
     container.appendChild(submitButton);
