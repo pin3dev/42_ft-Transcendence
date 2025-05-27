@@ -30,7 +30,7 @@ services:
       - event-bus 
       - user-mgmt
     volumes:
-      # - ./api-gateway:/app
+      - ./user-mgmt/avatars:/app/static/avatars # novo volume
       - ./pckg/redis:/app/pckg/redis:ro 
 
   auth-service:
@@ -71,6 +71,7 @@ services:
       - "5000" 
     volumes:
       - user-data:/app/data 
+      - ./user-mgmt/avatars:/app/avatars        # mesmo caminho interno
       - ./pckg/redis:/app/pckg/redis:ro 
 
 networks:

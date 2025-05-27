@@ -9,18 +9,15 @@ const updateUser_schema = {
       type: "object",
       properties: {
         name: { type: "string" },
-        avatar_path: { type: "string" },
+        avatar_url: { type: "string" }, // <- nome corrigido
       },
+      required: ["name"], // avatar_url pode ser null
     },
-    400: {
-      type: "object",
-      properties: {
-        error: { type: "string" }
-      }
-    },
+    400: error_responses[400],
     404: error_responses[404],
   },
 };
+
 
 // GET /user/profile - sem validação de resposta para permitir JSON ou binário
 const getUser_schema = {

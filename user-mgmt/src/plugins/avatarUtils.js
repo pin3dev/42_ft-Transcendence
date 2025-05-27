@@ -1,62 +1,40 @@
 const path = require('path');
 const fs = require('fs');
+const fsp = require('fs/promises');
 const { v4: uuidv4 } = require('uuid');
 
-// Diretório base para os avatares
-const AVATAR_DIR = path.join(__dirname, '../../avatars');
-
-// Garantir que o diretório existe
-if (!fs.existsSync(AVATAR_DIR)) {
-  fs.mkdirSync(AVATAR_DIR, { recursive: true });
-}
+const AVATAR_DIR = '/app/avatars';
+fsp.mkdir(AVATAR_DIR, { recursive: true }).catch(() => {});
 
 /**
  * Salva um avatar no sistema de arquivos
- * @param {Object} file - Objeto do arquivo enviado pelo cliente
- * @param {string} userId - ID do usuário
- * @returns {string} Caminho relativo do avatar salvo
  */
-function saveAvatar(file, userId) {
+async function saveAvatar(file, userId) {
   if (!file) return null;
 
-  console.log("Salvando avatar:", file);
-  
+  const ext = path.extname(file.filename || '').toLowerCase() || '.png';
+  const filename = `${userId}-${uuidv4()}${ext}`;
+  const filepath = path.join(AVATAR_DIR, filename);
+
+  console.log(`🖼️ Salvando avatar em: ${filepath}`);
+
   try {
-    // Gerar nome único para o arquivo
-    const fileExt = path.extname(file.filename).toLowerCase();
-    const filename = `${userId}-${uuidv4()}${fileExt}`;
-    const filepath = path.join(AVATAR_DIR, filename);
-    
-    console.log(`Gerando novo avatar: ${filepath}`);
-    
-    // Verificar como o arquivo está disponível
-    if (file.filepath && fs.existsSync(file.filepath)) {
-      // Se o arquivo foi salvo em um caminho temporário, copiar de lá
-      console.log(`Copiando de arquivo temporário: ${file.filepath}`);
-      fs.copyFileSync(file.filepath, filepath);
-      console.log("Arquivo copiado com sucesso");
+    if (file.filepath) {
+      await fsp.copyFile(file.filepath, filepath);
+      console.log('✅ Copiado de arquivo temporário');
     } else if (file.data) {
-      // Se temos o conteúdo do arquivo como Buffer
-      console.log('Salvando a partir de buffer de dados');
-      fs.writeFileSync(filepath, file.data);
-      console.log("Arquivo salvo com sucesso a partir do buffer");
+      await fsp.writeFile(filepath, file.data);
+      console.log('✅ Escrito a partir de buffer (.data)');
     } else if (file._buf) {
-      // Alguns plugins armazenam o buffer em _buf
-      console.log('Salvando a partir de _buf');
-      fs.writeFileSync(filepath, file._buf);
-      console.log("Arquivo salvo com sucesso a partir de _buf");
+      await fsp.writeFile(filepath, file._buf);
+      console.log('✅ Escrito a partir de buffer (_buf)');
     } else {
-      // Não foi possível identificar como salvar o arquivo
-      console.error('Formato de arquivo não reconhecido:', file);
       throw new Error('Formato de arquivo não reconhecido');
     }
-    
-    console.log(`Avatar salvo com sucesso em: ${filepath}`);
-    
-    // Retornar o caminho relativo
+
     return `/avatars/${filename}`;
   } catch (err) {
-    console.error("Erro ao salvar avatar:", err);
+    console.error('❌ Erro ao salvar avatar:', err);
     throw err;
   }
 }

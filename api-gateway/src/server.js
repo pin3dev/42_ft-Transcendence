@@ -2,10 +2,14 @@ require("dotenv").config();
 const Fastify = require("fastify");
 const fs = require("fs");
 const path = require("path");
+<<<<<<< HEAD
 
 const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
 const fastifyCookie = require("@fastify/cookie");
+=======
+const fastifyStatic = require("@fastify/static"); // Adicionado para servir arquivos estáticos
+>>>>>>> a457962 (refactor: adding static image server into api-gateway, and updating GET->user/friends to return name and avatar)
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
@@ -21,6 +25,12 @@ async function buildServer() {
   await app.register(fastifyCookie);
 
   // Hook: insere o token do cookie como Authorization
+  // Servir arquivos estáticos (avatares)
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, '../static/avatars'),
+    prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
+  });
+
   app.addHook("onRequest", async (request, reply) => {
     const jwtCookie = request.cookies?.jwt;
     if (jwtCookie && !request.headers.authorization) {

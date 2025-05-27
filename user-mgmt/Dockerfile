@@ -1,6 +1,7 @@
 FROM node:20.18.1
 
 WORKDIR /app
+RUN mkdir -p /app/avatars
 
 # RUN apt-get update && apt-get install -y sqlite3 
 # Instala dependências do sistema (sem cache sujo)

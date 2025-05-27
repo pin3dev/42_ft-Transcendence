@@ -27,17 +27,17 @@ if (!fs.existsSync(tmpDir)) {
 
 // Configurar o plugin multipart para lidar com upload de arquivos
 fastify.register(fastifyMultipart, {
+  attachFieldsToBody: true,
+  tmpdir: tmpDir,
   limits: {
     fileSize: 2 * 1024 * 1024, // 2MB
   },
-  attachFieldsToBody: true, // Anexar campos ao body automaticamente
-  tmpdir: tmpDir, // Diretório temporário para uploads
 });
 
 // Servir os arquivos estáticos da pasta avatars
 fastify.register(fastifyStatic, {
   root: path.join(__dirname, '../avatars'),
-  prefix: '/avatars/',
+  prefix: '/avatars/', // acessar via /avatars/nome.png
 });
 
 fastify.decorate("profileRepo", profileRepo);
