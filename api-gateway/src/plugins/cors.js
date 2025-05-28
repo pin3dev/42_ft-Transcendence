@@ -12,3 +12,5 @@ async function corsPlugin(fastify) {
 }
 
 module.exports = corsPlugin;
+
+

@@ -4,6 +4,7 @@ import { createFooter } from '../components/Footer';
 import { createNavbar } from '../components/Navbar';
 import { showToast } from '../utils/toast';
 import { render2FAPage } from './2faPage';
+import { setCookie } from '../utils/cookieUtils';
 
 export function renderLogin(): void {
   const root = document.getElementById('root');
@@ -47,8 +48,7 @@ export function renderLogin(): void {
         // Redireciona para a página de 2FA com ou sem QR Code
         render2FAPage(response.qr_code || null); // Passa null se qr_code não estiver presente
       } else {
-        showToast('Login bem-sucedido!', 'success');
-        window.location.hash = '#/'; // Redireciona para a página inicial
+        console.error('Resposta inesperada do backend:', response);
       }
     },
     onLoginError: (error) => {

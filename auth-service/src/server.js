@@ -2,6 +2,7 @@ const Fastify = require("fastify");
 const path = require("path");
 const fs = require("fs");
 const fastifyJwt = require("@fastify/jwt");
+const fastifyCookie = require('@fastify/cookie');
 
 // const registerRoutes = require("./api/routes/register");
 // const loginRoutes = require("./api/routes/login");
@@ -28,6 +29,7 @@ async function start() {
     sign: { algorithm: 'RS256', key: privateKey },
     verify: { algorithms: ['RS256'], key: publicKey }
   });
+  app.register(fastifyCookie);
 
   app.decorate("userRepo", userRepo);
   app.decorate("hasher", hasher);
