@@ -3,12 +3,14 @@ const { acceptFriend_controller } = require("../controllers/acceptFriend_control
 const { getFriends_controller } = require("../controllers/getFriends_controller");
 const { removeFriend_controller } = require("../controllers/removeFriend_controller");
 const { rejectFriend_controller } = require("../controllers/rejectFriend_controller");
+const { pendingFriends_controller } = require("../controllers/pendingFriends_controller");
 const { 
   sendFriend_schema, 
   acceptFriend_schema, 
   getFriends_schema, 
   removeFriend_schema, 
-  rejectFriend_schema 
+  rejectFriend_schema,
+  pendingFriends_schema,
 } = require("../schemas/friends_schemas");
 
 module.exports = async function (fastify) {
@@ -35,6 +37,11 @@ module.exports = async function (fastify) {
   fastify.post("/user/friends/reject", {
     schema: rejectFriend_schema,
     handler: rejectFriend_controller,
+  });
+
+  fastify.get("/user/friends/pending", {
+    schema: pendingFriends_schema,
+    handler: pendingFriends_controller,
   });
 };
 

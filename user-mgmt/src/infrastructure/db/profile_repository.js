@@ -43,7 +43,8 @@ async function findManyByIds(ids) {
 
   const placeholders = ids.map(() => '?').join(',');
   const sql = `SELECT user_id, name, avatar_path FROM user_profiles WHERE user_id IN (${placeholders})`;
-  const rows = await db.all(sql, ids);
+  // const rows = await db.all(sql, ids);
+  const rows = await all(sql, ids); 
   return rows; // <--- ESSA LINHA PRECISA EXISTIR!
 }
 
