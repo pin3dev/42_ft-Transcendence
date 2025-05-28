@@ -47,6 +47,26 @@ async function findManyByIds(ids) {
   return rows; // <--- ESSA LINHA PRECISA EXISTIR!
 }
 
+async function searchByName(name) {
+  if (!name || name.length < 2) return [];
+
+  const sql = `
+    SELECT user_id, name, avatar_path
+    FROM user_profiles
+    WHERE name LIKE ?
+    LIMIT 10
+  `;
+  const rows = await all(sql, [`%${name}%`]);
+
+  const GATEWAY = process.env.GATEWAY_URL || "http://localhost:1025";
+
+  return rows.map(p => ({
+    user_id: String(p.user_id || p.USER_ID),
+    name: p.name || p.NAME,
+    avatar_url: `${GATEWAY}/static${p.avatar_path || p.AVATAR_PATH}`
+  }));
+}
+
 module.exports = {
   save,
   nameExists,
@@ -54,6 +74,7 @@ module.exports = {
   update,
   delete: deleteProfile,
   findManyByIds,
+  searchByName,
 };
 
 

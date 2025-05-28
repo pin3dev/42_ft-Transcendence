@@ -1,7 +1,8 @@
 const { getUser_controller } = require("../controllers/getUser_controller");
 const { updateUser_controller } = require("../controllers/updateUser_controller");
 const { deleteUser_controller } = require("../controllers/deleteUser_controller");
-const { getUser_schema, updateUser_schema, deleteUser_schema } = require("../schemas/profiles_schemas");
+const { searchProfile_controller } = require("../controllers/searchProfile_controller");
+const { getUser_schema, updateUser_schema, deleteUser_schema, searchProfile_schema } = require("../schemas/profiles_schemas");
 
 module.exports = async function (fastify) {
   fastify.get("/user/profile", {
@@ -17,5 +18,10 @@ module.exports = async function (fastify) {
   fastify.delete("/user/profile", {
     schema: deleteUser_schema,
     handler: deleteUser_controller,
+  });
+
+  fastify.get("/user/search", {
+    schema: searchProfile_schema,
+    handler: searchProfile_controller
   });
 };

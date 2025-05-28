@@ -42,8 +42,36 @@ const deleteUser_schema = {
   },
 };
 
+const searchProfile_schema = {
+  headers: gateway_headers,
+  querystring: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: { type: "string", minLength: 2, maxLength: 20 }
+    }
+  },
+  response: {
+    200: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          user_id: { type: "string" },
+          name: { type: "string" },
+          avatar_url: { type: "string", format: "uri" }
+        }
+      }
+    },
+    400: error_responses[400],
+    401: error_responses[401],
+    500: error_responses[500]
+  }
+};
+
 module.exports = {
   getUser_schema,
   updateUser_schema,
   deleteUser_schema,
+  searchProfile_schema,
 };
