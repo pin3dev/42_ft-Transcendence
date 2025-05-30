@@ -11,19 +11,32 @@ async function updateUserProfile(userId, body) {
 
   const existing = await profileRepo.findById(userId);
   if (!existing) {
-    const error = new Error("User profile not found");
+    const error = new Error("Usuário não encontrado");
     error.statusCode = 404;
     throw error;
   }
 
-  if (!body || !body.name || !body.name.value) {
-    const error = new Error("Nome é obrigatório");
+  if (!body || (!body.name || !body.name.value) && (!body.avatar || !body.avatar.filename)) {
+    const error = new Error("Nenhum campo enviado para atualização");
     error.statusCode = 400;
     throw error;
   }
 
-  const name = body.name.value;
+  let name = existing.name;
   let avatarPath = existing.avatar_path;
+
+  if (body.name && body.name.value) {
+    const rawName = body.name.value;
+
+    const isValid = /^[a-z0-9-]{3,30}$/.test(rawName);
+    if (!isValid) {
+      const error = new Error("Nome de usuário inválido. Use apenas letras minúsculas, números e hífens, entre 3 e 30 caracteres.");
+      error.statusCode = 400;
+      throw error;
+    }
+  
+    name = rawName;
+  }
 
   // Se avatar foi enviado, processar
   if (body.avatar && body.avatar.filename) {
@@ -33,7 +46,7 @@ async function updateUserProfile(userId, body) {
       size: body.avatar.file?.length || 0,
     };
 
-    UserProfile.validateAvatar(avatar);
+    UserProfile.validateAvatar(avatar); //passar função para avatarUtils.js
     console.log("Avatar validado");
 
     const buffer = await body.avatar.toBuffer();

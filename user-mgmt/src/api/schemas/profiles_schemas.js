@@ -9,9 +9,8 @@ const updateUser_schema = {
       type: "object",
       properties: {
         name: { type: "string" },
-        avatar_url: { type: "string" }, // <- nome corrigido
+        avatar_url: { type: "string" },
       },
-      required: ["name"], // avatar_url pode ser null
     },
     400: error_responses[400],
     404: error_responses[404],

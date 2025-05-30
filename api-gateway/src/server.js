@@ -2,18 +2,17 @@ require("dotenv").config();
 const Fastify = require("fastify");
 const fs = require("fs");
 const path = require("path");
-<<<<<<< HEAD
 
 const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
 const fastifyCookie = require("@fastify/cookie");
-=======
 const fastifyStatic = require("@fastify/static"); // Adicionado para servir arquivos estáticos
->>>>>>> a457962 (refactor: adding static image server into api-gateway, and updating GET->user/friends to return name and avatar)
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
-const publicKey = fs.readFileSync("/app/keys/public.key");
+const publicKey = fs.readFileSync("/app/keys/public.key"); // trocar
+// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+
 
 async function buildServer() {
   const app = Fastify();
