@@ -15,8 +15,11 @@ const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { handleUserDeleted } = require("./events/handler");
 
 
-const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8");
-const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8");
+const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); //trocar
+const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // trocar
+// const privateKey = Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString('utf-8');
+// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+
 
 async function start() {
   const app = Fastify({ logger: true });

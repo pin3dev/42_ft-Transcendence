@@ -6,10 +6,13 @@ const path = require("path");
 const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
 const fastifyCookie = require("@fastify/cookie");
+const fastifyStatic = require("@fastify/static"); // Adicionado para servir arquivos estáticos
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
-const publicKey = fs.readFileSync("/app/keys/public.key");
+const publicKey = fs.readFileSync("/app/keys/public.key"); // trocar
+// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+
 
 async function buildServer() {
   const app = Fastify();
@@ -21,6 +24,12 @@ async function buildServer() {
   await app.register(fastifyCookie);
 
   // Hook: insere o token do cookie como Authorization
+  // Servir arquivos estáticos (avatares)
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, '../static/avatars'),
+    prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
+  });
+
   app.addHook("onRequest", async (request, reply) => {
     const jwtCookie = request.cookies?.jwt;
     if (jwtCookie && !request.headers.authorization) {

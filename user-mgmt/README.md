@@ -11,7 +11,9 @@ O `user-mgmt` é responsável pela gestão de perfis de usuários e amizades no 
 - Consulta do perfil autenticado
 - Atualização de dados de perfil (nome, avatar, etc.)
 - Exclusão de conta
+- Busca de perfis por nome
 - Gerenciamento de amizades (enviar, aceitar, rejeitar, remover)
+- Listagem de solicitações de amizade pendentes
 - Integração com o `auth-service` e `event-bus` via eventos
 
 ---
@@ -24,9 +26,10 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
 
 | Tipo | Método | Rota             | Descrição                                   |
 |:--:|:--:|:--:|:--:|
-| 🔐 Privada | GET    | `/user/profile` | Retorna os dados do perfil do usuário autenticado |
-| 🔐 Privada | PUT    | `/user/profile` | Atualiza os dados do perfil do usuário             |
-| 🔐 Privada | DELETE | `/user/profile` | Remove a conta do usuário                          |
+| 🔐 Privada | GET    | `/user/profile`     | Retorna os dados do perfil do usuário autenticado |
+| 🔐 Privada | PATCH  | `/user/profile`     | Atualiza os dados do perfil do usuário             |
+| 🔐 Privada | DELETE | `/user/profile`     | Remove a conta do usuário                          |
+| 🔐 Privada | GET    | `/user/search`      | Busca perfis de usuário pelo nome                  |
 
 #### Detalhes das Rotas de Perfil
 
@@ -48,20 +51,16 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
     - `401 Unauthorized`: Token inválido ou ausente.
     - `404 Not Found`: Usuário não encontrado.
 
-- **PUT /user/profile**
+- **PATCH /user/profile**
   - **Headers:**
     ```json
     {
       "Authorization": "Bearer <tokenJWT>"
     }
     ```
-  - **Body:**
-    ```json
-    {
-      "name": "string",
-      "avatar_url": "string"
-    }
-    ```
+  - **Body (form-data):**
+    - `name`: string (obrigatório)
+    - `avatar`: arquivo de imagem (opcional, JPEG/PNG até 2MB)
   - **Resposta:**
     - `200 OK`: Perfil atualizado com sucesso.
       ```json
@@ -83,15 +82,38 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
     - `204 No Content`: Conta excluída com sucesso.
     - `404 Not Found`: Usuário não encontrado.
 
+- **GET /user/search**
+  - **Headers:**
+    ```json
+    {
+      "Authorization": "Bearer <tokenJWT>"
+    }
+    ```
+  - **Query:**
+    - `name`: string (mínimo 2 caracteres)
+  - **Resposta:**
+    - `200 OK`: Lista de perfis encontrados.
+      ```json
+      [
+        {
+          "user_id": "string",
+          "name": "string",
+          "avatar_url": "string"
+        }
+      ]
+      ```
+    - `400 Bad Request`: Query muito curta.
+
 ### 🤝 Rotas de Amizade
 
-| Tipo | Método | Rota                  | Descrição                                   |
+| Tipo | Método | Rota                      | Descrição                                   |
 |:--:|:--:|:--:|:--:|
-| 🔐 Privada | GET    | `/user/friends`       | Retorna lista de amigos do usuário autenticado |
-| 🔐 Privada | POST   | `/user/friends/send`  | Envia solicitação de amizade para outro usuário |
-| 🔐 Privada | POST   | `/user/friends/accept`| Aceita solicitação de amizade recebida         |
-| 🔐 Privada | POST   | `/user/friends/remove`| Remove amizade existente                      |
-| 🔐 Privada | DELETE | `/user/friends/reject`| Rejeita solicitação de amizade recebida        |
+| 🔐 Privada | GET    | `/user/friends`           | Retorna lista de amigos do usuário autenticado |
+| 🔐 Privada | GET    | `/user/friends/pending`   | Lista solicitações de amizade pendentes        |
+| 🔐 Privada | POST   | `/user/friends/send`      | Envia solicitação de amizade para outro usuário |
+| 🔐 Privada | POST   | `/user/friends/accept`    | Aceita solicitação de amizade recebida         |
+| 🔐 Privada | POST   | `/user/friends/remove`    | Remove amizade existente                      |
+| 🔐 Privada | DELETE | `/user/friends/reject`    | Rejeita solicitação de amizade recebida        |
 
 #### Detalhes das Rotas de Amizade
 
@@ -105,16 +127,36 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
   - **Resposta:**
     - `200 OK`: Retorna a lista de amigos.
       ```json
-      {
-        "friends": [
-          {
-            "friend_id": "string",
-            "since": "timestamp"
-          }
-        ]
-      }
+      [
+        {
+          "user_id": "string",
+          "name": "string",
+          "avatar_url": "string",
+          "since": "timestamp"
+        }
+      ]
       ```
     - `401 Unauthorized`: Token inválido ou ausente.
+
+- **GET /user/friends/pending**
+  - **Headers:**
+    ```json
+    {
+      "Authorization": "Bearer <tokenJWT>"
+    }
+    ```
+  - **Resposta:**
+    - `200 OK`: Lista de solicitações de amizade pendentes.
+      ```json
+      [
+        {
+          "user_id": "string",
+          "name": "string",
+          "avatar_url": "string",
+          "since": "timestamp"
+        }
+      ]
+      ```
 
 - **POST /user/friends/send**
   - **Headers:**

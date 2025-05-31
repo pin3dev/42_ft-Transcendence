@@ -1,4 +1,4 @@
-const { findRelation, updateStatus } = require("../infrastructure/db/friends_repository");
+const { findRelation, deleteRelation } = require("../infrastructure/db/friends_repository");
 
 async function rejectFriend(user_id, sender_id) {
   const relation = await findRelation(sender_id, user_id);
@@ -15,7 +15,7 @@ async function rejectFriend(user_id, sender_id) {
     throw new Error("Você só pode rejeitar solicitações enviadas para você.");
   }
 
-  await updateStatus(sender_id, user_id, "REJECTED");
+  await deleteRelation(sender_id, user_id);
 }
 
 module.exports = rejectFriend;

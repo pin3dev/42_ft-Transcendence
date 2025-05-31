@@ -1,5 +1,4 @@
 const profileRepo = require("../infrastructure/db/profile_repository");
-const { getAvatarFileInfo } = require("../plugins/avatarUtils");
 
 async function getUserProfile(userId, options = {}) {
   const profile = await profileRepo.findById(userId);
@@ -10,18 +9,14 @@ async function getUserProfile(userId, options = {}) {
     throw error;
   }
 
-  // Construir o objeto de resposta
-  const result = {
+  const GATEWAY_BASE_URL = process.env.GATEWAY_URL || "http://localhost:1025";
+
+  return {
     name: profile.name,
-    avatar_path: profile.avatar_path
+    avatar_url: profile.avatar_path
+      ? `${GATEWAY_BASE_URL}/static${profile.avatar_path}`
+      : `${GATEWAY_BASE_URL}/static/avatars/default.png`
   };
-
-  // Se o cliente solicitar informações do arquivo de avatar
-  if (options.includeAvatarFile) {
-    result.avatarFile = getAvatarFileInfo(profile.avatar_path);
-  }
-
-  return result;
 }
 
 module.exports = getUserProfile;

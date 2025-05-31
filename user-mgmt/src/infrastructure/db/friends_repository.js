@@ -51,10 +51,20 @@ async function deleteRelation(userId, friendId) {
   );
 }
 
+async function listPending(userId) {
+  return all(`
+    SELECT user_id, created_at
+    FROM friends
+    WHERE friend_id = ? AND status = 'PENDING'
+  `, [userId]);
+}
+
+
 module.exports = {
   findRelation,
   createRelation,
   updateStatus,
   listAccepted,
   deleteRelation,
+  listPending,
 };

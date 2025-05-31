@@ -56,16 +56,41 @@ const getFriends_schema = {
           items: {
             type: "object",
             properties: {
-              friend_id: { type: "string" },
+              user_id: { type: "string" },
+              name: { type: "string" },
+              avatar_url: { type: "string", format: "uri" },
+              status: { type: "string" },
               since: { type: "string", format: "date-time" },
             },
+            required: ["user_id", "name", "avatar_url", "status", "since"],
           },
         },
       },
+      required: ["friends"],
     },
     401: error_responses[401],
     500: error_responses[500],
-  },
+  }
+};
+
+const pendingFriends_schema = {
+  headers: gateway_headers,
+  response: {
+    200: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          user_id: { type: "string" },
+          name: { type: "string" },
+          avatar_url: { type: "string", format: "uri" },
+          since: { type: "string", format: "date-time" }
+        }
+      }
+    },
+    401: error_responses[401],
+    500: error_responses[500],
+  }
 };
 
 const removeFriend_schema = {
@@ -117,4 +142,5 @@ module.exports = {
   getFriends_schema,
   removeFriend_schema,
   rejectFriend_schema,
+  pendingFriends_schema,
 };
