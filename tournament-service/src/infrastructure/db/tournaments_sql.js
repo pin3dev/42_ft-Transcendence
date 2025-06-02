@@ -7,13 +7,14 @@ const dbPath = path.join(dbFolder, "tournament.sqlite");
 
 if (!fs.existsSync(dbFolder)) {
   fs.mkdirSync(dbFolder, { recursive: true });
-  console.log("📁 Pasta 'data/' criada automaticamente.");
+  console.log("📁 Pasta 'data/' criada.");
 }
 
 const db = new sqlite3.Database(dbPath);
 
-// criação da tabela tournaments
 db.serialize(() => {
+  db.run("PRAGMA foreign_keys = ON");
+
   db.run(`
     CREATE TABLE IF NOT EXISTS tournaments (
       id TEXT PRIMARY KEY,
@@ -22,7 +23,7 @@ db.serialize(() => {
       password TEXT,
       started DATETIME NOT NULL,
       ended DATETIME,
-      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME NOT NULL
     )
   `);
 });

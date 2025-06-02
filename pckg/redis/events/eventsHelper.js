@@ -1,6 +1,8 @@
 const EventTypes = {
     USER_REGISTERED: "user.registered",
     USER_DELETED: "user.deleted",
+    MATCH_FINISHED: "match.finished",
+    TOURNAMENT_CREATED: "tournament.created",
     // USER_2FA_VERIFIED: "user.2fa.verified",
     // EMAIL_SENT: "email.sent"
 };

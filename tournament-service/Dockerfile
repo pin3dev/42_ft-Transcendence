@@ -1,22 +1,24 @@
-# Use imagem base do Node.js
-FROM node:18
+# Usa imagem oficial do Node
+FROM node:20.18.1
 
-# Crie e defina o diretório de trabalho
+# Define diretório de trabalho
 WORKDIR /app
 
-# Copie os arquivos
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends sqlite3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copia apenas os arquivos de dependência para instalar primeiro (cache eficiente)
 COPY package*.json ./
 
-# Instale as dependências
+# Instala dependências dentro do container
 RUN npm install
 
+# Copia o restante do código
 COPY . .
 
-# Crie a pasta de dados do SQLite (se necessário)
+# Cria diretório do banco se não existir
 RUN mkdir -p /app/data
 
-# Porta interna usada (apenas se quiser expor algo futuramente)
-EXPOSE 6000
-
-# Comando de inicialização
-CMD ["node", "src/index.js"]
+# Comando padrão de execução
+CMD ["node", "src/server.js"]
