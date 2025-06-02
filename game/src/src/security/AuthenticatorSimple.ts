@@ -1,12 +1,12 @@
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Authenticator } from "./Authenticator";
-import { Message } from "../message/Message";
+import { AuthenticationMessage } from "../message/AuthenticationMessage";
+import { MessageWithValue } from "../message/MessageWithValue";
 
-export class AuthenticatorSimple implements Authenticator<string>{
+export class AuthenticatorSimple implements Authenticator<AuthenticationMessage>{
 
-    makeLogin(ws : WebSocketUserSession, message : Message<string>) : boolean{
-
-        if (message.getValue === '123456'){
+    makeLogin(ws : WebSocketUserSession, message : MessageWithValue<AuthenticationMessage>) : boolean{
+        if (message.getValue.getUserToken == '123456'){
             ws.setUserId = '123';
 			return true;
         }

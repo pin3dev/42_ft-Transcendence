@@ -12,7 +12,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 	private gamesGlobal = new Map<Number, Game>();
 
 
-	message(ws: WebSocketUserSession, messageFromClient: Message<any>): void {
+	message(ws: WebSocketUserSession, messageFromClient: Message): void {
 
 		const sender = new Sender(ws.getWebsocket);
 
@@ -22,7 +22,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 				return;
 			} else if (this.waitingPlayer === null || (this.waitingPlayer.getWebsocket.readyState !== WebSocket.OPEN)) {
 				this.waitingPlayer = ws;
-				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER', ''));
+				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER'));
 			} else {
 				let game = new Game();
 
@@ -41,7 +41,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 		if (messageFromClient.getType === 'GAME_ABORT' && ws === this.waitingPlayer) {
 			this.waitingPlayer = null;
-			sender.sendMessage(new Message('GAME_ABORTED', ''));
+			sender.sendMessage(new Message('GAME_ABORTED'));
 			return;
 		}
 
@@ -64,7 +64,10 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 			}
 		}
 
-		else if (messageFromClient.getType === 'GAME_PADDLE_UP' || messageFromClient.getType === 'GAME_PADDLE_DOWN') {
+		else if (messageFromClient.getType === 'GAME_PADDLE_UP_KEYUP' ||
+			messageFromClient.getType === 'GAME_PADDLE_UP_KEYDOWN' ||
+			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYUP' ||
+			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYDOWN') {
 			playerGame.movePaddle(ws, messageFromClient.getType);
 		}
 
@@ -90,7 +93,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 		let playerGame = this.gamesGlobal.get(gameId);
 		if (!playerGame) {
-			sender.sendMessage(new Message<null>('ERROR_MATCH_DOES_NOT_EXIST', null));
+			sender.sendMessage(new Message('ERROR_MATCH_DOES_NOT_EXIST'));
 		}
 		return playerGame;
 	}

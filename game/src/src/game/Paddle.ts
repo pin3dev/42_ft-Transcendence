@@ -1,8 +1,11 @@
 
 export class Paddle{
 
-	public static readonly WIDTH: number = 10;
-    public static readonly HEIGHT: number = 70;
+	public static readonly SPACE_FROM_SIDE = 30;
+	public static readonly SPEED = 8;
+
+	public static readonly WIDTH: number = 14;
+    public static readonly HEIGHT: number = 90;
 
     private x: number;
     private y: number;
