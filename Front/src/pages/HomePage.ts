@@ -21,6 +21,23 @@ export function renderHome(): void {
   
   main.appendChild(createHero());
   main.appendChild(createCreatorsSection());
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'text-center mb-8';
+
+  const title = document.createElement('h2');
+  title.className = 'text-3xl md:text-4xl font-bold mb-4 text-white';
+  title.innerHTML = `Top Jogadores `;
+  
+  const subtitle = document.createElement('p');
+  subtitle.className = 'text-xl text-gray-300 max-w-3xl mx-auto';
+  subtitle.textContent = 'Os melhores jogadores de PingPong Arcade. Você pode ser o próximo?';
+  
+  header.appendChild(title);
+  header.appendChild(subtitle);
+
+  main.appendChild(header);
   main.appendChild(createLeaderboardPreview());
   
   
