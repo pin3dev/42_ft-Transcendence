@@ -75,10 +75,10 @@ async function testProtectedRoute(): Promise<UserStats | null> {
 
     const data = await response.json();
     return {
-      name: data.user?.username || mockUserStats.name,
-      wins: data.user?.stats?.wins || mockUserStats.wins,
-      losses: data.user?.stats?.losses || mockUserStats.losses,
-      avatar: data.user?.avatar_url || mockUserStats.avatar
+      name: data.name || mockUserStats.name,
+      wins: mockUserStats.wins,
+      losses: mockUserStats.losses,
+      avatar: data.avatar_url || mockUserStats.avatar
     };
   } catch (error) {
     console.error('Erro ao acessar a rota protegida:', error);
@@ -97,10 +97,10 @@ async function fetchFriendsList(): Promise<Friend[]> {
     }
 
     const data = await response.json();
-    return data.map((friend: any) => ({
-      id: friend.id,
-      name: friend.username,
-      status: friend.status,
+    return (data.friends || []).map((friend: any) => ({
+      id: friend.user_id,
+      name: friend.name,
+      status: 'offline', // ver
       avatar: friend.avatar_url
     }));
   } catch (error) {
@@ -134,11 +134,116 @@ export async function renderTestPage(): Promise<void> {
       testProtectedRoute().then(updatedStats => {
         if (updatedStats) {
           profileSection.update({ userStats: updatedStats });
+          insertUserSearchBar();
         }
       });
     }
   });
-  mainContainer.appendChild(profileSection.getElement());
+  const profileElement = profileSection.getElement();
+
+// --- BARRA DE BUSCA DE USUÁRIOS DENTRO DO PERFIL ---
+  // Wrapper para alinhar no topo e direita do card
+const searchWrapper = document.createElement('div');
+searchWrapper.className = 'flex justify-end items-start mt-[-12px] w-full';
+
+// Estilo refinado para o input de busca
+const userSearchInput = document.createElement('input');
+userSearchInput.type = 'text';
+userSearchInput.placeholder = 'Adicionar amigo...';
+userSearchInput.className = `
+  bg-gradient-to-r from-neon-purple to-arcade-darkPurple
+  text-white
+  placeholder-white/60
+  border-none
+  focus:outline-none
+  focus:ring-0
+  w-60
+  rounded-full
+  px-4 py-1
+  text-sm
+  transition-all
+`;
+
+// Dropdown dos resultados
+const userSearchResults = document.createElement('div');
+userSearchResults.className = `
+  absolute z-30 mt-1 w-full
+  bg-arcade-darkPurple border border-primary/10
+  rounded-lg shadow-md text-sm
+`;
+
+// Wrapper do input com dropdown
+const userSearchBox = document.createElement('div');
+userSearchBox.className = 'relative w-60';
+userSearchBox.appendChild(userSearchInput);
+userSearchBox.appendChild(userSearchResults);
+searchWrapper.appendChild(userSearchBox);
+
+  // Função para inserir a barra de busca no slot do header do perfil
+  function insertUserSearchBar() {
+    const userSearchSlot = profileElement.querySelector('#user-search-slot');
+    if (userSearchSlot && !userSearchSlot.contains(searchWrapper)) {
+      userSearchSlot.appendChild(searchWrapper);
+    }
+  }
+
+  // Insere a barra de busca inicialmente
+  insertUserSearchBar();
+
+  // Evento de busca
+  userSearchInput.addEventListener('input', async (e) => {
+    const value = (e.target as HTMLInputElement).value.trim();
+    userSearchResults.innerHTML = '';
+    if (value.length >= 2) {
+      try {
+        const response = await fetchWithAuth(`http://localhost:1025/user/search?name=${encodeURIComponent(value)}`);
+        if (response.ok) {
+          const users = await response.json();
+          if (Array.isArray(users) && users.length > 0) {
+            users.forEach((user: any) => {
+              const resultItem = document.createElement('div');
+              resultItem.className = 'flex items-center gap-2 px-2 py-1 hover:bg-primary/20 cursor-pointer rounded';
+
+              resultItem.innerHTML = `
+                <img src="${user.avatar_url}" class="w-6 h-6 rounded-full border border-primary" />
+                <span class="flex-1 text-white">${user.name}</span>
+                <button class="btn btn-xs btn-primary">Adicionar</button>
+              `;
+
+              resultItem.querySelector('button')?.addEventListener('click', async (ev) => {
+                ev.stopPropagation();
+                try {
+                  const addResp = await fetchWithAuth('http://localhost:1025/user/friends/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target_id: user.user_id })
+                  });
+                  if (addResp.ok) {
+                    resultItem.querySelector('button')!.textContent = 'Enviado!';
+                    resultItem.querySelector('button')!.setAttribute('disabled', 'true');
+                  } else {
+                    alert('Erro ao enviar solicitação.');
+                  }
+                } catch (err) {
+                  alert('Erro ao enviar solicitação.');
+                }
+              });
+
+              userSearchResults.appendChild(resultItem);
+            });
+          } else {
+            userSearchResults.innerHTML = '<div class="text-gray-400 px-2 py-1">Nenhum usuário encontrado.</div>';
+          }
+        } else {
+          userSearchResults.innerHTML = '<div class="text-red-400 px-2 py-1">Erro ao buscar usuários.</div>';
+        }
+      } catch (err) {
+        userSearchResults.innerHTML = '<div class="text-red-400 px-2 py-1">Erro ao buscar usuários.</div>';
+      }
+    }
+  });
+
+  mainContainer.appendChild(profileElement);
 
   // Cria o grid para ranking e lista de amigos
   const gridContainer = document.createElement('div');
@@ -161,6 +266,7 @@ export async function renderTestPage(): Promise<void> {
 
     if (updatedStats) {
       profileSection.update({ userStats: updatedStats });
+      insertUserSearchBar();
     }
     friendsList.update({ friends: updatedFriends });
   } catch (error) {

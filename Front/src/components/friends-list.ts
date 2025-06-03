@@ -22,41 +22,13 @@ export class FriendsList {
     this.render();
   }
   private render(): void {
-    const filteredFriends = this.props.friends.filter(friend =>
-      friend.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-
     this.element.className = 'bg-arcade-darker border-2 border-neon-green rounded-lg p-4';
     this.element.innerHTML = `
-      <h3 class="text-neon-green text-xl mb-4 text-center">Find Friend</h3>
-      
-      <div class="relative mb-4">
-        <input
-          type="text"
-          placeholder="Search friends..."
-          class="search-input w-full bg-arcade-darkPurple border border-neon-green rounded px-3 py-2 text-white text-sm pr-10"
-        />
-        <div class="search-icon absolute right-3 top-2.5 text-neon-green w-4 h-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.3-4.3"/>
-          </svg>
-        </div>
-      </div>
-      
+      <h3 class="text-neon-green text-xl mb-4 text-center">Seus amigos</h3>
       <div class="friends-container space-y-2 max-h-80 overflow-y-auto">
-        ${this.renderFriendsList(filteredFriends)}
+        ${this.renderFriendsList(this.props.friends)}
       </div>
     `;
-
-    // Adiciona event listeners
-    const searchInput = this.element.querySelector('.search-input') as HTMLInputElement;
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        this.searchTerm = (e.target as HTMLInputElement).value;
-        this.updateFriendsList();
-      });
-    }
   }
 
   private renderFriendsList(friends: Friend[]): string {
@@ -89,20 +61,12 @@ export class FriendsList {
     }
   }
 
-  private updateFriendsList(): void {
-    const filteredFriends = this.props.friends.filter(friend =>
-      friend.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-    
-    const friendsContainer = this.element.querySelector('.friends-container');
-    if (friendsContainer) {
-      friendsContainer.innerHTML = this.renderFriendsList(filteredFriends);
-    }
-  }
-
   public update(newProps: Partial<FriendsListProps>): void {
     this.props = { ...this.props, ...newProps };
-    this.updateFriendsList();
+    const friendsContainer = this.element.querySelector('.friends-container');
+    if (friendsContainer) {
+      friendsContainer.innerHTML = this.renderFriendsList(this.props.friends);
+    }
   }
 
   public getElement(): HTMLElement {
