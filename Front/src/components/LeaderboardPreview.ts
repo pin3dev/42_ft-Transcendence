@@ -12,16 +12,7 @@ export function createLeaderboardPreview(): HTMLElement {
   const header = document.createElement('div');
   header.className = 'text-center mb-8';
   
-  const title = document.createElement('h2');
-  title.className = 'text-3xl md:text-4xl font-bold mb-4 text-white';
-  title.innerHTML = `Top Jogadores `;
-  
-  const subtitle = document.createElement('p');
-  subtitle.className = 'text-xl text-gray-300 max-w-3xl mx-auto';
-  subtitle.textContent = 'Os melhores jogadores de PingPong Arcade. Você pode ser o próximo?';
-  
-  header.appendChild(title);
-  header.appendChild(subtitle);
+
   
   // Leaderboard table
   const tableWrapper = document.createElement('div');
@@ -51,6 +42,8 @@ export function createLeaderboardPreview(): HTMLElement {
   
   // Table body
   const tbody = document.createElement('tbody');
+
+  
   
   const topPlayers = [
     { rank: 1, username: "NeonMaster99", wins: 342, losses: 45, winRate: "88.4%" },
@@ -140,22 +133,13 @@ export function createLeaderboardPreview(): HTMLElement {
   table.appendChild(tbody);
   tableContainer.appendChild(table);
   
-  // View full rankings button
-  const buttonContainer = document.createElement('div');
-  buttonContainer.className = 'flex justify-center mt-8';
-  
-  const viewMoreButton = document.createElement('button');
-  viewMoreButton.className = 'border-neon-green text-neon-green hover:bg-neon-green hover:text-arcade-darker border px-4 py-2 rounded';
-  viewMoreButton.textContent = 'Ver Ranking Completo';
-  viewMoreButton.addEventListener('click', () => navigateTo('/rankings'));
-  
-  buttonContainer.appendChild(viewMoreButton);
+
   
   // Assemble components
   tableWrapper.appendChild(tableContainer);
-  tableWrapper.appendChild(buttonContainer);
+ 
   
-  container.appendChild(header);
+  
   container.appendChild(tableWrapper);
   
   section.appendChild(container);
