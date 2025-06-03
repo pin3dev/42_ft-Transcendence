@@ -4,7 +4,7 @@ const profileRepo = require("../infrastructure/db/profile_repository");
 async function getTopPlayersWithProfiles() {
   const topPlayers = await rankingRepo.getTopPlayers(5);
   const ids = topPlayers.map(p => p.player_id);
-  const profiles = await profileRepo.findManyByIds(ids);
+  // const profiles = await profileRepo.findManyByIds(ids); //Problema, acessar dados de outro serviço (user-mgmt)
 
   return topPlayers.map(p => {
     const profile = profiles.find(pr => pr.user_id === p.player_id);
