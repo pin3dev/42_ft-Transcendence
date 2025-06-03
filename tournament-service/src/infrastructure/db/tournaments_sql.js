@@ -23,7 +23,7 @@ db.serialize(() => {
       password TEXT,
       started DATETIME NOT NULL,
       ended DATETIME,
-      created_at DATETIME NOT NULL
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);
 });
