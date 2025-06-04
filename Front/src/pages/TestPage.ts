@@ -5,6 +5,7 @@ import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
 import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 import { FriendsList, type Friend } from '../components/friends-list';
+import { renderUserProfilePage } from '../pages/FriendProfilePage';
 // Mock data - em produção viria de uma API
 const mockUserProfile = {
   name: 'Player1',
@@ -206,41 +207,30 @@ export async function renderTestPage(): Promise<void> {
               resultItem.innerHTML = `
                 <img src="${user.avatar_url}" class="w-6 h-6 rounded-full border border-primary" />
                 <span class="flex-1 text-white">${user.name}</span>
-                <button class="btn btn-xs btn-primary">Adicionar</button>
               `;
 
-              resultItem.querySelector('button')?.addEventListener('click', async (ev) => {
-                ev.stopPropagation();
-                try {
-                  const addResp = await fetchWithAuth('http://localhost:1025/user/friends/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ target_id: user.user_id })
-                  });
-                  if (addResp.ok) {
-                    resultItem.querySelector('button')!.textContent = 'Enviado!';
-                    resultItem.querySelector('button')!.setAttribute('disabled', 'true');
-                  } else {
-                    alert('Erro ao enviar solicitação.');
-                  }
-                } catch (err) {
-                  alert('Erro ao enviar solicitação.');
-                }
-              });
-
-              userSearchResults.appendChild(resultItem);
+             // Adiciona o evento de clique no item inteiro
+             resultItem.addEventListener('click', () => {
+              // Limpa a busca
+              userSearchResults.innerHTML = '';
+              userSearchInput.value = '';
+              // Mostra o perfil do usuário
+              renderUserProfilePage(user);
             });
-          } else {
-            userSearchResults.innerHTML = '<div class="text-gray-400 px-2 py-1">Nenhum usuário encontrado.</div>';
-          }
+
+            userSearchResults.appendChild(resultItem);
+          });
         } else {
-          userSearchResults.innerHTML = '<div class="text-red-400 px-2 py-1">Erro ao buscar usuários.</div>';
+          userSearchResults.innerHTML = '<div class="text-gray-400 px-2 py-1">Nenhum usuário encontrado.</div>';
         }
-      } catch (err) {
+      } else {
         userSearchResults.innerHTML = '<div class="text-red-400 px-2 py-1">Erro ao buscar usuários.</div>';
       }
+    } catch (err) {
+      userSearchResults.innerHTML = '<div class="text-red-400 px-2 py-1">Erro ao buscar usuários.</div>';
     }
-  });
+  }
+});
 
   mainContainer.appendChild(profileElement);
 
