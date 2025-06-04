@@ -110,6 +110,73 @@ async function fetchFriendsList(): Promise<Friend[]> {
   }
 }
 
+async function fetchPendingRequests(): Promise<Friend[]> {
+  try {
+    const response = await fetchWithAuth('http://localhost:1025/user/friends/pending', {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao carregar solicitações de amizade');
+    }
+
+    const data = await response.json();
+    return (data || []).map((request: any) => ({
+      id: request.user_id,
+      name: request.name,
+      status: 'pending',
+      avatar: request.avatar_url
+    }));
+  } catch (error) {
+    console.error('Erro ao carregar solicitações de amizade:', error);
+    return []; // Retorna uma lista vazia em caso de erro
+  }
+}
+
+// Adicione estas funções após fetchPendingRequests()
+
+async function acceptFriendRequest(senderId: string): Promise<boolean> {
+  try {
+    const response = await fetchWithAuth('http://localhost:1025/user/friends/accept', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sender_id: senderId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao aceitar solicitação de amizade');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erro ao aceitar solicitação de amizade:', error);
+    return false;
+  }
+}
+
+async function rejectFriendRequest(senderId: string): Promise<boolean> {
+  try {
+    const response = await fetchWithAuth('http://localhost:1025/user/friends/reject', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sender_id: senderId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao rejeitar solicitação de amizade');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erro ao rejeitar solicitação de amizade:', error);
+    return false;
+  }
+}
+
 export async function renderTestPage(): Promise<void> {
   const root = document.getElementById('root');
   if (!root) return;
@@ -242,17 +309,46 @@ export async function renderTestPage(): Promise<void> {
   // const leaderboardPreview = await createLeaderboardPreview();
   // gridContainer.appendChild(leaderboardPreview);
 
-  // Adiciona a lista de amigos
-  const friendsList = new FriendsList({ friends: mockFriends });
+  // Adiciona a lista de amigos com título personalizado
+  const friendsList = new FriendsList({ 
+    friends: mockFriends,
+    title: 'Meus Amigos'  // Título personalizado para lista de amigos
+  });
   gridContainer.appendChild(friendsList.getElement());
 
-  const pendingList = new FriendsList({ friends: mockFriends });
+  // Adiciona a lista de solicitações pendentes com título personalizado
+  const pendingList = new FriendsList({ 
+    friends: [],  // Inicialmente vazia, será preenchida pela API
+    title: 'Solicitações de Amizade',  // Título personalizado para solicitações
+    onAccept: async (friendId) => {
+      const success = await acceptFriendRequest(friendId);
+      if (success) {
+        // Recarrega as listas para atualizar a UI
+        const [updatedFriends, pendingRequests] = await Promise.all([
+          fetchFriendsList(),
+          fetchPendingRequests()
+        ]);
+        friendsList.update({ friends: updatedFriends });
+        pendingList.update({ friends: pendingRequests });
+      }
+    },
+    onReject: async (friendId) => {
+      const success = await rejectFriendRequest(friendId);
+      if (success) {
+        // Apenas remove a solicitação rejeitada da lista pendente
+        const pendingRequests = await fetchPendingRequests();
+        pendingList.update({ friends: pendingRequests });
+      }
+    }
+  });
   gridContainer.appendChild(pendingList.getElement());
+
   // Atualiza com dados reais da API
   try {
-    const [updatedStats, updatedFriends] = await Promise.all([
+    const [updatedStats, updatedFriends, pendingRequests] = await Promise.all([
       testProtectedRoute(),
-      fetchFriendsList()
+      fetchFriendsList(),
+      fetchPendingRequests()
     ]);
 
     if (updatedStats) {
@@ -260,7 +356,7 @@ export async function renderTestPage(): Promise<void> {
       insertUserSearchBar();
     }
     friendsList.update({ friends: updatedFriends });
-    pendingList.update({ friends: updatedFriends });
+    pendingList.update({ friends: pendingRequests });
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
   }

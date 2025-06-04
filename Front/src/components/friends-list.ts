@@ -3,12 +3,15 @@
 export interface Friend {
   id: number;
   name: string;
-  status: 'online' | 'offline';
+  status: 'online' | 'offline' | 'pending';
   avatar: string;
 }
 
 interface FriendsListProps {
   friends: Friend[];
+  title?: string; // Título opcional
+  onAccept?: (friendId: string) => void;
+  onReject?: (friendId: string) => void;
 }
 
 export class FriendsList {
@@ -21,44 +24,86 @@ export class FriendsList {
     this.element = document.createElement('div');
     this.render();
   }
+  
+  private renderFriendsList(friends: Friend[]): string {
+    if (friends.length === 0) {
+      return '<p class="text-gray-400 text-center">Nenhum item para exibir</p>';
+    }
+    return friends.map(friend => `
+    <div class="friend-item flex items-center justify-between bg-arcade-dark p-2 rounded-lg transition-all hover:bg-arcade-darker">
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <img src="${friend.avatar}" alt="${friend.name}" class="w-10 h-10 rounded-full border-2 ${friend.status === 'online' ? 'border-neon-green' : friend.status === 'pending' ? 'border-neon-orange' : 'border-gray-500'}">
+          <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full ${
+            friend.status === 'online' ? 'bg-neon-green' : 
+            friend.status === 'pending' ? 'bg-neon-orange' : 'bg-gray-500'
+          } border border-arcade-darker"></div>
+        </div>
+        <div>
+          <p class="text-white font-medium">${friend.name}</p>
+          <p class="text-xs ${
+            friend.status === 'online' ? 'text-neon-green' : 
+            friend.status === 'pending' ? 'text-neon-orange' : 'text-gray-500'
+          }">${friend.status === 'pending' ? 'Solicitação pendente' : friend.status}</p>
+        </div>
+      </div>
+        
+        ${friend.status === 'pending' ? `
+          <div class="flex gap-2">
+            <button class="accept-btn" data-friend-id="${friend.id}">
+              <div class="bg-neon-green/20 hover:bg-neon-green/40 text-neon-green p-1 rounded-full transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </button>
+            <button class="reject-btn" data-friend-id="${friend.id}">
+              <div class="bg-red-500/20 hover:bg-red-500/40 text-red-500 p-1 rounded-full transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  private setupEventListeners(): void {
+    // Botões de aceitar solicitação
+    this.element.querySelectorAll('.accept-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const friendId = (btn as HTMLElement).dataset.friendId;
+        if (friendId && this.props.onAccept) {
+          this.props.onAccept(friendId);
+        }
+      });
+    });
+
+    // Botões de rejeitar solicitação
+    this.element.querySelectorAll('.reject-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const friendId = (btn as HTMLElement).dataset.friendId;
+        if (friendId && this.props.onReject) {
+          this.props.onReject(friendId);
+        }
+      });
+    });
+  }
+
   private render(): void {
     this.element.className = 'bg-arcade-darker border-2 border-neon-green rounded-lg p-4';
     this.element.innerHTML = `
-      <h3 class="text-neon-green text-xl mb-4 text-center">Seus amigos</h3>
+      <h3 class="text-neon-green text-xl mb-4 text-center">${this.props.title || 'Seus amigos'}</h3>
       <div class="friends-container space-y-2 max-h-80 overflow-y-auto">
         ${this.renderFriendsList(this.props.friends)}
       </div>
     `;
-  }
-
-  private renderFriendsList(friends: Friend[]): string {
-    if (friends.length > 0) {
-      return friends.map(friend => `
-        <div class="friend-item flex items-center justify-between bg-arcade-darkPurple p-3 rounded border border-neon-green" data-id="${friend.id}">
-          <div class="flex items-center space-x-3">
-            <div class="relative">
-              <img
-                src="${friend.avatar}"
-                alt="${friend.name}"
-                class="w-8 h-8 rounded-full border border-neon-blue"
-              />
-              <div class="status-indicator absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-arcade-darker ${
-                friend.status === 'online' ? 'bg-neon-green' : 'bg-gray-500'
-              }"></div>
-            </div>
-            <span class="text-white text-sm">${friend.name}</span>
-          </div>
-          
-          <div class="status-dot w-3 h-3 rounded-full ${
-            friend.status === 'online' ? 'bg-neon-green' : 'bg-gray-500'
-          }"></div>
-        </div>
-      `).join('');
-    } else if (this.searchTerm) {
-      return '<div class="text-center text-neon-green py-8">No friends found</div>';
-    } else {
-      return '<div class="text-center text-neon-green py-8">N/A</div>';
-    }
+    
+    this.setupEventListeners();
   }
 
   public update(newProps: Partial<FriendsListProps>): void {
@@ -66,6 +111,7 @@ export class FriendsList {
     const friendsContainer = this.element.querySelector('.friends-container');
     if (friendsContainer) {
       friendsContainer.innerHTML = this.renderFriendsList(this.props.friends);
+      this.setupEventListeners();
     }
   }
 
