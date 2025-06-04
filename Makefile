@@ -1,4 +1,4 @@
-all: build run
+all: keys build run
 
 build:
 	docker compose -f docker-compose.yml build
@@ -9,6 +9,9 @@ run: build
 exec:
 	$(eval service=$(filter-out $@,$(MAKECMDGOALS)))
 	docker compose -f docker-compose.yml exec $(service) bash
+
+keys: 
+	./gen-env.sh
 
 status:
 	$(eval service=$(filter-out $@,$(MAKECMDGOALS)))
