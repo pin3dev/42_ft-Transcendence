@@ -43,29 +43,30 @@ export async function renderUserProfilePage(user: any): Promise<void> {
     name: user.name,
     wins: user.wins || 0,
     losses: user.losses || 0,
-    avatar: user.avatar_url
+    avatar: user.avatar_url,
+    user_id: user.user_id,
   };
 
-  // Tenta buscar informações completas do usuário
-  try {
-    const response = await fetchWithAuth(`http://localhost:1025/user/profile/${user.user_id}`, {
-      method: 'GET',
-    });
+//   // Tenta buscar informações completas do usuário
+//   try {
+//     const response = await fetchWithAuth(`http://localhost:1025/user/profile/${user.user_id}`, {
+//       method: 'GET',
+//     });
 
-    if (response.ok) {
-      const data = await response.json();
-      // Atualiza os dados caso tenha recebido da API
-      userStats = {
-        name: data.name || user.name,
-        wins: data.wins || userStats.wins,
-        losses: data.losses || userStats.losses,
-        avatar: data.avatar_url || user.avatar_url
-      };
-    }
-  } catch (error) {
-    console.error('Erro ao buscar dados do usuário:', error);
-    // Continua com os dados já disponíveis
-  }
+//     if (response.ok) {
+//       const data = await response.json();
+//       // Atualiza os dados caso tenha recebido da API
+//       userStats = {
+//         name: data.name || user.name,
+//         wins: data.wins || userStats.wins,
+//         losses: data.losses || userStats.losses,
+//         avatar: data.avatar_url || user.avatar_url
+//       };
+//     }
+//   } catch (error) {
+//     console.error('Erro ao buscar dados do usuário:', error);
+//     // Continua com os dados já disponíveis
+//   }
 
   // Cria e adiciona a seção de perfil sem a barra de busca e botão de jogar
   const customProfile = document.createElement('div');
@@ -102,11 +103,98 @@ export async function renderUserProfilePage(user: any): Promise<void> {
       </div>
     </div>
   `;
-  customProfile.appendChild(userInfo);
-  
-  mainContainer.appendChild(customProfile);
-  pageContainer.appendChild(mainContainer);
-  pageContainer.appendChild(createFooter());
-  
-  root.appendChild(pageContainer);
+
+    // Adiciona o botão "Adicionar Amigo"
+    const addFriendBtn = document.createElement('button');
+    addFriendBtn.className = 'mt-6 px-4 py-2 bg-neon-blue text-white rounded-full hover:bg-opacity-80 transition-colors flex items-center gap-2 mx-auto';
+    addFriendBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      <span>Adicionar Amigo</span>
+    `;
+    
+    // Manipulador de evento para o botão de adicionar amigo
+    addFriendBtn.addEventListener('click', async () => {
+      try {
+        // Desabilita o botão durante a requisição
+        addFriendBtn.disabled = true;
+        addFriendBtn.innerHTML = 'Enviando solicitação...';
+        
+        const response = await fetchWithAuth('http://localhost:1025/user/friends/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            target_id: userStats.user_id
+          })
+        });
+        
+        if (response.ok) {
+          // Atualiza o botão para mostrar que a solicitação foi enviada
+          addFriendBtn.className = 'mt-6 px-4 py-2 bg-neon-green text-white rounded-full cursor-default mx-auto';
+          addFriendBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Solicitação Enviada</span>
+          `;
+        } else {
+          const errorData = await response.json();
+          
+          // Verifica se já existe uma relação
+          if (errorData.error && errorData.error.includes("Já existe uma relação")) {
+            addFriendBtn.className = 'mt-6 px-4 py-2 bg-gray-500 text-white rounded-full cursor-default mx-auto';
+            addFriendBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+              <span>Já existe uma solicitação</span>
+            `;
+          } else {
+            // Reativa o botão em caso de erro
+            addFriendBtn.disabled = false;
+            addFriendBtn.className = 'mt-6 px-4 py-2 bg-neon-red text-white rounded-full hover:bg-opacity-80 transition-colors flex items-center gap-2 mx-auto';
+            addFriendBtn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Tentar Novamente</span>
+            `;
+            
+            // Mostra mensagem de erro
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'text-neon-red text-sm mt-2';
+            errorMsg.textContent = errorData.error || 'Erro ao enviar solicitação de amizade';
+            userInfo.appendChild(errorMsg);
+            
+            // Remove a mensagem após 5 segundos
+            setTimeout(() => {
+              errorMsg.remove();
+            }, 5000);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao enviar solicitação de amizade:', error);
+        
+        // Reativa o botão em caso de erro
+        addFriendBtn.disabled = false;
+        addFriendBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Tentar Novamente</span>
+        `;
+      }
+    });
+
+    userInfo.appendChild(addFriendBtn);
+    customProfile.appendChild(userInfo);
+
+    mainContainer.appendChild(customProfile);
+    pageContainer.appendChild(mainContainer);
+    pageContainer.appendChild(createFooter());
+
+    root.appendChild(pageContainer);
 }

@@ -5,6 +5,7 @@ export interface UserStats {
   wins: number;
   losses: number;
   avatar: string;
+  user_id?: string; // Campo opcional para manter compatibilidade com código existente
 }
 
 export interface ProfileSectionProps {
