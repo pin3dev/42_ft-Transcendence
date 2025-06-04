@@ -142,43 +142,42 @@ export async function renderTestPage(): Promise<void> {
   const profileElement = profileSection.getElement();
 
 // --- BARRA DE BUSCA DE USUÁRIOS DENTRO DO PERFIL ---
-  // Wrapper para alinhar no topo e direita do card
-const searchWrapper = document.createElement('div');
-searchWrapper.className = 'flex justify-end items-start mt-[-12px] w-full';
+// Wrapper da barra de pesquisa posicionado no canto superior direito do card
+  const searchWrapper = document.createElement('div');
+  searchWrapper.className = `
+    absolute top-4 right-4 z-20
+    flex items-center justify-end
+  `;
 
-// Estilo refinado para o input de busca
-const userSearchInput = document.createElement('input');
-userSearchInput.type = 'text';
-userSearchInput.placeholder = 'Adicionar amigo...';
-userSearchInput.className = `
-  bg-gradient-to-r from-neon-purple to-arcade-darkPurple
-  text-white
-  placeholder-white/60
-  border-none
-  focus:outline-none
-  focus:ring-0
-  w-60
-  rounded-full
-  px-4 py-1
-  text-sm
-  transition-all
-`;
+  // Campo de input estilizado com visual neon
+  const userSearchInput = document.createElement('input');
+  userSearchInput.type = 'text';
+  userSearchInput.placeholder = '🔍 Procurar usuário...';
+  userSearchInput.className = `
+    w-full max-w-xs
+    bg-gradient-to-r from-[#4c1d95] to-[#581c87]
+    text-white placeholder-white/60
+    border border-neon-purple
+    rounded-full px-4 py-2
+    shadow-lg focus:outline-none focus:ring-2 focus:ring-neon-purple
+    transition-all duration-300 ease-in-out
+    text-sm animate-pulse-neon
+  `;
 
-// Dropdown dos resultados
-const userSearchResults = document.createElement('div');
-userSearchResults.className = `
-  absolute z-30 mt-1 w-full
-  bg-arcade-darkPurple border border-primary/10
-  rounded-lg shadow-md text-sm
-`;
+  // Dropdown de resultados
+  const userSearchResults = document.createElement('div');
+  userSearchResults.className = `
+    absolute top-full left-0 mt-2 w-full
+    bg-arcade-dark border border-neon-purple
+    rounded-lg shadow-lg text-sm z-50 overflow-hidden
+  `;
 
-// Wrapper do input com dropdown
-const userSearchBox = document.createElement('div');
-userSearchBox.className = 'relative w-60';
-userSearchBox.appendChild(userSearchInput);
-userSearchBox.appendChild(userSearchResults);
-searchWrapper.appendChild(userSearchBox);
-
+  // Wrapper com posicionamento relativo
+  const userSearchBox = document.createElement('div');
+  userSearchBox.className = 'relative w-full max-w-xs';
+  userSearchBox.appendChild(userSearchInput);
+  userSearchBox.appendChild(userSearchResults);
+  searchWrapper.appendChild(userSearchBox);
   // Função para inserir a barra de busca no slot do header do perfil
   function insertUserSearchBar() {
     const userSearchSlot = profileElement.querySelector('#user-search-slot');
@@ -250,13 +249,15 @@ searchWrapper.appendChild(userSearchBox);
   gridContainer.className = 'grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8';
 
   // Adiciona o ranking (leaderboard)
-  const leaderboardPreview = await createLeaderboardPreview();
-  gridContainer.appendChild(leaderboardPreview);
+  // const leaderboardPreview = await createLeaderboardPreview();
+  // gridContainer.appendChild(leaderboardPreview);
 
   // Adiciona a lista de amigos
   const friendsList = new FriendsList({ friends: mockFriends });
   gridContainer.appendChild(friendsList.getElement());
 
+  const pendingList = new FriendsList({ friends: mockFriends });
+  gridContainer.appendChild(pendingList.getElement());
   // Atualiza com dados reais da API
   try {
     const [updatedStats, updatedFriends] = await Promise.all([
@@ -269,6 +270,7 @@ searchWrapper.appendChild(userSearchBox);
       insertUserSearchBar();
     }
     friendsList.update({ friends: updatedFriends });
+    pendingList.update({ friends: updatedFriends });
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
   }

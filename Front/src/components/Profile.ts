@@ -25,10 +25,10 @@ export class ProfileSection {
 private render(): void {
   const { userStats, onPlay } = this.props;
 
-  this.element.className = 'bg-arcade-darker border-2 border-neon-purple rounded-lg p-6 mb-8';
+  this.element.className = 'relative bg-arcade-darker border-2 border-neon-purple rounded-lg p-6 mb-8';
   this.element.innerHTML = `
-    <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-6">
+  <div id="user-search-slot" class="relative w-full h-0"></div>
+    <div class="flex items-center space-x-6 mt-12">
         <div class="w-24 h-24 rounded-full border-4 border-neon-blue overflow-hidden">
           <img
             src="${userStats.avatar}"
@@ -50,7 +50,6 @@ private render(): void {
           </div>
         </div>
       </div>
-      <div id="user-search-slot" class="flex-shrink-0"></div>
     </div>
     <div class="flex justify-center mt-6">
       <button
