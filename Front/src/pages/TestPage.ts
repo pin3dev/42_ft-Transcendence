@@ -71,6 +71,10 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     });
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/';
+        return null;
+      }
       throw new Error('Erro ao acessar a rota protegida.');
     }
 
@@ -83,7 +87,8 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     };
   } catch (error) {
     console.error('Erro ao acessar a rota protegida:', error);
-    return mockUserStats; // Retorna os dados mockados em caso de erro
+    window.location.href = '/';
+    return null; // Retorna os dados mockados em caso de erro
   }
 }
 
@@ -94,6 +99,10 @@ async function fetchFriendsList(): Promise<Friend[]> {
     });
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/';
+        return [];
+      }
       throw new Error('Erro ao carregar lista de amigos');
     }
 
@@ -106,7 +115,8 @@ async function fetchFriendsList(): Promise<Friend[]> {
     }));
   } catch (error) {
     console.error('Erro ao carregar amigos:', error);
-    return mockFriends; // Retorna os dados mockados em caso de erro
+    window.location.href = '/';
+    return [];
   }
 }
 
@@ -117,6 +127,10 @@ async function fetchPendingRequests(): Promise<Friend[]> {
     });
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = '/';
+        return [];
+      }
       throw new Error('Erro ao carregar solicitações de amizade');
     }
 
