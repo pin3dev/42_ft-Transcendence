@@ -177,6 +177,27 @@ async function rejectFriendRequest(senderId: string): Promise<boolean> {
   }
 }
 
+async function removeFriend(targetId: string): Promise<boolean> {
+  try {
+    const response = await fetchWithAuth('http://localhost:1025/user/friends/remove', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ target_id: targetId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao remover amizade');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Erro ao remover amizade:', error);
+    return false;
+  }
+}
+
 export async function renderTestPage(): Promise<void> {
   const root = document.getElementById('root');
   if (!root) return;
@@ -309,10 +330,18 @@ export async function renderTestPage(): Promise<void> {
   // const leaderboardPreview = await createLeaderboardPreview();
   // gridContainer.appendChild(leaderboardPreview);
 
-  // Adiciona a lista de amigos com título personalizado
+// Adiciona a lista de amigos com título personalizado
   const friendsList = new FriendsList({ 
     friends: mockFriends,
-    title: 'Meus Amigos'  // Título personalizado para lista de amigos
+    title: 'Meus Amigos',  // Título personalizado para lista de amigos
+    onRemove: async (friendId) => {
+      const success = await removeFriend(friendId);
+      if (success) {
+        // Recarrega a lista de amigos para atualizar a UI
+        const updatedFriends = await fetchFriendsList();
+        friendsList.update({ friends: updatedFriends });
+      }
+    }
   });
   gridContainer.appendChild(friendsList.getElement());
 
