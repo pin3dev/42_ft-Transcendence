@@ -81,6 +81,19 @@
   }
 }
 
+input::-webkit-search-decoration,
+  input::-webkit-search-cancel-button,
+  input::-webkit-search-results-button,
+  input::-webkit-search-results-decoration {
+    display: none;
+  }
+
+  input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+  }
+
 /* Custom Animations */
 @keyframes glow {
   0%, 100% { 
