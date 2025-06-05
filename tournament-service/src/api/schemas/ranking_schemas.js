@@ -2,6 +2,12 @@ const { gateway_headers, error_responses } = require("./common_schemas");
 
 const getTopRanking_schema = {
   headers: gateway_headers,
+  querystring: {
+    type: "object",
+    properties: {
+      limit: { type: "string", pattern: "^[0-9]+$" }
+    }
+  },
   response: {
     200: {
       type: "array",
@@ -9,9 +15,10 @@ const getTopRanking_schema = {
         type: "object",
         properties: {
           user_id: { type: "string" },
-          name: { type: "string" },
-          avatar_url: { type: "string", format: "uri" },
-          score: { type: "integer" }
+          score: { type: "integer" },
+          total_wins: { type: "integer" },
+          total_losses: { type: "integer" },
+          win_rate: { type: "string" }
         }
       }
     },
@@ -25,8 +32,9 @@ const getUserStats_schema = {
     200: {
       type: "object",
       properties: {
-        totalWins: { type: "integer" },
-        totalLosses: { type: "integer" }
+        total_wins: { type: "integer" },
+        total_losses: { type: "integer" },
+        score: { type: "integer" }
       }
     },
     401: error_responses[401],
