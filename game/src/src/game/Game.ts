@@ -2,7 +2,7 @@ import { Ball } from "./Ball";
 import { Field } from "./Field";
 import { Paddle } from "./Paddle";
 import { Player } from "./Player";
-import { MessageType } from "../message/Message";
+import { Message, MessageType } from "../message/Message";
 import { MessageWithValue } from "../message/MessageWithValue";
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Sender } from "../Sender";
@@ -14,7 +14,7 @@ export class Game {
 	private static matchIdCounter: number = 1;
 	private static readonly START_COUNT_DOWN_VALUE = 3;
 	private static readonly MAX_POINT = 10;
-	private static readonly WINNING_SCORE = (this.MAX_POINT/2) + 1;
+	private static readonly WINNING_SCORE = (this.MAX_POINT / 2) + 1;
 
 	private userSessions: WebSocketUserSession[] = [];
 	private players: Player[] = [];
@@ -102,7 +102,7 @@ export class Game {
 
 	public abort() {
 		if (this.gameStatus !== 'RUNNING') return;
-		this.broadcast('GAME_ABORTED', '');
+		this.broadcast('GAME_ABORTED');
 		this.stop();
 	}
 
@@ -110,7 +110,7 @@ export class Game {
 	public playerExit(wsSession: WebSocketUserSession) {
 
 		let playerSession = (wsSession === this.userSessions[0]) ? this.players[0] : this.players[1];
-		this.broadcast('GAME_ABORTED', '');
+		this.broadcast('GAME_ABORTED');
 		this.stop();
 	}
 
@@ -261,11 +261,11 @@ export class Game {
 			this.gameStatus = 'FINISHED';
 			this.sendMessageToWinner(this.players[0]);
 			this.stop();
-		}else if (this.players[1].score >= Game.WINNING_SCORE) {
+		} else if (this.players[1].score >= Game.WINNING_SCORE) {
 			this.gameStatus = 'FINISHED';
 			this.sendMessageToWinner(this.players[1]);
 			this.stop();
-		}else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINT) {
+		} else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINT) {
 			this.gameStatus = 'FINISHED';
 			this.sendMessageDraw();
 			this.stop();
@@ -275,18 +275,18 @@ export class Game {
 
 	//------------------------------ messages --------------------------------------
 
-	private sendMessageToWinner(player : Player){
-		if (player == this.players[0]){
-			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_WIN', '')
-			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_LOSE', '')
-		}else if (player == this.players[1]){
-			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_LOSE', '')
-			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_WIN', '')
+	private sendMessageToWinner(player: Player) {
+		if (player == this.players[0]) {
+			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_WIN')
+			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_LOSE')
+		} else if (player == this.players[1]) {
+			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_LOSE')
+			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_WIN')
 		}
 	}
 
-	private sendMessageDraw(){
-		this.broadcast('GAME_PLAYER_DRAW', '');
+	private sendMessageDraw() {
+		this.broadcast('GAME_PLAYER_DRAW');
 	}
 
 
@@ -314,7 +314,7 @@ export class Game {
 	}
 
 	private sendMessageGameCanStart(): void {
-		this.broadcast('GAME_CAN_START', '');
+		this.broadcast('GAME_CAN_START');
 	}
 
 	private sendMessageGameStatus() {
@@ -328,15 +328,17 @@ export class Game {
 		});
 	}
 
-	private broadcast(messageType: MessageType, obj: Object) {
+	private broadcast(messageType: MessageType, obj?: Object) {
 		this.sendMessageToPlayer(this.userSessions[0], messageType, obj);
 		this.sendMessageToPlayer(this.userSessions[1], messageType, obj);
 	}
 
-	private sendMessageToPlayer(player: WebSocketUserSession, messageType: MessageType, obj: Object) {
+	private sendMessageToPlayer(player: WebSocketUserSession, messageType: MessageType, obj?: Object) {
 		let sender = new Sender(player.getWebsocket);
 
-		let messageToSend = new MessageWithValue(messageType, obj);
+		let messageToSend = (obj === undefined)
+			? new Message(messageType)
+			: new MessageWithValue(messageType, obj);
 
 		sender.sendMessage(messageToSend);
 	}
