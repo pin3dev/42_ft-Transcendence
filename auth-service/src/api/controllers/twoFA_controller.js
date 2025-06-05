@@ -29,7 +29,7 @@ async function twoFA_controller(request, reply) {
       user_id: user.id,
       email: user.email
     },
-    { expiresIn: "60s" }
+    { expiresIn: "1h" }
   );
 
   // Define o cookie com o token JWT

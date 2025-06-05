@@ -74,6 +74,20 @@ services:
       - ./user-mgmt/avatars:/app/avatars        # mesmo caminho interno
       - ./pckg/redis:/app/pckg/redis:ro 
 
+  tournament-service:
+    build:
+      context: ./tournament-service
+    container_name: tournament-service
+    networks:
+      - internal_network
+    expose:
+      - "6000"
+    volumes:
+      - ./pckg/redis:/app/pckg/redis:ro
+      - tournament-data:/app/data
+    depends_on:
+      - event-bus
+
 networks:
   internal_network:
     name: internal_network
@@ -90,5 +104,6 @@ volumes:
     name: auth-data
   event-data:
     name: event-data
-  # shared-keys:
+  tournament-data:
+    name: tournament-data
 
