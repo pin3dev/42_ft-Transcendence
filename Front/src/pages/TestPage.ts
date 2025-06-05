@@ -220,7 +220,7 @@ export async function renderTestPage(): Promise<void> {
 
   // Cria a estrutura principal da página
   const pageContainer = document.createElement('div');
-  pageContainer.className = 'min-h-screen bg-arcade-darkPurple flex flex-col';
+  pageContainer.className = 'bgp-arcade-darkBlueGreen';
 
   // Adiciona a navbar
   pageContainer.appendChild(createNavbar());
@@ -257,27 +257,32 @@ export async function renderTestPage(): Promise<void> {
   userSearchInput.type = 'text';
   userSearchInput.placeholder = '🔍 Procurar usuário...';
   userSearchInput.className = `
-    w-full max-w-xs
-    bg-gradient-to-r from-[#4c1d95] to-[#581c87]
-    text-white placeholder-white/60
-    border border-neon-purple
-    rounded-full px-4 py-2
-    shadow-lg focus:outline-none focus:ring-2 focus:ring-neon-purple
-    transition-all duration-300 ease-in-out
-    text-sm animate-pulse-neon
-  `;
-
+  w-full max-w-xs
+  appearance-none
+  bg-black text-neon-pink placeholder-white/60
+  border border-neon-pink
+  px-4 py-2 rounded-full
+  focus:outline-none focus:ring-0 focus:border-neon-pink
+  animate-pulse-neon
+  transition-all duration-300 ease-in-out
+  text-sm
+`;
+ 
   // Dropdown de resultados
   const userSearchResults = document.createElement('div');
   userSearchResults.className = `
     absolute top-full left-0 mt-2 w-full
-    bg-arcade-dark border border-neon-purple
+    bg-arcade-dark border border-white/10 focus-within:border-neon-purple
     rounded-lg shadow-lg text-sm z-50 overflow-hidden
   `;
 
   // Wrapper com posicionamento relativo
   const userSearchBox = document.createElement('div');
-  userSearchBox.className = 'relative w-full max-w-xs';
+  userSearchBox.className = `
+  relative z-20 w-full max-w-xs
+  bg-black rounded-full overflow-hidden
+  shadow-[0_0_8px_#00FFFF]
+`;
   userSearchBox.appendChild(userSearchInput);
   userSearchBox.appendChild(userSearchResults);
   searchWrapper.appendChild(userSearchBox);
@@ -407,8 +412,28 @@ export async function renderTestPage(): Promise<void> {
   mainContainer.appendChild(gridContainer);
   pageContainer.appendChild(mainContainer);
 
+
+  const deleteButton = document.createElement('button');
+  deleteButton.id = 'delete-profile-btn';
+  deleteButton.className = `
+    mx-auto mt-6 mb-10 block
+    text-xs text-red-400 hover:text-red-300
+    hover:text-red-300
+    transition-colors duration-200
+  `;
+  deleteButton.textContent = 'Excluir conta';
+  deleteButton.title = 'Remover sua conta do sistema';
+  
+  deleteButton.addEventListener('click', () => {
+    const deleteModal = document.querySelector('#confirm-delete')?.closest('.fixed');
+    if (deleteModal) deleteModal.classList.remove('hidden');
+  });
+  
+  pageContainer.appendChild(deleteButton);
+
   // Adiciona o footer
   pageContainer.appendChild(createFooter());
+
 
   root.appendChild(pageContainer);
 }

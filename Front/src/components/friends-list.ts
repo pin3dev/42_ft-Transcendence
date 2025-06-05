@@ -44,7 +44,7 @@ export class FriendsList {
           <p class="text-white font-medium">${friend.name}</p>
           <p class="text-xs ${
             friend.status === 'online' ? 'text-neon-green' : 
-            friend.status === 'pending' ? 'text-neon-orange' : 'text-gray-500'
+            friend.status === 'pending' ? 'text-neon-orange' : 'text-neon-pink/70'
           }">${friend.status === 'pending' ? 'Solicitação pendente' : friend.status}</p>
         </div>
       </div>
@@ -117,9 +117,9 @@ export class FriendsList {
   }
 
   private render(): void {
-    this.element.className = 'bg-arcade-darker border-2 border-neon-green rounded-lg p-4';
+    this.element.className = 'bg-arcade-darker border border-neon-green rounded-xl p-5 shadow-lg shadow-neon-green/10';
     this.element.innerHTML = `
-      <h3 class="text-neon-green text-xl mb-4 text-center">${this.props.title || 'Seus amigos'}</h3>
+      <h3 class="text-neon-green text-lg mb-4 font-semibold text-center tracking-wide uppercase">${this.props.title || 'Seus amigos'}</h3>
       <div class="friends-container space-y-2 max-h-80 overflow-y-auto">
         ${this.renderFriendsList(this.props.friends)}
       </div>

@@ -81,18 +81,33 @@
   }
 }
 
-input::-webkit-search-decoration,
-  input::-webkit-search-cancel-button,
-  input::-webkit-search-results-button,
-  input::-webkit-search-results-decoration {
-    display: none;
+@layer base {
+  input {
+    background-clip: padding-box;
   }
 
-  input:focus {
-    outline: none !important;
+  input, input:focus {
+    background-color: black !important;
     box-shadow: none !important;
-    border-bottom: none !important;
+    border: none !important;
+    outline: none !important;
   }
+
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button,
+  input::-webkit-search-decoration,
+  input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+
+  input[type="text"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
 
 /* Custom Animations */
 @keyframes glow {
@@ -190,6 +205,29 @@ input::-webkit-search-decoration,
   background: linear-gradient(
     0deg, /* O ângulo aqui pode ser fixo, pois vamos rotacionar o pseudo-elemento */
     #ff00ff,
+    #000000,
+    #000000
+  );
+  animation: rotatePseudoGradient 2s linear infinite;
+}
+
+.bgp-arcade-darkBlueGreen {
+  @apply min-h-screen flex flex-col relative overflow-hidden;
+  background-color: #0d032a;
+  z-index: 0;
+}
+
+.bgp-arcade-darkBlueGreen::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  z-index: -1;
+  background: linear-gradient(
+    0deg,
+    #00ffff, /* neon azul */
     #000000,
     #000000
   );

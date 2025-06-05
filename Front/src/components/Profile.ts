@@ -26,11 +26,11 @@ export class ProfileSection {
 private render(): void {
   const { userStats, onPlay } = this.props;
 
-  this.element.className = 'relative bg-arcade-darker border-2 border-neon-purple rounded-lg p-6 mb-8';
+  this.element.className = 'relative bg-arcade-darker border-2 border-neon-blue rounded-lg p-6 mb-8';
   this.element.innerHTML = `
   <div id="user-search-slot" class="relative w-full h-0"></div>
     <div class="flex items-center space-x-6 mt-12 relative">
-      <div class="relative group w-24 h-24 rounded-full border-4 border-neon-blue overflow-hidden">
+      <div class="relative group w-24 h-24 rounded-full border-2 border-white/20 hover:border-neon-blue transition-all overflow-hidden">
         <img
           src="${userStats.avatar}"
           alt="${userStats.name}"
@@ -45,7 +45,7 @@ private render(): void {
         </button>
       </div>
       <div class="space-y-2">
-        <h2 class="text-2xl text-neon-blue neon-text">${userStats.name}</h2>
+        <h2 class="text-2xl text-neon-blue">${userStats.name}</h2>
         <div class="flex space-x-6">
           <div class="text-center">
             <div class="text-neon-green text-xl">${userStats.wins}</div>
@@ -60,18 +60,9 @@ private render(): void {
     </div>
     <div class="flex justify-center mt-6">
       <button
-        class="play-button bg-neon-green text-black px-8 py-3 rounded-lg text-lg font-bold hover:bg-opacity-80 transition-all animate-pulse-neon"
+        class="play-button bg-neon-green text-black px-8 py-3 rounded-lg text-lg font-bold shadow-[0_0_16px_#39FF14] animate-pulse"
       >
         PLAY
-      </button>
-    </div>
-    <div class="flex justify-center mt-4">
-      <button
-        class="bg-red-600 text-white px-6 py-2 rounded-lg text-md font-semibold hover:bg-red-700 transition-all border border-red-400 shadow-md hover:shadow-red-500/50 neon-text"
-        id="delete-profile-btn"
-        title="Deletar Perfil"
-      >
-        🗑️ Deletar Perfil
       </button>
     </div>
   `;
@@ -82,7 +73,7 @@ private render(): void {
     fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden
   `;
   modal.innerHTML = `
-    <div class="bg-arcade-darker p-6 rounded-xl border border-neon-purple w-full max-w-md text-white space-y-4">
+    <div class="bg-arcade-darker p-6 rounded-xl border border-neon-blue w-full max-w-md text-white space-y-4">
       <h3 class="text-xl font-bold">Editar Perfil</h3>
       <input id="edit-name" type="text" class="w-full p-2 rounded text-black" placeholder="Novo nome de usuário" />
       <input id="edit-avatar" type="file" accept="image/*" class="w-full" />
@@ -95,7 +86,7 @@ private render(): void {
   document.body.appendChild(modal);
 
   const deleteModal = document.createElement('div');
-  deleteModal.className = 'fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden';
+  deleteModal.className = 'fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden transition-opacity';
   deleteModal.innerHTML = `
     <div class="bg-arcade-darker p-6 rounded-xl border border-neon-pink w-full max-w-md text-white space-y-4">
       <h3 class="text-xl font-bold text-neon-pink">Tem certeza que deseja deletar seu perfil?</h3>
