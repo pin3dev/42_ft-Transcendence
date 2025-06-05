@@ -104,6 +104,18 @@ async function buildServer() {
     }
   }));
 
+    // Proxy: Teste protegido
+    app.register(createServiceProxy({
+      prefix: "/tournament",
+      target: "http://tournament-service:6000",
+      onRequest: async (request, reply) => {
+        if (request.method === 'OPTIONS') return;
+        await app.authenticate(request, reply);
+        request.headers['x-user-id'] = request.user.user_id;
+        request.headers['x-user-email'] = request.user.email;
+      }
+    }));
+
   await app.ready();
   await app.listen({ port: 1025, host: "0.0.0.0" });
 }

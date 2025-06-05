@@ -46,22 +46,9 @@ function calculateElo(winnerScore, loserScore) {
 
 async function getTopPlayers(limit = 5) {
   return await all(
-    `SELECT player_id, score FROM player_ranking ORDER BY score DESC LIMIT ?`,
+    `SELECT player_id, score FROM ranking ORDER BY score DESC LIMIT ?`,
     [limit]
   );
-}
-
-async function getStats(userId) {
-  const winsRow = await get(`SELECT COUNT(*) as total FROM matches WHERE winner_id = ?`, [userId]);
-  const lossesRow = await get(
-    `SELECT COUNT(*) as total FROM matches WHERE (player1_id = ? OR player2_id = ?) AND winner_id != ?`,
-    [userId, userId, userId]
-  );
-
-  return {
-    totalWins: winsRow?.total || 0,
-    totalLosses: lossesRow?.total || 0
-  };
 }
 
 module.exports = {
@@ -69,5 +56,4 @@ module.exports = {
   updateRanking,
   calculateElo,
   getTopPlayers,
-  getStats
 };

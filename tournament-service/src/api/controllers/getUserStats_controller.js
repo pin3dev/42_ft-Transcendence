@@ -1,4 +1,4 @@
-const { getUserStats } = require("../../../application/getUserStats");
+const { getUserStats } = require("../../application/getUserStats");
 
 async function getUserStats_controller(request, reply) {
   const userId = request.headers["x-user-id"];
@@ -11,6 +11,7 @@ async function getUserStats_controller(request, reply) {
     const stats = await getUserStats(userId);
     reply.code(200).send(stats);
   } catch (err) {
+    console.error("Detalhes do erro:", err);
     reply.code(500).send({ error: "Erro ao recuperar estatísticas do usuário." });
   }
 }

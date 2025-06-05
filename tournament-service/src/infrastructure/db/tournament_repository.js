@@ -1,8 +1,10 @@
-const db = require("./tournaments_sql");
+const db_tournament = require("./tournaments_sql");
+const db_players = require("./players_sql");
+
 const util = require("util");
 
-const run = util.promisify(db.run).bind(db);
-const prepare = db.prepare.bind(db);
+const run = util.promisify(db_tournament.run).bind(db_tournament);
+const prepare = db_players.prepare.bind(db_players);
 
 async function insertTournament(tournament) {
   await run(
@@ -37,5 +39,5 @@ async function insertPlayers(tournamentId, players) {
 
 module.exports = {
   insertTournament,
-  insertPlayers
+  insertPlayers,
 };
