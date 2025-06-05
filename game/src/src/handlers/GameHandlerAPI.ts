@@ -18,9 +18,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 		if (messageFromClient.getType === 'GAME_CREATE_GLOBAL_MATCH') {
 
-			if (this.waitingPlayer === ws) {
-				return;
-			} else if (this.waitingPlayer === null || (this.waitingPlayer.getWebsocket.readyState !== WebSocket.OPEN)) {
+			if (this.waitingPlayer === ws || this.waitingPlayer === null || (this.waitingPlayer.getWebsocket.readyState !== WebSocket.OPEN)) {
 				this.waitingPlayer = ws;
 				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER'));
 			} else {
