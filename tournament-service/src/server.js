@@ -1,10 +1,11 @@
+const Fastify = require("fastify");
+
 mRepo = require("./infrastructure/db/match_repository.js");
 rRepo = require("./infrastructure/db/ranking_repository.js");
 tRepo = require("./infrastructure/db/tournament_repository.js");
-const Fastify = require("fastify");
 
-// require("./events/matchFinished_listener");
-// require("./events/tournamentCreated_listener");
+const { matchFinished_listener } = require("./events/matchFinished_listener");
+const { tournamentCreated_listener } = require("./events/tournamentCreated_listener");
 
 const ranking_routes = require("./api/routes/ranking_routes");
 
@@ -35,3 +36,6 @@ const fastify = Fastify({
       process.exit(1);
     }
   });
+
+  matchFinished_listener();
+  tournamentCreated_listener();
