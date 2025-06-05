@@ -260,7 +260,6 @@ export async function renderTestPage(): Promise<void> {
   w-full max-w-xs
   appearance-none
   bg-black text-neon-pink placeholder-white/60
-  border border-neon-pink
   px-4 py-2 rounded-full
   focus:outline-none focus:ring-0 focus:border-neon-pink
   animate-pulse-neon

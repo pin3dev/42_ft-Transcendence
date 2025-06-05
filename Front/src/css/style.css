@@ -81,34 +81,6 @@
   }
 }
 
-@layer base {
-  input {
-    background-clip: padding-box;
-  }
-
-  input, input:focus {
-    background-color: black !important;
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
-  }
-
-  input::-webkit-inner-spin-button,
-  input::-webkit-outer-spin-button,
-  input::-webkit-search-decoration,
-  input::-webkit-search-cancel-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-  }
-
-  input[type="text"] {
-    -webkit-appearance: none;
-    appearance: none;
-  }
-}
-
-
 /* Custom Animations */
 @keyframes glow {
   0%, 100% { 
@@ -201,6 +173,7 @@
   width: 300%;  /* Maior que o pai para cobrir durante a rotação */
   height: 300%; /* Maior que o pai para cobrir durante a rotação */
   z-index: -1;  /* Coloca o pseudo-elemento atrás do conteúdo do .bgp-arcade-darkPurple */
+  
 
   background: linear-gradient(
     0deg, /* O ângulo aqui pode ser fixo, pois vamos rotacionar o pseudo-elemento */
@@ -233,6 +206,7 @@
   );
   animation: rotatePseudoGradient 2s linear infinite;
 }
+
 
 /* Sua animação atual, mas agora ela rotaciona o ::before */
 @keyframes rotatePseudoGradient {
