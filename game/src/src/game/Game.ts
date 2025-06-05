@@ -296,20 +296,46 @@ export class Game {
 
 	private sendMessageGameFull() {
 		this.broadcast('GAME_FULL', {
-			id: this.id,
-			field_width: Field.WIDTH,
-			field_height: Field.HEIGHT,
-			paddle_height: Paddle.HEIGHT,
-			paddle_width: Paddle.WIDTH,
-			paddle_player_1_height_position: this.players[0].y,
-			paddle_player_1_width_position: this.players[0].x,
-			paddle_player_2_height_position: this.players[1].y,
-			paddle_player_2_width_position: this.players[1].x,
-			ball_size: Ball.BALL_SIZE,
-			ball_y_position: this.ball.y,
-			ball_x_position: this.ball.x,
-			scoreboard_player_1: this.players[0].score,
-			scoreboard_player_2: this.players[1].score
+			"id": this.id,
+			"sizes": {
+				"field": {
+					"width": Field.WIDTH,
+					"height": Field.HEIGHT
+				},
+				"paddles": {
+					"width": Paddle.WIDTH,
+					"height": Paddle.HEIGHT
+				},
+				"ball": Ball.BALL_SIZE,
+				"player_info": {
+					"player_1": {
+						"nome": "jonh"
+					},
+					"player_2": {
+						"nome": "mary"
+					}
+				}
+			},
+			"positions": {
+				"paddles": {
+					"player_1": {
+						"x": this.players[0].x,
+						"y": this.players[0].y
+					},
+					"player_2": {
+						"x": this.players[1].x,
+						"y": this.players[1].y
+					}
+				},
+				"ball": {
+					"x": this.ball.x,
+					"y": this.ball.y
+				}
+			},
+			"scoreboard": {
+				"player_1": this.players[0].score,
+				"player_2": this.players[1].score
+			}
 		});
 	}
 
@@ -319,12 +345,26 @@ export class Game {
 
 	private sendMessageGameStatus() {
 		this.broadcast('GAME_STATUS', {
-			paddle_player_1_height_position: this.players[0].y,
-			paddle_player_2_height_position: this.players[1].y,
-			ball_y_position: this.ball.y,
-			ball_x_position: this.ball.x,
-			scoreboard_player_1: this.players[0].score,
-			scoreboard_player_2: this.players[1].score
+			"positions": {
+				"paddles": {
+					"player_1": {
+						"x": this.players[0].x,
+						"y": this.players[0].y
+					},
+					"player_2": {
+						"x": this.players[1].x,
+						"y": this.players[1].y
+					}
+				},
+				"ball": {
+					"x": this.ball.x,
+					"y": this.ball.y
+				}
+			},
+			"scoreboard": {
+				"player_1": this.players[0].score,
+				"player_2": this.players[1].score
+			}
 		});
 	}
 
