@@ -1,72 +1,71 @@
-import { Message, MessageType } from "../message/Message";
-import { Sender } from "../Sender";
-import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Ball } from "./Ball";
+import { Field } from "./Field";
 import { Paddle } from "./Paddle";
+import { Player } from "./Player";
+import { MessageType } from "../message/Message";
+import { MessageWithValue } from "../message/MessageWithValue";
+import { WebSocketUserSession } from "../WebSocketUserSession";
+import { Sender } from "../Sender";
 
-export type GameStatus = 'NOT_READY' | 'RUNNING' | 'FINISHED';
+export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 
 export class Game {
 
-	private static readonly START_COUNT_DOWN_VALUE = 3;
-
-	//fps values
-	private static readonly MININUM_FPS_SPEED = 10;
-	private static readonly START_FPS_SPEED = 25;
-
 	private static matchIdCounter: number = 1;
+	private static readonly START_COUNT_DOWN_VALUE = 3;
+	private static readonly MAX_POINT = 10;
+	private static readonly WINNING_SCORE = (this.MAX_POINT/2) + 1;
 
-	private static readonly FIELD_WIDTH: number = 800;
-	private static readonly FIELD_HEIGHT: number = 600;
+	private userSessions: WebSocketUserSession[] = [];
+	private players: Player[] = [];
+	private ball: Ball;
+
+	private gameStatus: GameStatus2;
 
 	private id: number = 0;
 
-	private arrayPlayers: WebSocketUserSession[] = [];
-	private arrayPaddles: Paddle[] = [];
-	private ball: Ball;
-
-	private scores: number[] = [];
+	private confirmed: Set<WebSocketUserSession>;
 
 	private gameLoopInterval: NodeJS.Timeout | undefined;
-	private fpsSpeepInterval: NodeJS.Timeout | undefined;
 	private countDownInterval: NodeJS.Timeout | undefined;
 
 	private countDown = Game.START_COUNT_DOWN_VALUE;
 
-	private gameStatus: GameStatus;
-
-	private confirmed: Set<WebSocketUserSession>;
-
-	private fps: number = Game.START_FPS_SPEED;
+	private keys = {
+		paddle_left_up: false,
+		paddle_left_down: false,
+		paddle_right_up: false,
+		paddle_right_down: false
+	};
 
 	constructor() {
+		this.ball = new Ball(Field.WIDTH / 2, Field.HEIGHT / 2);
+		this.players[0] = new Player(Paddle.SPACE_FROM_SIDE, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0, 0);
+		this.players[1] = new Player(Field.WIDTH - Paddle.SPACE_FROM_SIDE - Paddle.WIDTH, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0, 0);
+
 		this.gameStatus = 'NOT_READY';
-		this.ball = new Ball(Game.FIELD_WIDTH / 2, Game.FIELD_HEIGHT / 2);
-		this.gameLoopInterval = undefined;
-		this.fpsSpeepInterval = undefined;
-		this.countDownInterval = undefined;
-		this.confirmed = new Set<WebSocketUserSession>();
 
 		this.id = Game.matchIdCounter++;
+		this.confirmed = new Set<WebSocketUserSession>();
+
+		this.gameLoopInterval = undefined;
+		this.countDownInterval = undefined;
 	}
 
 	public createMatch(player1: WebSocketUserSession, player2: WebSocketUserSession) {
-
-		this.arrayPlayers[0] = player1;
-		this.arrayPlayers[1] = player2;
-
-		const middleYtoPaddles = (Game.FIELD_HEIGHT - Paddle.HEIGHT) / 2;
-
-		this.arrayPaddles[0] = new Paddle(10, middleYtoPaddles);
-		this.arrayPaddles[1] = new Paddle(Game.FIELD_WIDTH - 10, middleYtoPaddles);
-
-		this.scores = [0, 0];
+		this.userSessions[0] = player1;
+		this.userSessions[1] = player2;
 
 		this.sendMessageGameCanStart();
 	}
 
+	public addConfirmation(wsSession: WebSocketUserSession): number {
+		this.confirmed.add(wsSession);
+		return this.confirmed.size;
+	}
+
 	public startGame() {
-		this.gameStatus = 'RUNNING';
+		this.gameStatus = 'READY';
 		this.sendMessageGameFull();
 		this.makeCountDownRoutine();
 	}
@@ -75,23 +74,30 @@ export class Game {
 
 		if (this.gameStatus !== 'RUNNING') return;
 
-		const paddleToMove = (player === this.arrayPlayers[0] ? this.arrayPaddles[0] : this.arrayPaddles[1]);
-		const speed = 10;
-
-		if (paddleDirection === 'GAME_PADDLE_UP') {
-			paddleToMove.setY = Math.max(0, paddleToMove.getY - speed);
-		} else if (paddleDirection === 'GAME_PADDLE_DOWN') {
-			paddleToMove.setY = Math.min(Game.FIELD_HEIGHT - Paddle.HEIGHT, paddleToMove.getY + speed);
+		if (player === this.userSessions[0]) {
+			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
+				this.keys.paddle_left_up = true;
+			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
+				this.keys.paddle_left_up = false;
+			} else if (paddleDirection === 'GAME_PADDLE_DOWN_KEYDOWN') {
+				this.keys.paddle_left_down = true;
+			} else if (paddleDirection === 'GAME_PADDLE_DOWN_KEYUP') {
+				this.keys.paddle_left_down = false;
+			}
+			this.updatePaddleSpeeds();
 		}
-	}
-
-	public get getId() {
-		return this.id;
-	}
-
-	public addConfirmation(wsSession: WebSocketUserSession): number {
-		this.confirmed.add(wsSession);
-		return this.confirmed.size;
+		else if (player === this.userSessions[1]) {
+			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
+				this.keys.paddle_right_up = true;
+			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
+				this.keys.paddle_right_up = false;
+			} else if (paddleDirection === 'GAME_PADDLE_DOWN_KEYDOWN') {
+				this.keys.paddle_right_down = true;
+			} else if (paddleDirection === 'GAME_PADDLE_DOWN_KEYUP') {
+				this.keys.paddle_right_down = false;
+			}
+			this.updatePaddleSpeeds();
+		}
 	}
 
 	public abort() {
@@ -100,107 +106,16 @@ export class Game {
 		this.stop();
 	}
 
+
 	public playerExit(wsSession: WebSocketUserSession) {
 
-		let playerSession = (wsSession === this.arrayPlayers[0]) ? this.arrayPlayers[0] : this.arrayPlayers[1];
+		let playerSession = (wsSession === this.userSessions[0]) ? this.players[0] : this.players[1];
 		this.broadcast('GAME_ABORTED', '');
 		this.stop();
 	}
 
-
-
-	// ----------------------------- stop routines -----------------------------
-	private stopCountDownRoutine(){
-		if (this.countDownInterval){
-			clearInterval(this.countDownInterval);
-			this.countDownInterval = undefined;
-		}
-	}
-	private stopGameLoopRoutine(){
-		if (this.gameLoopInterval) {
-			clearInterval(this.gameLoopInterval);
-			this.gameLoopInterval = undefined;
-		}
-	}
-	private stopFpsSpeedRoutine(){
-		if (this.fpsSpeepInterval) {
-			clearInterval(this.fpsSpeepInterval);
-			this.fpsSpeepInterval = undefined;
-		}
-	}
-    // --------------------------- end stop routines ---------------------------
-
-	private stop() {
-		this.gameStatus = 'FINISHED';
-
-		this.stopCountDownRoutine();
-		this.stopFpsSpeedRoutine();
-		this.stopGameLoopRoutine();
-	}
-
-	private fpsSpeedRoutine() {
-		if (this.fpsSpeepInterval) {
-			clearInterval(this.fpsSpeepInterval);
-		}
-		this.fpsSpeepInterval = setInterval(() => {
-			if (this.fps > Game.MININUM_FPS_SPEED) {
-				this.fps--;
-				this.changeGameLoopInterval();
-			}
-		}, 1500);
-	}
-
-	private gameLoopRoutine() {
-
-		this.gameLoopInterval = setInterval(() => {
-
-			if (this.gameStatus !== 'RUNNING') return;
-
-			// move ball
-			this.ball.setX = this.ball.getX + this.ball.getVX;
-			this.ball.setY = this.ball.getY + this.ball.getVY;
-
-			// Bounce the ball off the upper/lower walls
-			if (this.ball.getY <= 0 || this.ball.getY + Ball.SIZE >= Game.FIELD_HEIGHT) {
-				this.ball.setVY = this.ball.getVY * -1;
-			}
-
-			// check hit the ball on the paddle
-			let paddle1 = this.arrayPaddles[0];
-			let paddle2 = this.arrayPaddles[1];
-
-			if (this.paddleCollision(paddle1) && this.ball.getVX < 0) {
-				this.ball.setVX = this.ball.getVX * -1;
-			} else if (this.paddleCollision(paddle2) && this.ball.getVX > 0) {
-				this.ball.setVX = this.ball.getVX * -1;
-			}
-
-			// Check if any player scored the point
-			if (this.ball.getX < 0) {
-				// point for player 2
-				this.scores[1]++;
-				this.resetBall();
-			} else if (this.ball.getX > Game.FIELD_WIDTH) {
-				// point for player 1
-				this.scores[0]++;
-				this.resetBall();
-			}
-
-			// Send the game status to client
-			this.sendMessageGameStatus();
-
-			// Send updated game status
-			if (this.scores[0] >= 5) {
-				this.sendMessageToPlayer(this.arrayPlayers[0], 'GAME_PLAYER_WIN', '');
-				this.sendMessageToPlayer(this.arrayPlayers[1], 'GAME_PLAYER_LOSE', '');
-				this.stop();
-			} else if (this.scores[1] >= 5) {
-				this.sendMessageToPlayer(this.arrayPlayers[0], 'GAME_PLAYER_LOSE', '');
-				this.sendMessageToPlayer(this.arrayPlayers[1], 'GAME_PLAYER_WIN', '');
-				this.stop();
-			}
-		}, this.fps);
-
+	public get getId() {
+		return this.id;
 	}
 
 	private makeCountDownRoutine() {
@@ -210,83 +125,219 @@ export class Game {
 			if (this.countDown < 0) {
 				this.stopCountDownRoutine();
 				this.gameLoopRoutine();
-				this.fpsSpeedRoutine();
 			}
 		}, 1000);
 	}
 
-	private changeGameLoopInterval() {
-		clearInterval(this.gameLoopInterval);
-		this.gameLoopRoutine();
+	// ----------------------------- stop routines -----------------------------
+	private stopCountDownRoutine() {
+		if (this.countDownInterval) {
+			clearInterval(this.countDownInterval);
+			this.countDownInterval = undefined;
+		}
+	}
+	private stopGameLoopRoutine() {
+		if (this.gameLoopInterval) {
+			clearInterval(this.gameLoopInterval);
+			this.gameLoopInterval = undefined;
+		}
+	}
+	// --------------------------- end stop routines ---------------------------
+
+	private stop() {
+		this.gameStatus = 'FINISHED';
+
+		this.stopCountDownRoutine();
+		this.stopGameLoopRoutine();
 	}
 
+	// Updates the paddles speeds
+	private updatePaddleSpeeds() {
+		this.players[0].speed = 0;
+		if (this.keys.paddle_left_up) this.players[0].speed = -Paddle.SPEED;
+		if (this.keys.paddle_left_down) this.players[0].speed = Paddle.SPEED;
+
+		this.players[1].speed = 0;
+		if (this.keys.paddle_right_up) this.players[1].speed = -Paddle.SPEED;
+		if (this.keys.paddle_right_down) this.players[1].speed = Paddle.SPEED;
+	}
+
+	private gameLoopRoutine() {
+		this.gameStatus = 'RUNNING';
+		this.gameLoopInterval = setInterval(() => {
+			if (this.gameStatus === 'RUNNING') {
+				this.update();
+				this.sendMessageGameStatus();
+			}
+		}, 15);
+	}
+
+	// Updates the game state
+	private update() {
+
+		// Movement of the paddles
+		this.players[0].y = this.players[0].y + this.players[0].speed;
+		this.players[1].y = this.players[1].y + this.players[1].speed;
+
+		// Limits the paddles within the canvas
+		this.players[0].y = Math.max(0, Math.min(Field.HEIGHT - Paddle.HEIGHT, this.players[0].y));
+		this.players[1].y = Math.max(0, Math.min(Field.HEIGHT - Paddle.HEIGHT, this.players[1].y));
+
+		// Ball movement
+		this.ball.x = this.ball.x + this.ball.speedX;
+		this.ball.y = this.ball.y + this.ball.speedY;
+
+		// Collision with top and bottom edges
+		if (this.ball.y <= 0 || this.ball.y >= Field.HEIGHT - Ball.BALL_SIZE) {
+			this.ball.speedY = this.ball.speedY * -1;
+		}
+
+		// Collision with the paddles
+		if (this.checkPaddleCollision(this.players[0], true) || this.checkPaddleCollision(this.players[1], false)) {
+			// Increases ball speed with each hit (up to a limit)
+			const speedIncrease = 0.2;
+			const maxSpeed = 10;
+
+			this.ball.speedX = Math.sign(this.ball.speedX) * Math.min(Math.abs(this.ball.speedX) + speedIncrease, maxSpeed);
+		}
+
+		// Check if someone scored a point
+		if (this.ball.x < 0) {
+			this.players[1].score++;
+			this.checkIfAnyPlayerWon();
+			this.resetBall();
+		} else if (this.ball.x > Field.WIDTH) {
+			this.players[0].score++;
+			this.checkIfAnyPlayerWon();
+			this.resetBall();
+		}
+	}
+
+	// Check collision with a paddle
+	private checkPaddleCollision(player: Player, isLeftPaddle: boolean) {
+
+		const paddleRight = player.x + Paddle.WIDTH;
+		const paddleBottom = player.y + Paddle.HEIGHT;
+		const ballRight = this.ball.x + Ball.BALL_SIZE;
+		const ballBottom = this.ball.y + Ball.BALL_SIZE;
+
+		// Check for overlap
+		if (ballRight > player.x && this.ball.x < paddleRight &&
+			ballBottom > player.y && this.ball.y < paddleBottom) {
+
+			// Calculates where the ball hit the paddle (from -1 to 1)
+			const hitPosition = (this.ball.y + Ball.BALL_SIZE / 2 - (player.y + Paddle.HEIGHT / 2)) / (Paddle.HEIGHT / 2);
+
+			// Inverts the X direction and adjusts the Y direction based on the impact location
+			this.ball.speedX = -this.ball.speedX * 1.05; // Increase the speed a little
+			this.ball.speedY = hitPosition * Math.abs(this.ball.speedX);
+
+			// Adjust position to avoid multiple collisions
+			if (isLeftPaddle) {
+				this.ball.x = paddleRight;
+			} else {
+				this.ball.x = player.x - Ball.BALL_SIZE;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	// Reset the ball in the center
 	private resetBall() {
-		this.ball.setX = Game.FIELD_WIDTH / 2;
-		this.ball.setY = Math.floor(Math.random() * ((Game.FIELD_HEIGHT - 10) - 10 + 1)) + 10;
-		this.ball.setVX = (Math.random() > 0.5 ? 1 : -1) * 5;
-		this.ball.setVY = (Math.random() > 0.5 ? 1 : -1) * 3;
-		this.fps = Game.START_FPS_SPEED;
-		this.changeGameLoopInterval();
+		this.ball.x = Field.WIDTH / 2;
+		this.ball.y = Math.floor(Math.random() * ((Field.HEIGHT - 10) - 10 + 1)) + 10;
+
+		// Random direction (but always towards the player who lost the point)
+		this.ball.speedX = this.ball.speedX > 0 ? Ball.INITIAL_BALL_SPEED : -Ball.INITIAL_BALL_SPEED;
+		this.ball.speedY = (Math.random() * Ball.INITIAL_BALL_SPEED * 2) - Ball.INITIAL_BALL_SPEED;
 	}
 
-	private paddleCollision(paddle: Paddle) {
-		return (
-			this.ball.getX <= paddle.getX + Paddle.WIDTH &&
-			this.ball.getX + Ball.SIZE >= paddle.getX &&
-			this.ball.getY + Ball.SIZE >= paddle.getY &&
-			this.ball.getY <= paddle.getY + Paddle.HEIGHT
-		);
+	// Update the scoreboard
+	private checkIfAnyPlayerWon() {
+
+		// Check if someone won
+		if (this.players[0].score >= Game.WINNING_SCORE) {
+			this.gameStatus = 'FINISHED';
+			this.sendMessageToWinner(this.players[0]);
+			this.stop();
+		}else if (this.players[1].score >= Game.WINNING_SCORE) {
+			this.gameStatus = 'FINISHED';
+			this.sendMessageToWinner(this.players[1]);
+			this.stop();
+		}else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINT) {
+			this.gameStatus = 'FINISHED';
+			this.sendMessageDraw();
+			this.stop();
+		}
+
+	}
+
+	//------------------------------ messages --------------------------------------
+
+	private sendMessageToWinner(player : Player){
+		if (player == this.players[0]){
+			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_WIN', '')
+			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_LOSE', '')
+		}else if (player == this.players[1]){
+			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_LOSE', '')
+			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_WIN', '')
+		}
+	}
+
+	private sendMessageDraw(){
+		this.broadcast('GAME_PLAYER_DRAW', '');
+	}
+
+
+	private sendMessageGameCountdown(second: number) {
+		this.broadcast('GAME_COUNT_DOWN', second);
+	}
+
+	private sendMessageGameFull() {
+		this.broadcast('GAME_FULL', {
+			id: this.id,
+			field_width: Field.WIDTH,
+			field_height: Field.HEIGHT,
+			paddle_height: Paddle.HEIGHT,
+			paddle_width: Paddle.WIDTH,
+			paddle_player_1_height_position: this.players[0].y,
+			paddle_player_1_width_position: this.players[0].x,
+			paddle_player_2_height_position: this.players[1].y,
+			paddle_player_2_width_position: this.players[1].x,
+			ball_size: Ball.BALL_SIZE,
+			ball_y_position: this.ball.y,
+			ball_x_position: this.ball.x,
+			scoreboard_player_1: this.players[0].score,
+			scoreboard_player_2: this.players[1].score
+		});
 	}
 
 	private sendMessageGameCanStart(): void {
 		this.broadcast('GAME_CAN_START', '');
 	}
 
-	private sendMessageGameFull() {
-		this.broadcast('GAME_FULL', {
-			id: this.id,
-			field_width: Game.FIELD_WIDTH,
-			field_height: Game.FIELD_HEIGHT,
-			paddle_height: Paddle.HEIGHT,
-			paddle_width: Paddle.WIDTH,
-			paddle_player_1_height_position: this.arrayPaddles[0].getY,
-			paddle_player_1_width_position: this.arrayPaddles[0].getX,
-			paddle_player_2_height_position: this.arrayPaddles[1].getY,
-			paddle_player_2_width_position: this.arrayPaddles[1].getX,
-			ball_size: Ball.SIZE,
-			ball_height_position: this.ball.getY,
-			ball_width_position: this.ball.getX,
-			scoreboard_player_1: this.scores[0],
-			scoreboard_player_2: this.scores[1]
-		});
-	}
-
-	private sendMessageGameCountdown(second: number) {
-		this.broadcast('GAME_COUNT_DOWN', second);
-	}
-
 	private sendMessageGameStatus() {
 		this.broadcast('GAME_STATUS', {
-			paddle_player_1_height_position: this.arrayPaddles[0].getY,
-			paddle_player_2_height_position: this.arrayPaddles[1].getY,
-			ball_height_position: this.ball.getY,
-			ball_width_position: this.ball.getX,
-			scoreboard_player_1: this.scores[0],
-			scoreboard_player_2: this.scores[1]
+			paddle_player_1_height_position: this.players[0].y,
+			paddle_player_2_height_position: this.players[1].y,
+			ball_y_position: this.ball.y,
+			ball_x_position: this.ball.x,
+			scoreboard_player_1: this.players[0].score,
+			scoreboard_player_2: this.players[1].score
 		});
 	}
 
 	private broadcast(messageType: MessageType, obj: Object) {
-		this.sendMessageToPlayer(this.arrayPlayers[0], messageType, obj);
-		this.sendMessageToPlayer(this.arrayPlayers[1], messageType, obj);
+		this.sendMessageToPlayer(this.userSessions[0], messageType, obj);
+		this.sendMessageToPlayer(this.userSessions[1], messageType, obj);
 	}
 
 	private sendMessageToPlayer(player: WebSocketUserSession, messageType: MessageType, obj: Object) {
 		let sender = new Sender(player.getWebsocket);
 
-		let messageToSend = new Message(messageType, obj);
+		let messageToSend = new MessageWithValue(messageType, obj);
 
 		sender.sendMessage(messageToSend);
 	}
-
 }

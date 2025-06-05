@@ -1,49 +1,56 @@
 
 export class Ball{
-    public static readonly SIZE: number = 10;
+
+	public static readonly BALL_SIZE = 15;
+	public static readonly INITIAL_BALL_SPEED = 5
+
     public static readonly VX: number = 5;
     public static readonly VY: number = 3;
 
-    private x: number = 0;
-    private y: number = 0;
-	private vx: number = Ball.VX;
-	private vy: number = Ball.VY;
+    private _x: number = 0;
+    private _y: number = 0;
+	private _speedX: number = Ball.INITIAL_BALL_SPEED;
+	private _speedY: number = Ball.INITIAL_BALL_SPEED;
 
     constructor(x: number, y: number){
-        this.x = x;
-        this.y = y;
+        this._x = x;
+        this._y = y;
+
+		// randomly chooses a direction (x and y) for the ball to start
+		this._speedX = Ball.INITIAL_BALL_SPEED * (Math.random() < 0.5 ? 1 : -1);
+		this._speedY = Ball.INITIAL_BALL_SPEED * (Math.random() < 0.5 ? 1 : -1);
     }
 
-    public get getX(){
-        return this.x;
+    public get x(){
+        return this._x;
     }
 
-    public set setX(x: number){
-        this.x = x;
+    public set x(x: number){
+        this._x = x;
     }
 
-    public get getY(){
-        return this.y;
+    public get y(){
+        return this._y;
     }
 
-    public set setY(y: number){
-        this.y = y;
+    public set y(y: number){
+        this._y = y;
     }
 
-	public get getVX(){
-        return this.vx;
+	public get speedX(){
+        return this._speedX;
     }
 
-    public set setVX(vx: number){
-        this.vx = vx;
+    public set speedX(speedX: number){
+        this._speedX = speedX;
     }
 
-	public get getVY(){
-        return this.vy;
+	public get speedY(){
+        return this._speedY;
     }
 
-    public set setVY(vy: number){
-        this.vy = vy;
+    public set speedY(speedY: number){
+        this._speedY = speedY;
     }
 
 }

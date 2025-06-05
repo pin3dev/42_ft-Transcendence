@@ -17,7 +17,7 @@ export class Sender {
         return false;
     }
 
-    public sendMessage(message: Message<any>) : boolean{
+    public sendMessage(message: Message) : boolean{
         if (this.webSocket.readyState === WebSocket.OPEN){
             const strMessage = JSON.stringify(message);
             this.webSocket.send(strMessage);
