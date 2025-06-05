@@ -114,11 +114,20 @@ export function createNavbar(): HTMLElement {
   // Montar navbar
   container.appendChild(logo);
   container.appendChild(desktopNav);
-  container.appendChild(authButtons);
-  container.appendChild(mobileMenuBtn);
+
+
   
+  if(localStorage.getItem('user_id')){
+    container.appendChild(authButtons);
+    container.appendChild(mobileMenuBtn);
+  } 
+  else{ 
+    container.appendChild(authButtons);
+    container.appendChild(mobileMenuBtn);
+  }
+
   nav.appendChild(container);
   nav.appendChild(mobileMenu);
-  
+
   return nav;
 }
