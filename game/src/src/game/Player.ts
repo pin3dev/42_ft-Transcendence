@@ -1,4 +1,3 @@
-import { sourceMapsEnabled } from "process";
 
 export class Player{
 

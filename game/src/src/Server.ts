@@ -15,7 +15,6 @@ const WS_PORT = 3001;
 
 const server = http.createServer((req, res) => {
 
-  // Serve arquivos estáticos da pasta public
   let urlPath = req.url ?? '/'; // Se req.url for undefined, assume '/'
   let filePath = path.join(__dirname, '../public', urlPath === '/' ? 'index.html' : urlPath);
   let ext = path.extname(filePath);

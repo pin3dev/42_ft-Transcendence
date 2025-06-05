@@ -19,7 +19,7 @@ export type FatalErrorMessageTypeResponse = 'FATAL_ERROR_INVALID_JSON_SYNTAX' |
 export type ErrorMessageTypeResponse =
 	'ERROR_USER_NOT_AUTHENTICATED' |
 	'ERROR_INVALID_CREDENTIALS' |
-	'ERROR_MATCH_DOES_NOT_EXIST'; //quando o usuário manda o id de um match invalido
+	'ERROR_MATCH_DOES_NOT_EXIST';
 
 export type AuthenticationMessageTypeResponse = 'OK_USER_AUTHENTICATED';
 
