@@ -2,6 +2,7 @@ const { register_schema, login_schema , twoFA_schema } = require("../schemas/use
 const { twoFA_controller } = require("../controllers/twoFA_controller");
 const { register_controller } = require("../controllers/register_controller");
 const { login_controller } = require("../controllers/login_controller");
+const { logout_controller } = require("../controllers/logout_controller");
 
 module.exports = async function (fastify) {
   fastify.post("/auth/2fa", {
@@ -17,5 +18,9 @@ module.exports = async function (fastify) {
   fastify.post("/auth/login", {
     schema: login_schema,
     handler: login_controller
+  });
+
+  fastify.post("/auth/logout", {
+    handler: logout_controller
   });
 };
