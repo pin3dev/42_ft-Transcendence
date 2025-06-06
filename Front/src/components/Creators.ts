@@ -13,7 +13,7 @@ const creatorsData: Creator[] = [
     name: 'Clara Franco',
     role: 'Engenheira de Software (Cyber Security)',
     bio: '',
-    imageUrl: '../public/creators/clara.jpeg',
+    imageUrl: '/creators/clara.jpeg',
     links: [
       { platform: 'GitHub', url: 'https://github.com/anasilva' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
@@ -23,7 +23,7 @@ const creatorsData: Creator[] = [
     name: 'David Cavalcante',
     role: 'Engenheiro de Software (Game Developer)',
     bio: '',
-    imageUrl: '../public/creators/dmanoel-.jpeg',
+    imageUrl: '/creators/dmanoel-.jpeg',
     links: [
       { platform: 'GitHub', url: 'https://github.com/anasilva' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
@@ -33,7 +33,7 @@ const creatorsData: Creator[] = [
     name: 'Isabela Genial',
     role: 'Engenheira de Software (Designer UI/UX)',
     bio: '',
-    imageUrl: '../public/creators/isa.jpeg',
+    imageUrl: '/creators/isa.jpeg',
     links: [
       { platform: 'GitHub', url: 'https://github.com/anasilva' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
@@ -43,7 +43,7 @@ const creatorsData: Creator[] = [
     name: 'Ivany Batista',
     role: 'Engenheira de Software (Backend Developer)',
     bio: '',
-    imageUrl: '../public/creators/Ivy.jpeg', 
+    imageUrl: '/creators/Ivy.jpeg', 
     links: [
       { platform: 'GitHub', url: 'https://github.com/anasilva' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
@@ -53,7 +53,7 @@ const creatorsData: Creator[] = [
     name: 'Jaqueline Ribeiro',
     role: 'Engenheira de Software (Developer)',
     bio: '',
-    imageUrl: '../public/creators/Jaque.png', 
+    imageUrl: '/creators/Jaque.png', 
     links: [
       { platform: 'GitHub', url: 'https://github.com/anasilva' },
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
