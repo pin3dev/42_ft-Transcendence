@@ -3,6 +3,7 @@ services:
     build:
       context: ./Front
       dockerfile: Dockerfile
+    container_name: frontend
     volumes:
       - ./Front:/frontend
       - /frontend/node_modules
@@ -19,7 +20,9 @@ services:
       context: ./api-gateway
     container_name: api-gateway
     environment:
-      - PUBLIC_KEY_BASE64=${PUBLIC_KEY_BASE64}
+      - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
+      - SSL_CERT_BASE64=${SSL_CERT_BASE64}
+      - SSL_KEY_BASE64=${SSL_KEY_BASE64}
     networks:
       - internal_network
       - external_network
@@ -38,8 +41,8 @@ services:
       context: ./auth-service
     container_name: auth-service
     environment:
-      - PRIVATE_KEY_BASE64=${PRIVATE_KEY_BASE64}
-      - PUBLIC_KEY_BASE64=${PUBLIC_KEY_BASE64}
+      - JWT_PRIVATE_KEY_BASE64=${JWT_PRIVATE_KEY_BASE64}
+      - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
     networks:
       - internal_network
     expose:

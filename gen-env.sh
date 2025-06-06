@@ -39,8 +39,9 @@ PUBLIC_KEY=$(base64 < secrets/public.key | tr -d '\n')
 
 # Cria .env
 cat <<EOF > .env
-PRIVATE_KEY_BASE64=$PRIVATE_KEY
-PUBLIC_KEY_BASE64=$PUBLIC_KEY
+JWT_PRIVATE_KEY_BASE64=$PRIVATE_KEY
+JWT_PUBLIC_KEY_BASE64=$PUBLIC_KEY
 EOF
 
 echo "✅ Arquivo .env criado com sucesso."
+rm -rf secrets

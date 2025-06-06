@@ -98,8 +98,8 @@ As rotas abaixo são acessadas pelo frontend através do `api-gateway` na porta 
 Este serviço espera que algumas variáveis de ambiente estejam configuradas, especialmente se usado com Docker Compose:
 
 ```env
-PRIVATE_KEY_BASE64=<chave_privada_em_base64>
-PUBLIC_KEY_BASE64=<chave_publica_em_base64>
+JWT_PRIVATE_KEY_BASE64=<chave_privada_em_base64>
+JWT_PUBLIC_KEY_BASE64=<chave_publica_em_base64>
 ```
 
 ---
@@ -108,7 +108,7 @@ PUBLIC_KEY_BASE64=<chave_publica_em_base64>
 
 O serviço é inicializado por meio do script `entrypoint.sh`, que realiza as seguintes ações:
 
-1. Restaura as chaves RSA a partir das variáveis de ambiente `PRIVATE_KEY_BASE64` e `PUBLIC_KEY_BASE64`.
+1. Restaura as chaves RSA a partir das variáveis de ambiente `JWT_PRIVATE_KEY_BASE64` e `JWT_PUBLIC_KEY_BASE64`.
 2. Salva as chaves no diretório `/app/keys`.
 3. Inicia o servidor na porta `4000`.
 

@@ -11,7 +11,7 @@ const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
 // const publicKey = fs.readFileSync("/app/keys/public.key"); // key antiga
-const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const publicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function buildServer() {

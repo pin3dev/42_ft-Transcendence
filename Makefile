@@ -1,7 +1,7 @@
 all: keys build run
 
 keys: 
-	[ -s .env ] || ./gen-env.sh
+	[ -s .env ] || ./env_generator.sh
 
 build:
 	docker compose -f docker-compose.yml build

@@ -13,8 +13,8 @@ const { handleUserDeleted } = require("./events/handler");
 
 // const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); // key antiga
 // const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // key antiga
-const privateKey = Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
-const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const privateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const publicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function start() {

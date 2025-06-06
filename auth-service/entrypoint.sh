@@ -30,8 +30,8 @@
 
 # echo "🚀 Iniciando Auth Service..."
 
-# echo "$PRIVATE_KEY_BASE64" | base64 -d > /app/keys/private.key
-# echo "$PUBLIC_KEY_BASE64"  | base64 -d > /app/keys/public.key
+# echo "$JWT_PRIVATE_KEY_BASE64" | base64 -d > /app/keys/private.key
+# echo "$JWT_PUBLIC_KEY_BASE64"  | base64 -d > /app/keys/public.key
 
 # echo "✅ Chaves restauradas:"
 # ls -l /app/keys
