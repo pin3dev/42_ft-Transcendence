@@ -267,7 +267,7 @@ export class FormLogin {
 
   private async sendLoginRequest(email: string, password: string): Promise<{ requires2FA: boolean; token?: string; qr_code?: string }> {
     console.log('Enviando requisição de login:', { email, password });
-    const response = await fetch('http://localhost:1025/auth/login', {
+    const response = await fetch('/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ export class FormLogin {
   }
 
 private async verify2FACode(code: string): Promise<void> {
-    const response = await fetch('http://localhost:3000/auth/2fa/verify', {
+    const response = await :3000/auth/2fa/verify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

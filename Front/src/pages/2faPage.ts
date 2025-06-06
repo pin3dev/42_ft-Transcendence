@@ -76,7 +76,7 @@ function render2FAInput(container?: HTMLElement): void {
       const user_id = localStorage.getItem('user_id');
       if (!user_id) throw new Error('ID do usuário não encontrado. Faça login novamente.');
 
-      const response = await fetch('http://localhost:1025/auth/2fa', {
+      const response = await fetch('auth/2fa', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

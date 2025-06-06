@@ -1,22 +1,4 @@
 services:
-  # frontend:
-  #   build:
-  #     context: ./Front
-  #     dockerfile: Dockerfile
-  #   container_name: frontend
-  #   environment:
-  #     - SSL_CERT_BASE64=${SSL_CERT_BASE64}
-  #     - SSL_KEY_BASE64=${SSL_KEY_BASE64}
-  #   volumes:
-  #     - ./Front:/frontend
-  #     - /frontend/node_modules
-  #   ports:
-  #     - "443:443"
-  #   command: dev
-  #   depends_on:
-  #     - api-gateway
-  #   networks:
-  #     - external_network
   frontend-builder:
     build:
       context: ./Front

@@ -58,7 +58,7 @@ async function buildServer() {
 
   // Headers CORS para todas as respostas
   app.addHook("onSend", async (request, reply, payload) => {
-    reply.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    reply.header("Access-Control-Allow-Origin", "https://localhost"); //request.headers.origin || ""
     reply.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
     reply.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     reply.header("Access-Control-Allow-Credentials", "true");
