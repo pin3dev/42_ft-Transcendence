@@ -11,10 +11,8 @@ const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { handleUserDeleted } = require("./events/handler");
 
 
-// const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); // key antiga
-// const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // key antiga
-const privateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
-const publicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function start() {
@@ -22,11 +20,11 @@ async function start() {
 
   app.register(fastifyJwt, {
     secret: {
-      private: privateKey,
-      public: publicKey
+      private: JWTprivateKey,
+      public: JWTpublicKey
     },
-    sign: { algorithm: 'RS256', key: privateKey },
-    verify: { algorithms: ['RS256'], key: publicKey }
+    sign: { algorithm: 'RS256', key: JWTprivateKey },
+    verify: { algorithms: ['RS256'], key: JWTpublicKey }
   });
   app.register(fastifyCookie);
 

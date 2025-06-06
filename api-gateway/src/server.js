@@ -10,13 +10,18 @@ const fastifyStatic = require("@fastify/static"); // Adicionado para servir arqu
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
-// const publicKey = fs.readFileSync("/app/keys/public.key"); // key antiga
-const publicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
+const SSLcert = Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('utf-8');
 
 
 async function buildServer() {
-  const app = Fastify();
-
+  const app = Fastify({
+    https: {
+      key: SSLkey,
+      cert: SSLcert,
+    }
+  });
   console.log("🚀 Iniciando API Gateway...");
 
   // Plugins essenciais
@@ -62,7 +67,7 @@ async function buildServer() {
 
   // JWT
   await app.register(jwt, {
-    secret: async () => publicKey,
+    secret: async () => JWTpublicKey,
     verify: { algorithms: ["RS256"] },
     sign: false
   });
@@ -129,7 +134,7 @@ async function buildServer() {
     }));
 
   await app.ready();
-  await app.listen({ port: 1025, host: "0.0.0.0" });
+  await app.listen({ port: 443, host: "0.0.0.0" });
 }
 
 buildServer().catch(err => {
