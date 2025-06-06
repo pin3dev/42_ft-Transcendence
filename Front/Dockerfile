@@ -13,7 +13,7 @@ RUN npm install -g vite
 COPY . .
 
 # Expõe a porta para o servidor de desenvolvimento
-EXPOSE 3000
+EXPOSE 443
 
 # Comando para iniciar o servidor de desenvolvimento
 ENTRYPOINT ["npm", "run"]
