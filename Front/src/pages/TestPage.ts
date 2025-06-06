@@ -16,6 +16,7 @@ const mockUserStats: UserStats = {
   name: 'Player1',
   wins: 15,
   losses: 8,
+  score: 1100,
   avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=player1'
 };
 
@@ -66,24 +67,52 @@ const mockFriends: Friend[] = [
 
 async function testProtectedRoute(): Promise<UserStats | null> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/profile', {
+    const profileResponse = await fetchWithAuth('http://localhost:1025/user/profile', {
       method: 'GET',
     });
 
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+    if (!profileResponse.ok) {
+      if (profileResponse.status === 401 || profileResponse.status === 403) {
         window.location.href = '/';
         return null;
       }
       throw new Error('Erro ao acessar a rota protegida.');
     }
 
-    const data = await response.json();
+    const profileData = await profileResponse.json();
+    console.log("Dados do perfil:", profileData);
+
+// Busca dados de ranking (wins, losses, score)
+    let wins = mockUserStats.wins;
+    let losses = mockUserStats.losses;
+    let score = mockUserStats.score;
+
+    try {
+      console.log("ID do usuário que será enviado:", profileData.id);
+      
+      const rankingResponse = await fetchWithAuth('http://localhost:1025/tournament/ranking/me');
+
+      console.log("Status da resposta ranking:", rankingResponse.status);
+      
+      if (rankingResponse.ok) {
+        const rankingData = await rankingResponse.json();
+        console.log("Dados de ranking recebidos:", rankingData);
+        wins = rankingData.total_wins;
+        losses = rankingData.total_losses;
+        score = rankingData.score;
+      }
+    } catch (rankingError) {
+      console.error('Erro ao buscar dados de ranking:', rankingError);
+      // Em caso de erro, mantém os valores mockados
+    }
+
     return {
-      name: data.name || mockUserStats.name,
-      wins: mockUserStats.wins,
-      losses: mockUserStats.losses,
-      avatar: data.avatar_url || mockUserStats.avatar
+      name: profileData.name || mockUserStats.name,
+      wins: wins,
+      losses: losses,
+      score: score,
+      avatar: profileData.avatar_url || mockUserStats.avatar,
+      user_id: profileData.id
     };
   } catch (error) {
     console.error('Erro ao acessar a rota protegida:', error);

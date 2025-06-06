@@ -12,7 +12,7 @@ async function getUserStats(userId) {
   return {
     total_wins: matchStats.totalWins || 0,
     total_losses: matchStats.totalLosses || 0,
-    score: rankingData.score || 1200
+    score: rankingData.score || 1000
   };
 }
 

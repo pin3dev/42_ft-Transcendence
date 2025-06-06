@@ -107,7 +107,7 @@ async function buildServer() {
     // Proxy: Teste protegido
     app.register(createServiceProxy({
       prefix: "/tournament",
-      target: "http://tournament-service:6000",
+      target: "http://tournament-service:8000",
       onRequest: async (request, reply) => {
         if (request.method === 'OPTIONS') return;
         await app.authenticate(request, reply);
