@@ -59,7 +59,7 @@ async function searchByName(name) {
   `;
   const rows = await all(sql, [`%${name}%`]);
 
-  const GATEWAY = process.env.GATEWAY_URL || "http://localhost:1025";
+  const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
 
   return rows.map(p => ({
     user_id: String(p.user_id || p.USER_ID),

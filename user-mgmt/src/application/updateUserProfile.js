@@ -77,7 +77,7 @@ async function updateUserProfile(userId, body) {
     avatar_path: avatarPath,
   });
 
-  const gatewayUrl = process.env.GATEWAY_URL || 'http://localhost:1025';
+  const gatewayUrl = process.env.GATEWAY_URL || 'https://localhost';
 
   return {
     name: updated.name,

@@ -12,7 +12,7 @@ async function pendingFriends(userId) {
   const profiles = await profileRepo.findManyByIds(requesterIds);
   console.log("👤 Perfis encontrados:", profiles);
 
-  const GATEWAY = process.env.GATEWAY_URL || "http://localhost:1025";
+  const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
 
   return requests.map(req => {
     const profile = profiles.find(p => p.user_id === req.user_id);
