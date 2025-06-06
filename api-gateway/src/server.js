@@ -24,10 +24,22 @@ async function buildServer() {
   await app.register(fastifyCookie);
 
   // Hook: insere o token do cookie como Authorization
+  
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, '../frontend'),
+    prefix: '/',
+    index: 'index.html'
+  });
+  
   // Servir arquivos estáticos (avatares)
   await app.register(fastifyStatic, {
     root: path.join(__dirname, '../static/avatars'),
     prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
+    decorateReply: false // <- ESSENCIAL
+  });
+  
+  app.setNotFoundHandler((req, reply) => {
+    reply.sendFile('index.html'); // fallback para SPA simples
   });
 
   app.addHook("onRequest", async (request, reply) => {

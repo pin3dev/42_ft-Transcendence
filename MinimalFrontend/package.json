@@ -1,0 +1,12 @@
+{
+    "name": "minimal-frontend",
+    "version": "1.0.0",
+    "scripts": {
+      "build": "vite build"
+    },
+    "devDependencies": {
+      "vite": "^5.0.0",
+      "typescript": "^5.0.0"
+    }
+  }
+  
