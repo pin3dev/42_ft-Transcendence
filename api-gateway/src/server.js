@@ -10,8 +10,8 @@ const fastifyStatic = require("@fastify/static"); // Adicionado para servir arqu
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
-const publicKey = fs.readFileSync("/app/keys/public.key"); // trocar
-// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+// const publicKey = fs.readFileSync("/app/keys/public.key"); // key antiga
+const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function buildServer() {

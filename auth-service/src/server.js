@@ -4,10 +4,6 @@ const fs = require("fs");
 const fastifyJwt = require("@fastify/jwt");
 const fastifyCookie = require('@fastify/cookie');
 
-// const registerRoutes = require("./api/routes/register");
-// const loginRoutes = require("./api/routes/login");
-// const twoFARoutes = require("./api/routes/2fa");
-// const testeRoutes = require("./api/routes/teste");
 const auth_routes = require("./api/routes/auth_routes");
 
 const userRepo = require("./infrastructure/db/user_repository");
@@ -15,10 +11,10 @@ const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { handleUserDeleted } = require("./events/handler");
 
 
-const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); //trocar
-const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // trocar
-// const privateKey = Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString('utf-8');
-// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+// const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); // key antiga
+// const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // key antiga
+const privateKey = Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function start() {

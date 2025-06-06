@@ -24,17 +24,17 @@
 # echo "🟢 Iniciando servidor..."
 # node src/server.js
 
-#!/bin/sh
+# !/bin/sh
 
-mkdir -p /app/keys
+# mkdir -p /app/keys
 
-echo "🚀 Iniciando Auth Service..."
+# echo "🚀 Iniciando Auth Service..."
 
-echo "$PRIVATE_KEY_BASE64" | base64 -d > /app/keys/private.key
-echo "$PUBLIC_KEY_BASE64"  | base64 -d > /app/keys/public.key
+# echo "$PRIVATE_KEY_BASE64" | base64 -d > /app/keys/private.key
+# echo "$PUBLIC_KEY_BASE64"  | base64 -d > /app/keys/public.key
 
-echo "✅ Chaves restauradas:"
-ls -l /app/keys
+# echo "✅ Chaves restauradas:"
+# ls -l /app/keys
 
-node src/server.js
+# node src/server.js
 
