@@ -12,4 +12,8 @@ export class AuthenticatorSimple implements Authenticator<AuthenticationMessage>
         }
 		return false;
     }
+
+	makeLogout(ws : WebSocketUserSession): void{
+		ws.cleanSession();
+	}
 }

@@ -38,32 +38,47 @@ export class API {
 
 		const sender = new Sender(ws.getWebsocket);
 
-		// if the message type is 'AUTHENTICATION_MAKE', log in
-		if (Message.authenticationMessageTypeRequest.has(messageFromClient.getType)) {
+		// Firstly we will always check if the user is authenticated
+		if (!this.isUserAuthenticated(ws, messageFromClient)) {
+			return;
+		}
+
+		// process game type messages
+		if (Message.gameMessageTypeRequest.has(messageFromClient.getType)) {
+			this.gameHandlerAPI.message(ws, messageFromClient);
+		}
+
+	}
+
+	private isUserAuthenticated(ws: WebSocketUserSession, messageFromClient: Message | MessageWithValue<any>): boolean {
+
+		const sender = new Sender(ws.getWebsocket);
+
+		if (ws.getUserId === "" || messageFromClient.getType === 'AUTHENTICATION_LOGOUT') {
+
+			if (!Message.authenticationMessageTypeRequest.has(messageFromClient.getType)) {
+				sender.sendMessage(new Message('ERROR_USER_NOT_AUTHENTICATED'));
+				return false;
+			}
 
 			const authenticator = new AuthenticatorSimple();
 
-			if (messageFromClient instanceof MessageWithValue) {
-				const isAuthenticated: boolean = authenticator.makeLogin(ws, messageFromClient);
+			if (messageFromClient.getType === 'AUTHENTICATION_LOGIN') {
 
+				const authLogin = messageFromClient as MessageWithValue<any>;
+				const isAuthenticated: boolean = authenticator.makeLogin(ws, authLogin);
 				if (isAuthenticated) {
 					sender.sendMessage(new Message('OK_USER_AUTHENTICATED'));
 				} else {
 					sender.sendMessage(new Message('ERROR_INVALID_CREDENTIALS'));
 				}
+
+			} else if (messageFromClient.getType === 'AUTHENTICATION_LOGOUT') {
+				const authLogin = messageFromClient as MessageWithValue<any>;
+				authenticator.makeLogout(ws);
 			}
+			return false;
 		}
-
-		// if the message type is different from 'AUTHENTICATION_MAKE' check if the user is authenticated
-		//  before continuing
-		else if (ws.getUserId === "" && !Message.authenticationMessageTypeRequest.has(messageFromClient.getType)) {
-			sender.sendMessage(new Message('ERROR_USER_NOT_AUTHENTICATED'));
-		}
-
-		// process game type messages
-		else if (Message.gameMessageTypeRequest.has(messageFromClient.getType)) {
-			this.gameHandlerAPI.message(ws, messageFromClient);
-		}
+		return true;
 	}
-
 }

@@ -37,7 +37,7 @@ function connect() {
 
 	ws.onopen = () => {
 
-		ws.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken: "123456", userId: "xxxxx" } }));
+		ws.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken: "123456", userId: "xxxxx" } }));
 
 		statusDiv.textContent = 'Conectado! Aguardando outro jogador...';
 		ws.send(JSON.stringify({ type: 'GAME_CREATE_GLOBAL_MATCH' }));
@@ -149,10 +149,6 @@ function updateInformation(value) {
 	gameState.paddle_height = value.sizes.paddles.height;
 
 	gameState.ball_size = value.sizes.ball;
-
-	console.log(value);
-	console.log('paddle width: ' + value.sizes.paddles.width);
-
 }
 
 // Desenhar tudo no canvas
@@ -208,10 +204,8 @@ window.addEventListener('keyup', (e) => {
 
 	if (e.key === 'ArrowUp') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
-		console.log('soltando a seta')
 	} else if (e.key === 'ArrowDown') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
-		console.log('soltando a seta')
 	}
 
 });

@@ -30,4 +30,11 @@ export class WebSocketUserSession{
         return this.ws;
     }
 
+	/**
+	 * reset the properties to their default values
+	 */
+	public cleanSession(): void{
+		this.userId = "";
+		this.gameId = 0;
+	}
 }

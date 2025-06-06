@@ -1,5 +1,6 @@
 
-export type AuthenticationMessageTypeRequest = 'AUTHENTICATION_MAKE';
+export type AuthenticationMessageTypeRequest = 'AUTHENTICATION_LOGIN' |
+                                               'AUTHENTICATION_LOGOUT';
 
 export type GameMessageTypeRequest = 'GAME_CREATE_GLOBAL_MATCH' |
 	'GAME_START_MATCH' |
@@ -44,7 +45,8 @@ export type MessageType = MessageTypeRequest | MessageTypeResponse;
 export class Message {
 
 	public static readonly authenticationMessageTypeRequest = new Map<string, AuthenticationMessageTypeRequest>([
-		['AUTHENTICATION_MAKE', 'AUTHENTICATION_MAKE']
+		['AUTHENTICATION_LOGIN', 'AUTHENTICATION_LOGIN'],
+		['AUTHENTICATION_LOGOUT', 'AUTHENTICATION_LOGOUT']
 	]);
 
 	public static readonly gameMessageTypeRequest = new Map<string, GameMessageTypeRequest>([
