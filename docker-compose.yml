@@ -17,6 +17,13 @@ services:
   #     - api-gateway
   #   networks:
   #     - external_network
+  frontend-builder:
+    build:
+      context: ./Front
+      dockerfile: Dockerfile
+    volumes:
+      - frontend-build:/app/dist
+    profiles: ["builder"]
 
   api-gateway:
     build:
@@ -36,9 +43,10 @@ services:
       - event-bus 
       - user-mgmt
     volumes:
-      - ./user-mgmt/avatars:/app/static/avatars # novo volume
-      - ./pckg/redis:/app/pckg/redis:ro 
-      - ./MinimalFrontend/dist:/app/frontend
+      - ./user-mgmt/avatars:/app/static/avatars # acesso a avatars do user-mgmt
+      - frontend-build:/app/frontend
+      # - ./MinimalFrontend/dist:/app/frontend # acesso ao MinimalFrontend estático
+      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
 
 
   auth-service:
@@ -55,8 +63,8 @@ services:
     depends_on:
       - event-bus  
     volumes:
-      - auth-data:/app/data 
-      - ./pckg/redis:/app/pckg/redis:ro 
+      - auth-data:/app/data  # persistência de DB de autenticação
+      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
 
   event-bus:
     build:
@@ -78,9 +86,9 @@ services:
     expose:
       - "5000" 
     volumes:
-      - user-data:/app/data 
-      - ./user-mgmt/avatars:/app/avatars        # mesmo caminho interno
-      - ./pckg/redis:/app/pckg/redis:ro 
+      - user-data:/app/data # persistência de DB e avatares de perfil de usuário
+      - ./user-mgmt/avatars:/app/avatars  # acesso a avatars do user-mgmt
+      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
 
   tournament-service:
     build:
@@ -91,8 +99,8 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./pckg/redis:/app/pckg/redis:ro
-      - tournament-data:/app/data
+      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - tournament-data:/app/data # persistência de DB de torneios
     depends_on:
       - event-bus
 
@@ -114,4 +122,6 @@ volumes:
     name: event-data
   tournament-data:
     name: tournament-data
+  frontend-build:
+    name: frontend-build
 
