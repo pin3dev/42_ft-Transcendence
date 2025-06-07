@@ -20,8 +20,6 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
   const header = document.createElement('div');
   header.className = 'text-center mb-8';
   
-
-  
   // Leaderboard table
   const tableWrapper = document.createElement('div');
   tableWrapper.className = 'max-w-3xl mx-auto';

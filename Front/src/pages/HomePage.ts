@@ -42,10 +42,4 @@ export async function renderHome(): Promise<void> {
   container.appendChild(main);
   container.appendChild(createFooter());
   root.appendChild(container);
-
-  // Agora, chama a API para adicionar o leaderboard
-  setTimeout(async () => {
-    const leaderboardSection = await createLeaderboardPreview();
-    main.appendChild(leaderboardSection);
-  }, 0);
 }
