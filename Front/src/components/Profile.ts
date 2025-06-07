@@ -31,8 +31,11 @@ export class ProfileSection {
         headers['x-user-id'] = this.props.userStats.user_id;
       }
 
-      const response = await fetch('http://localhost:8000/tournament/ranking/me', {
-        headers,
+      const response = await fetchWithAuth('/tournament/ranking/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
   
       if (!response.ok) {

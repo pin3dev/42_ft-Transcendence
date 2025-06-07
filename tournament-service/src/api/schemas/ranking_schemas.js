@@ -42,7 +42,31 @@ const getUserStats_schema = {
   }
 };
 
+const getFriendStats_schema = {
+  headers: gateway_headers,
+  querystring: {
+    type: "object",
+    properties: {
+      user_id: { type: "string" }
+    },
+    required: ["user_id"]
+  },
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        total_wins: { type: "integer" },
+        total_losses: { type: "integer" },
+        score: { type: "integer" }
+      }
+    },
+    400: error_responses[400],
+    500: error_responses[500]
+  }
+};
+
 module.exports = {
   getTopRanking_schema,
   getUserStats_schema,
+  getFriendStats_schema,
 };
