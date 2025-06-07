@@ -13,8 +13,8 @@ async function getOrCreateRanking(playerId) {
 
   if (row) return row;
 
-  await createRanking(playerId, 1200);
-  return { player_id: playerId, score: 1200 };
+  await createRanking(playerId, 0);
+  return { player_id: playerId, score: 1000 };
 }
 
 async function createRanking(playerId, score) {

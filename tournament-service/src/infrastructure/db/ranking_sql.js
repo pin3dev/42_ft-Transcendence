@@ -18,7 +18,7 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS ranking (
       player_id TEXT PRIMARY KEY,
-      score INTEGER NOT NULL DEFAULT 1200,
+      score INTEGER NOT NULL DEFAULT 1000,
       last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `);

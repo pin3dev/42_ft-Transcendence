@@ -81,7 +81,7 @@ services:
     networks:
       - internal_network
     expose:
-      - "6000"
+      - "8000"
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro
       - tournament-data:/app/data

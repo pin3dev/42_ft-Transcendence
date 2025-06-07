@@ -28,9 +28,10 @@ const fastify = Fastify({
   fastify.decorate("rRepo", rRepo);
   fastify.decorate("tRepo", tRepo);
 
+  fastify.register(require("@fastify/cookie"));
   fastify.register(ranking_routes);
 
-  fastify.listen({ port: 6000, host: "0.0.0.0" }, (err) => {
+  fastify.listen({ port: 8000, host: "0.0.0.0" }, (err) => {
     if (err) {
       fastify.log.error(err);
       process.exit(1);

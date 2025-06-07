@@ -4,6 +4,7 @@ export interface UserStats {
   name: string;
   wins: number;
   losses: number;
+  score: number; 
   avatar: string;
   user_id?: string; // Campo opcional para manter compatibilidade com código existente
 }
@@ -21,6 +22,36 @@ export class ProfileSection {
     this.props = props;
     this.element = document.createElement('div');
     this.render();
+  }
+
+  public async fetchUserStats(): Promise<void> {
+    try {
+      const headers: Record<string, string> = {};
+      if (this.props.userStats.user_id) {
+        headers['x-user-id'] = this.props.userStats.user_id;
+      }
+
+      const response = await fetch('http://localhost:8000/tournament/ranking/me', {
+        headers,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao buscar estatísticas do usuário');
+      }
+  
+      const stats = await response.json();
+  
+      this.update({
+        userStats: {
+          ...this.props.userStats,
+          wins: stats.total_wins,
+          losses: stats.total_losses,
+          score: stats.score, // Adiciona o score
+        },
+      });
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas do usuário:', error);
+    }
   }
   
 private render(): void {
@@ -54,6 +85,10 @@ private render(): void {
           <div class="text-center">
             <div class="text-neon-pink text-xl">${userStats.losses}</div>
             <div class="text-neon-pink text-sm">Lose</div>
+          </div>
+          <div class="text-center">
+            <div class="text-neon-yellow text-xl">${userStats.score}</div>
+            <div class="text-neon-yellow text-sm">Score</div>
           </div>
         </div>
       </div>
@@ -245,6 +280,21 @@ public update(newProps: Partial<ProfileSectionProps>): void {
   if (avatarElement) {
     avatarElement.src = this.props.userStats.avatar;
     avatarElement.alt = this.props.userStats.name;
+  }
+
+  const winsElement = this.element.querySelector('.text-neon-green.text-xl');
+  if (winsElement) {
+    winsElement.textContent = this.props.userStats.wins.toString();
+  }
+
+  const lossesElement = this.element.querySelector('.text-neon-pink.text-xl');
+  if (lossesElement) {
+    lossesElement.textContent = this.props.userStats.losses.toString();
+  }
+
+  const scoreElement = this.element.querySelector('.text-neon-yellow.text-xl');
+  if (scoreElement) {
+    scoreElement.textContent = this.props.userStats.score.toString();
   }
 }
 }
