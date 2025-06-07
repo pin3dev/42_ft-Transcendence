@@ -45,6 +45,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
     losses: user.losses || 0,
     avatar: user.avatar_url,
     user_id: user.user_id,
+    score: user.score || 0,
   };
 
   // Cria e adiciona a seção de perfil sem a barra de busca e botão de jogar

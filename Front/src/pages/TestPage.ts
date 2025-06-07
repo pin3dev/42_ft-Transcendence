@@ -90,8 +90,13 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     try {
       console.log("ID do usuário que será enviado:", profileData.id);
       
-      const rankingResponse = await fetchWithAuth('http://localhost:1025/tournament/ranking/me');
-
+      const rankingResponse = await fetchWithAuth('/tournament/ranking/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
       console.log("Status da resposta ranking:", rankingResponse.status);
       
       if (rankingResponse.ok) {
@@ -259,10 +264,11 @@ export async function renderTestPage(): Promise<void> {
   mainContainer.className = 'container mx-auto px-4 py-8 flex-grow';
 
   // Cria e adiciona a seção de perfil
+  const userStats = await testProtectedRoute() || mockUserStats;
+
   const profileSection = new ProfileSection({
-    userStats: mockUserStats,
+    userStats,
     onPlay: () => {
-      console.log('Starting game...');
       testProtectedRoute().then(updatedStats => {
         if (updatedStats) {
           profileSection.update({ userStats: updatedStats });
@@ -271,6 +277,7 @@ export async function renderTestPage(): Promise<void> {
       });
     }
   });
+  
   const profileElement = profileSection.getElement();
 
 // --- BARRA DE BUSCA DE USUÁRIOS DENTRO DO PERFIL ---
@@ -300,7 +307,7 @@ export async function renderTestPage(): Promise<void> {
   const userSearchResults = document.createElement('div');
   userSearchResults.className = `
     absolute top-full left-0 mt-2 w-full
-    bg-arcade-dark border border-white/10 focus-within:border-neon-purple
+    bg-black bg-opacity-90 border border-neon-purple
     rounded-lg shadow-lg text-sm z-50 overflow-hidden
   `;
 
@@ -308,7 +315,7 @@ export async function renderTestPage(): Promise<void> {
   const userSearchBox = document.createElement('div');
   userSearchBox.className = `
   relative z-20 w-full max-w-xs
-  bg-black rounded-full overflow-hidden
+  bg-black rounded-full 
   shadow-[0_0_8px_#00FFFF]
 `;
   userSearchBox.appendChild(userSearchInput);
@@ -334,15 +341,16 @@ export async function renderTestPage(): Promise<void> {
         const response = await fetchWithAuth(`/user/search?name=${encodeURIComponent(value)}`);
         if (response.ok) {
           const users = await response.json();
+          console.log('Usuários encontrados:', users);
           if (Array.isArray(users) && users.length > 0) {
             users.forEach((user: any) => {
               const resultItem = document.createElement('div');
               resultItem.className = 'flex items-center gap-2 px-2 py-1 hover:bg-primary/20 cursor-pointer rounded';
 
               resultItem.innerHTML = `
-                <img src="${user.avatar_url}" class="w-6 h-6 rounded-full border border-primary" />
-                <span class="flex-1 text-white">${user.name}</span>
-              `;
+              <img src="${user.avatar_url || '/images/default-avatar.png'}" class="w-6 h-6 rounded-full border border-primary" />
+              <span class="flex-1 text-white">${user.name}</span>
+            `;
 
              // Adiciona o evento de clique no item inteiro
              resultItem.addEventListener('click', () => {
