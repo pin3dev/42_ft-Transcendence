@@ -2,7 +2,7 @@
 
 export interface UIElements {
   pageContainer: HTMLDivElement;
-  mainContent: HTMLDivElement;
+  mainContent: HTMLElement;
   backgroundTableContainer: HTMLDivElement; // O container da mesa de fundo que se tornará o jogo
   pingPongTableElement: HTMLDivElement; // A div específica da mesa para sobrepor o canvas
   scoreDisplay: HTMLDivElement;

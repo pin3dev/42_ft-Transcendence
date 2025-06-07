@@ -10,13 +10,18 @@ const fastifyStatic = require("@fastify/static"); // Adicionado para servir arqu
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 
-const publicKey = fs.readFileSync("/app/keys/public.key"); // trocar
-// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
+const SSLcert = Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('utf-8');
 
 
 async function buildServer() {
-  const app = Fastify();
-
+  const app = Fastify({
+    https: {
+      key: SSLkey,
+      cert: SSLcert,
+    }
+  });
   console.log("🚀 Iniciando API Gateway...");
 
   // Plugins essenciais
@@ -24,10 +29,22 @@ async function buildServer() {
   await app.register(fastifyCookie);
 
   // Hook: insere o token do cookie como Authorization
+  
+  await app.register(fastifyStatic, {
+    root: path.join(__dirname, '../frontend'),
+    prefix: '/',
+    index: 'index.html'
+  });
+  
   // Servir arquivos estáticos (avatares)
   await app.register(fastifyStatic, {
     root: path.join(__dirname, '../static/avatars'),
     prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
+    decorateReply: false // <- ESSENCIAL
+  });
+  
+  app.setNotFoundHandler((req, reply) => {
+    reply.sendFile('index.html'); // fallback para SPA simples
   });
 
   app.addHook("onRequest", async (request, reply) => {
@@ -41,7 +58,7 @@ async function buildServer() {
 
   // Headers CORS para todas as respostas
   app.addHook("onSend", async (request, reply, payload) => {
-    reply.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    reply.header("Access-Control-Allow-Origin", "https://localhost"); //request.headers.origin || ""
     reply.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
     reply.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     reply.header("Access-Control-Allow-Credentials", "true");
@@ -50,7 +67,7 @@ async function buildServer() {
 
   // JWT
   await app.register(jwt, {
-    secret: async () => publicKey,
+    secret: async () => JWTpublicKey,
     verify: { algorithms: ["RS256"] },
     sign: false
   });
@@ -117,7 +134,7 @@ async function buildServer() {
     }));
 
   await app.ready();
-  await app.listen({ port: 1025, host: "0.0.0.0" });
+  await app.listen({ port: 443, host: "0.0.0.0" });
 }
 
 buildServer().catch(err => {

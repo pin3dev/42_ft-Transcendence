@@ -14,7 +14,7 @@ async function getFriends(userId) {
     console.log("🧠 Perfis retornados:", profiles);
     console.log("📌 Tipo de profiles:", Array.isArray(profiles) ? "array" : typeof profiles);
 
-    const GATEWAY = process.env.GATEWAY_URL || "http://localhost:1025";
+    const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
 
     return rows.map(row => {
       const fid = row.user_id === userId ? row.friend_id : row.user_id;

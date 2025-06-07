@@ -28,7 +28,7 @@ export function createFooter(): HTMLElement {
   const logoIcon = document.createElement('span');
   logoIcon.className = 'text-neon-pink';
   logoIcon.innerHTML = `
- <img src="../public/joystick.png" width="24" height="24" alt="Joystick Icon">
+ <img src="/joystick.png" width="24" height="24" alt="Joystick Icon">
   `;
 
   const logoText = document.createElement('span');

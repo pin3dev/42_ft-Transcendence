@@ -114,7 +114,7 @@ export function createHero(): HTMLElement {
       color: 'neon-blue'
     },
     {
-      icon: `<img src="../public/joystick.png" width="24" height="24" alt="Joystick Icon">`,
+      icon: `<img src="/joystick.png" width="24" height="24" alt="Joystick Icon">`,
       title: 'Visual Arcade',
       description: 'Gráficos neon vibrantes e efeitos visuais incríveis para uma experiência arcade autêntica.',
       color: 'neon-pink'

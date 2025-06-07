@@ -6,7 +6,7 @@ O `api-gateway` é o ponto de entrada centralizado para o sistema, responsável 
 
 - **Porta:** 1025
 - **Autenticação:** Baseada em JWT (JSON Web Tokens) com algoritmo RS256.
-- **Chave Pública:** Restaurada no momento da inicialização a partir da variável de ambiente `PUBLIC_KEY_BASE64` e armazenada em `/app/keys/public.key`.
+- **Chave Pública:** Restaurada no momento da inicialização a partir da variável de ambiente `JWT_PUBLIC_KEY_BASE64` e armazenada em `/app/keys/public.key`.
 
 ## 🔑 Autenticação JWT
 
@@ -42,7 +42,7 @@ O `api-gateway` é o ponto de entrada centralizado para o sistema, responsável 
 
 O serviço é inicializado por meio do script `entrypoint.sh`, que realiza as seguintes ações:
 
-1. Restaura a chave pública a partir da variável de ambiente `PUBLIC_KEY_BASE64`.
+1. Restaura a chave pública a partir da variável de ambiente `JWT_PUBLIC_KEY_BASE64`.
 2. Salva a chave pública no diretório `/app/keys/public.key`.
 3. Inicia o servidor Fastify no endereço `0.0.0.0:1025`.
 
@@ -58,7 +58,7 @@ O serviço é inicializado por meio do script `entrypoint.sh`, que realiza as se
   make status api-gateway
   ```
 
-> **Nota:** Certifique-se de que a chave pública esteja disponível no caminho correto ou configure a variável de ambiente `PUBLIC_KEY_BASE64` adequadamente.
+> **Nota:** Certifique-se de que a chave pública esteja disponível no caminho correto ou configure a variável de ambiente `JWT_PUBLIC_KEY_BASE64` adequadamente.
 
 ## 📖 Guia para o Frontend
 

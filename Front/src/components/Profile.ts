@@ -168,7 +168,7 @@ private render(): void {
   
         formData.append('avatar', file);
         
-        response = await fetchWithAuth('http://localhost:1025/user/profile', {
+        response = await fetchWithAuth('/user/profile', {
         method: 'PATCH',
         body: formData,
       });
@@ -178,7 +178,7 @@ private render(): void {
           jsonBody.name = { value: name };
         }
 
-        response = await fetchWithAuth('http://localhost:1025/user/profile', {
+        response = await fetchWithAuth('/user/profile', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ private render(): void {
     confirmButton.disabled = true;
 
     try {
-      const response = await fetchWithAuth('http://localhost:1025/user/profile', {
+      const response = await fetchWithAuth('/user/profile', {
         method: 'DELETE'
       });
 

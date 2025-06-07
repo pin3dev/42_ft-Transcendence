@@ -9,7 +9,7 @@ async function getUserProfile(userId, options = {}) {
     throw error;
   }
 
-  const GATEWAY_BASE_URL = process.env.GATEWAY_URL || "http://localhost:1025";
+  const GATEWAY_BASE_URL = process.env.GATEWAY_URL || "https://localhost";
 
   return {
     name: profile.name,

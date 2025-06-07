@@ -67,7 +67,7 @@ const mockFriends: Friend[] = [
 
 async function testProtectedRoute(): Promise<UserStats | null> {
   try {
-    const profileResponse = await fetchWithAuth('http://localhost:1025/user/profile', {
+    const profileResponse = await fetchWithAuth('/user/profile', {
       method: 'GET',
     });
 
@@ -123,7 +123,7 @@ async function testProtectedRoute(): Promise<UserStats | null> {
 
 async function fetchFriendsList(): Promise<Friend[]> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/friends', {
+    const response = await fetchWithAuth('/user/friends', {
       method: 'GET',
     });
 
@@ -151,7 +151,7 @@ async function fetchFriendsList(): Promise<Friend[]> {
 
 async function fetchPendingRequests(): Promise<Friend[]> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/friends/pending', {
+    const response = await fetchWithAuth('/user/friends/pending', {
       method: 'GET',
     });
 
@@ -180,7 +180,7 @@ async function fetchPendingRequests(): Promise<Friend[]> {
 
 async function acceptFriendRequest(senderId: string): Promise<boolean> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/friends/accept', {
+    const response = await fetchWithAuth('/user/friends/accept', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ async function acceptFriendRequest(senderId: string): Promise<boolean> {
 
 async function rejectFriendRequest(senderId: string): Promise<boolean> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/friends/reject', {
+    const response = await fetchWithAuth('/user/friends/reject', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -222,7 +222,7 @@ async function rejectFriendRequest(senderId: string): Promise<boolean> {
 
 async function removeFriend(targetId: string): Promise<boolean> {
   try {
-    const response = await fetchWithAuth('http://localhost:1025/user/friends/remove', {
+    const response = await fetchWithAuth('/user/friends/remove', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -331,7 +331,7 @@ export async function renderTestPage(): Promise<void> {
     userSearchResults.innerHTML = '';
     if (value.length >= 2) {
       try {
-        const response = await fetchWithAuth(`http://localhost:1025/user/search?name=${encodeURIComponent(value)}`);
+        const response = await fetchWithAuth(`/user/search?name=${encodeURIComponent(value)}`);
         if (response.ok) {
           const users = await response.json();
           if (Array.isArray(users) && users.length > 0) {

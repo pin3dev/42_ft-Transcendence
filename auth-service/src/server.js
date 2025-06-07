@@ -4,10 +4,6 @@ const fs = require("fs");
 const fastifyJwt = require("@fastify/jwt");
 const fastifyCookie = require('@fastify/cookie');
 
-// const registerRoutes = require("./api/routes/register");
-// const loginRoutes = require("./api/routes/login");
-// const twoFARoutes = require("./api/routes/2fa");
-// const testeRoutes = require("./api/routes/teste");
 const auth_routes = require("./api/routes/auth_routes");
 
 const userRepo = require("./infrastructure/db/user_repository");
@@ -15,10 +11,8 @@ const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { handleUserDeleted } = require("./events/handler");
 
 
-const privateKey = fs.readFileSync(path.join(__dirname, "../keys/private.key"), "utf8"); //trocar
-const publicKey = fs.readFileSync(path.join(__dirname, "../keys/public.key"), "utf8"); // trocar
-// const privateKey = Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString('utf-8');
-// const publicKey = Buffer.from(process.env.PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
+const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 
 
 async function start() {
@@ -26,25 +20,25 @@ async function start() {
 
   app.register(fastifyJwt, {
     secret: {
-      private: privateKey,
-      public: publicKey
+      private: JWTprivateKey,
+      public: JWTpublicKey
     },
-    sign: { algorithm: 'RS256', key: privateKey },
-    verify: { algorithms: ['RS256'], key: publicKey }
+    sign: { algorithm: 'RS256', key: JWTprivateKey },
+    verify: { algorithms: ['RS256'], key: JWTpublicKey }
   });
   app.register(fastifyCookie);
 
   app.decorate("userRepo", userRepo);
   app.decorate("hasher", hasher);
 
-  app.options("/*", (request, reply) => {
-    reply
-      .header("Access-Control-Allow-Origin", "http://localhost:3000")
-      .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-      .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-      .header("Access-Control-Allow-Credentials", "true")
-      .send();
-  });
+  // app.options("/*", (request, reply) => {
+  //   reply
+  //     .header("Access-Control-Allow-Origin", "http://localhost:3000")
+  //     .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+  //     .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+  //     .header("Access-Control-Allow-Credentials", "true")
+  //     .send();
+  // });
 
   app.register(auth_routes);
   // app.register(loginRoutes);

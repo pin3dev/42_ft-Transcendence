@@ -17,7 +17,7 @@ export function createNavbar(): HTMLElement {
   
   const logoIcon = document.createElement('div');
   logoIcon.className = 'text-neon-pink';
-  logoIcon.innerHTML = `<img src="../public/joystick.png" width="24" height="24" alt="Joystick Icon">`;
+  logoIcon.innerHTML = `<img src="/joystick.png" width="24" height="24" alt="Joystick Icon">`;
   
   const logoText = document.createElement('span');
   logoText.className = 'font-bold text-xl md:text-2xl text-white neon-text';

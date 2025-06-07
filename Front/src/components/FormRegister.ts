@@ -225,7 +225,7 @@ export class FormRegister {
 
   private async sendRegisterRequest(email: string, password: string) {
     console.log('Enviando dados para registro:', { email, password });
-    const response = await fetch('http://localhost:1025/auth/register', {
+    const response = await fetch('/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

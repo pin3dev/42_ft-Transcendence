@@ -47,27 +47,6 @@ export async function renderUserProfilePage(user: any): Promise<void> {
     user_id: user.user_id,
   };
 
-//   // Tenta buscar informações completas do usuário
-//   try {
-//     const response = await fetchWithAuth(`http://localhost:1025/user/profile/${user.user_id}`, {
-//       method: 'GET',
-//     });
-
-//     if (response.ok) {
-//       const data = await response.json();
-//       // Atualiza os dados caso tenha recebido da API
-//       userStats = {
-//         name: data.name || user.name,
-//         wins: data.wins || userStats.wins,
-//         losses: data.losses || userStats.losses,
-//         avatar: data.avatar_url || user.avatar_url
-//       };
-//     }
-//   } catch (error) {
-//     console.error('Erro ao buscar dados do usuário:', error);
-//     // Continua com os dados já disponíveis
-//   }
-
   // Cria e adiciona a seção de perfil sem a barra de busca e botão de jogar
   const customProfile = document.createElement('div');
   customProfile.className = 'bg-arcade-dark rounded-lg overflow-hidden shadow-lg border border-neon-purple relative';
@@ -121,7 +100,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
         addFriendBtn.disabled = true;
         addFriendBtn.innerHTML = 'Enviando solicitação...';
         
-        const response = await fetchWithAuth('http://localhost:1025/user/friends/send', {
+        const response = await fetchWithAuth('/user/friends/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
