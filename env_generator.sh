@@ -32,8 +32,8 @@ install_mkcert_mac() {
 # ==============================
 install_mkcert_linux() {
   echo "🐧 Instalando mkcert em ambiente Linux..."
-  sudo apt-get update
-  sudo apt-get install -y libnss3-tools curl
+  sudo apt-get update || echo "⚠️ Falha no apt-get update (ignorado)"
+  sudo apt-get install -y libnss3-tools curl || echo "⚠️ Falha ao instalar libnss3-tools e curl (ignorado)"
   curl -JLO https://dl.filippo.io/mkcert/latest?for=linux/amd64
   chmod +x mkcert-*-linux-amd64
   sudo mv mkcert-*-linux-amd64 /usr/local/bin/mkcert
