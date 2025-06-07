@@ -118,8 +118,8 @@ export function createNavbar(): HTMLElement {
 
   
   if(localStorage.getItem('user_id')){
-    container.appendChild(authButtons);
-    container.appendChild(mobileMenuBtn);
+    // container.appendChild();
+    // container.appendChild();
   } 
   else{ 
     container.appendChild(authButtons);
