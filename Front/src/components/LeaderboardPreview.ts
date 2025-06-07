@@ -1,7 +1,15 @@
 
-import { navigateTo } from '../router/index';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
-export function createLeaderboardPreview(): HTMLElement {
+interface Player {
+  rank: number;
+  username: string;
+  total_wins: number;
+  total_losses: number;
+  win_rate: string;
+}
+
+export async function createLeaderboardPreview(): Promise<HTMLElement> {
   const section = document.createElement('section');
   section.className = 'py-16 ';
   
@@ -43,17 +51,32 @@ export function createLeaderboardPreview(): HTMLElement {
   // Table body
   const tbody = document.createElement('tbody');
 
+  let topPlayers = [];
+    try {
+    const response = await fetchWithAuth('/tournament/ranking/top', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Adicionando rank aos jogadores
+      topPlayers = data.slice(0, 5).map((player: Player, index: number) => ({
+        ...player,
+        rank: index + 1, // Rank baseado na posição (0 é o primeiro, 1 é o segundo...)
+      }));
+    } else {
+      console.error("Erro ao carregar dados do ranking");
+    }
+  } catch (err) {
+    console.error("Erro ao buscar ranking:", err);
+  }
+
   
-  
-  const topPlayers = [
-    { rank: 1, username: "NeonMaster99", wins: 342, losses: 45, winRate: "88.4%" },
-    { rank: 2, username: "PingPongKing", wins: 304, losses: 62, winRate: "83.1%" },
-    { rank: 3, username: "ArcadeLegend", wins: 287, losses: 59, winRate: "82.9%" },
-    { rank: 4, username: "PaddleWizard", wins: 265, losses: 78, winRate: "77.3%" },
-    { rank: 5, username: "TableTitanX", wins: 251, losses: 83, winRate: "75.2%" }
-  ];
-  
-  topPlayers.forEach(player => {
+  topPlayers.forEach((player: Player) => {
     const row = document.createElement('tr');
     row.className = `
       border-neon-green/30 hover:bg-neon-green/5 transition-colors
@@ -112,12 +135,12 @@ export function createLeaderboardPreview(): HTMLElement {
     // W/L cell
     const wlCell = document.createElement('td');
     wlCell.className = 'text-right p-4 text-white';
-    wlCell.textContent = `${player.wins}/${player.losses} `;
+    wlCell.textContent = `${player.total_wins}/${player.total_losses} `;
     
     // Win rate cell
     const winRateCell = document.createElement('td');
     winRateCell.className = `text-right p-4 ${player.rank === 1 ? "text-neon-green" : "text-white"}`;
-    winRateCell.textContent = player.winRate;
+    winRateCell.textContent = player.win_rate;
     
     // Add cells to row
     row.appendChild(rankCell);
@@ -137,11 +160,7 @@ export function createLeaderboardPreview(): HTMLElement {
   
   // Assemble components
   tableWrapper.appendChild(tableContainer);
- 
-  
-  
   container.appendChild(tableWrapper);
-  
   section.appendChild(container);
   
   return section;

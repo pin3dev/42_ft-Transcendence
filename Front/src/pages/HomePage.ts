@@ -5,7 +5,7 @@ import { createCreatorsSection } from '../components/Creators';
 import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 import { createFooter } from '../components/Footer';
 
-export function renderHome(): void {
+export async function renderHome(): Promise<void> {
   const root = document.getElementById('root');
   if (!root) return;
   
@@ -38,12 +38,14 @@ export function renderHome(): void {
   header.appendChild(subtitle);
 
   main.appendChild(header);
-  main.appendChild(createLeaderboardPreview());
-  
-  
+
   container.appendChild(main);
   container.appendChild(createFooter());
-  
-  // Insere no DOM
   root.appendChild(container);
+
+  // Agora, chama a API para adicionar o leaderboard
+  setTimeout(async () => {
+    const leaderboardSection = await createLeaderboardPreview();
+    main.appendChild(leaderboardSection);
+  }, 0);
 }

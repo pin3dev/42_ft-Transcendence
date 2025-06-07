@@ -4,6 +4,7 @@ import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
 import { renderTestPage } from './TestPage';
 import type { UserStats } from '../components/Profile';
+import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 
 export async function renderUserProfilePage(user: any): Promise<void> {
   const root = document.getElementById('root');
@@ -202,8 +203,16 @@ export async function renderUserProfilePage(user: any): Promise<void> {
     customProfile.appendChild(userInfo);
 
     mainContainer.appendChild(customProfile);
+
+    // Chama o leaderboard depois que a página foi renderizada
+    setTimeout(async () => {
+      const leaderboardSection = await createLeaderboardPreview();
+      mainContainer.appendChild(leaderboardSection);
+    }, 0);
+
     pageContainer.appendChild(mainContainer);
     pageContainer.appendChild(createFooter());
 
     root.appendChild(pageContainer);
+
 }
