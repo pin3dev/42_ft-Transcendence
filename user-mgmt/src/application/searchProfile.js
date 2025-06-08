@@ -3,7 +3,9 @@ const profileRepo = require("../infrastructure/db/profile_repository");
 async function searchProfile({name, id}) {
   
   if (id) {
-    return await profileRepo.findById(id);
+    const user = await profileRepo.findById(id);
+    if (!user) return [];
+    return [user];
   }
   
   if (name){

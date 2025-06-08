@@ -73,13 +73,31 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     console.error("Erro ao buscar ranking:", err);
   }
 
-  
-  topPlayers.forEach((player: Player) => {
-    const row = document.createElement('tr');
-    row.className = `
-      border-neon-green/30 hover:bg-neon-green/5 transition-colors
-      ${player.rank === 1 ? "bg-neon-green/10" : ""}
-    `;
+    const getPlayerName = async (userId: string) => {
+      try {
+        const response = await fetchWithAuth(`/user/search?id=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            return data[0].name; // Corrigido: pega o nome do primeiro usuário encontrado
+          }
+          return 'Desconhecido';
+        } else {
+          console.error("Erro ao buscar nome do jogador.");
+          return 'Desconhecido';
+        }
+      } catch (err) {
+        console.error("Erro ao buscar nome do jogador:", err);
+        return 'Desconhecido';
+      }
+    };
+    
+    for (const player of topPlayers) {
+      const row = document.createElement('tr');
+      row.className = `
+        border-neon-green/30 hover:bg-neon-green/5 transition-colors
+        ${player.rank === 1 ? "bg-neon-green/10" : ""}
+      `;
     
     // Rank cell
     const rankCell = document.createElement('td');
@@ -102,10 +120,13 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     
     const playerNameWrapper = document.createElement('div');
     playerNameWrapper.className = 'flex items-center gap-2';
+
+
     
     const playerName = document.createElement('span');
     playerName.className = player.rank <= 3 ? 'text-neon-green' : 'text-white';
-    playerName.textContent = player.username;
+    const name = await getPlayerName(player.user_id);
+    playerName.textContent = name;
     
     playerNameWrapper.appendChild(playerName);
     
@@ -147,7 +168,7 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     row.appendChild(winRateCell);
     
     tbody.appendChild(row);
-  });
+  }
   
   // Assemble table
   table.appendChild(thead);
