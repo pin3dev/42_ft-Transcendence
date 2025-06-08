@@ -89,9 +89,9 @@ function render2FAInput(container?: HTMLElement): void {
         throw new Error('Código inválido.');
       }
 
-      showToast('Autenticação concluída com sucesso!', 'success');
+            showToast('Autenticação concluída com sucesso!', 'success');
       localStorage.removeItem('user_id');
-      window.location.href = '/Test';
+      window.location.href = '/Profile';
     } catch (error) {
       console.error('Erro ao verificar o código 2FA:', error);
       showToast(error instanceof Error ? error.message : 'Erro desconhecido.', 'error');

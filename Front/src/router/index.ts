@@ -14,7 +14,7 @@ const routes: Record<string, () => void> = {
   '/ComoJogar': renderHowToPlayPage,
   '/Game': renderGamePage,
   '/Register': renderRegister,
-  '/Test': renderTestPage
+  '/Profile': renderTestPage
 };
 
 // Função para renderizar a página baseada na rota atual
