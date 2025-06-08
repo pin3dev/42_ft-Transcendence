@@ -2,6 +2,119 @@
 import { navigateTo } from '../router/index'; // Seu import original
 import { fetchWithAuth } from '../utils/fetchWithAuth'; // Importar fetchWithAuth
 
+// Função para mostrar modal personalizado de logout
+function showLogoutModal(): void {
+  const logoutModal = document.createElement('div');
+  logoutModal.className = 'fixed inset-0 bg-black/70 z-50 flex items-center justify-center transition-opacity';
+  logoutModal.innerHTML = `
+    <div class="bg-arcade-darker p-6 rounded-xl border border-neon-blue w-full max-w-md text-white space-y-4">
+      <h3 class="text-xl font-bold text-neon-blue">Tem certeza que deseja sair?</h3>
+      <p class="text-sm text-white/80">Você será desconectado da sua conta.</p>
+      <div class="flex justify-end gap-4 mt-4">
+        <button id="cancel-logout" class="text-white border border-white px-4 py-2 rounded hover:bg-white/10">Cancelar</button>
+        <button id="confirm-logout" class="bg-neon-blue px-4 py-2 rounded text-black font-bold hover:bg-neon-green">Sair</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(logoutModal);
+
+  // Event listeners para os botões do modal
+  logoutModal.querySelector('#cancel-logout')?.addEventListener('click', () => {
+    logoutModal.remove();
+  });
+
+  logoutModal.querySelector('#confirm-logout')?.addEventListener('click', async () => {
+    const confirmButton = logoutModal.querySelector('#confirm-logout') as HTMLButtonElement;
+    confirmButton.textContent = 'Saindo...';
+    confirmButton.disabled = true;
+
+    try {
+      // Chamar a rota /auth/logout primeiro
+      const response = await fetchWithAuth('/auth/logout', {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        console.log('Logout realizado com sucesso no servidor');
+      } else {
+        console.warn('Erro no logout do servidor, mas continuando com logout local');
+      }
+    } catch (error) {
+      console.warn('Erro ao chamar logout no servidor:', error);
+    } finally {
+      // Limpar dados locais independentemente do resultado da API
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userAvatar');
+      window.location.href = '/';
+    }
+  });
+
+  // Fechar modal ao clicar fora
+  logoutModal.addEventListener('click', (e) => {
+    if (e.target === logoutModal) {
+      logoutModal.remove();
+    }
+  });
+}
+
+// Função para mostrar modal personalizado de confirmação de exclusão
+function showDeleteModal(): void {
+  const deleteModal = document.createElement('div');
+  deleteModal.className = 'fixed inset-0 bg-black/70 z-50 flex items-center justify-center transition-opacity';
+  deleteModal.innerHTML = `
+    <div class="bg-arcade-darker p-6 rounded-xl border border-neon-pink w-full max-w-md text-white space-y-4">
+      <h3 class="text-xl font-bold text-neon-pink">Tem certeza que deseja deletar seu perfil?</h3>
+      <p class="text-sm text-white/80">Essa ação é irreversível e todos os seus dados serão apagados.</p>
+      <div class="flex justify-end gap-4 mt-4">
+        <button id="cancel-delete" class="text-white border border-white px-4 py-2 rounded hover:bg-white/10">Cancelar</button>
+        <button id="confirm-delete" class="bg-red-600 px-4 py-2 rounded text-white font-bold hover:bg-red-700">Deletar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(deleteModal);
+
+  // Event listeners para os botões do modal
+  deleteModal.querySelector('#cancel-delete')?.addEventListener('click', () => {
+    deleteModal.remove();
+  });
+
+  deleteModal.querySelector('#confirm-delete')?.addEventListener('click', async () => {
+    const confirmButton = deleteModal.querySelector('#confirm-delete') as HTMLButtonElement;
+    confirmButton.textContent = 'Deletando...';
+    confirmButton.disabled = true;
+
+    try {
+      const response = await fetchWithAuth('/user/profile', {
+        method: 'DELETE'
+      });
+
+      if (response.status === 204) {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userAvatar');
+        window.location.href = '/';
+      } else {
+        throw new Error('Falha ao deletar o perfil');
+      }
+    } catch (error) {
+      alert('Erro ao deletar perfil.');
+      console.error(error);
+    } finally {
+      confirmButton.textContent = 'Deletar';
+      confirmButton.disabled = false;
+      deleteModal.remove();
+    }
+  });
+
+  // Fechar modal ao clicar fora
+  deleteModal.addEventListener('click', (e) => {
+    if (e.target === deleteModal) {
+      deleteModal.remove();
+    }
+  });
+}
+
 
 function createProfileButtonWithDropdown(container: HTMLElement): void {
   if (!container) {
@@ -56,51 +169,11 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
           console.log(`Ação do menu: ${item.action}`);
           
           if (item.action === 'logout') {
-            try {
-              // Chamar a rota /auth/logout primeiro
-              const response = await fetchWithAuth('/auth/logout', {
-                method: 'POST'
-              });
-
-              if (response.ok) {
-                console.log('Logout realizado com sucesso no servidor');
-              } else {
-                console.warn('Erro no logout do servidor, mas continuando com logout local');
-              }
-            } catch (error) {
-              console.warn('Erro ao chamar logout no servidor:', error);
-            } finally {
-              // Limpar dados locais independentemente do resultado da API
-              localStorage.removeItem('userToken');
-              localStorage.removeItem('userName');
-              localStorage.removeItem('userAvatar');
-              alert('Deslogado!');
-              window.location.reload();
-            }
+            // Mostrar modal personalizado de logout
+            showLogoutModal();
           } else if (item.action === 'delete') {
-            // Implementar a funcionalidade de deletar conta
-            const confirmed = confirm('Tem certeza que deseja deletar seu perfil? Essa ação é irreversível e todos os seus dados serão apagados.');
-            
-            if (confirmed) {
-              try {
-                const response = await fetchWithAuth('/user/profile', {
-                  method: 'DELETE'
-                });
-
-                if (response.status === 204) {
-                  alert('Perfil deletado com sucesso!');
-                  localStorage.removeItem('userToken');
-                  localStorage.removeItem('userName');
-                  localStorage.removeItem('userAvatar');
-                  window.location.href = '/';
-                } else {
-                  throw new Error('Falha ao deletar o perfil');
-                }
-              } catch (error) {
-                alert('Erro ao deletar perfil.');
-                console.error(error);
-              }
-            }
+            // Criar e mostrar modal personalizado de confirmação
+            showDeleteModal();
           } else {
             navigateTo(item.href);
           }
@@ -236,31 +309,11 @@ export function createNavbar(): HTMLElement {
     const mobileLogoutLink = document.createElement('a');
     mobileLogoutLink.textContent = 'Sair';
     mobileLogoutLink.className = 'text-neon-pink hover:underline p-2 transition-colors cursor-pointer block';
-    mobileLogoutLink.addEventListener('click', async (e) => {
+    mobileLogoutLink.addEventListener('click', (e) => {
       e.preventDefault();
-      
-      try {
-        // Chamar a rota /auth/logout primeiro
-        const response = await fetchWithAuth('/auth/logout', {
-          method: 'POST'
-        });
-
-        if (response.ok) {
-          console.log('Logout realizado com sucesso no servidor');
-        } else {
-          console.warn('Erro no logout do servidor, mas continuando com logout local');
-        }
-      } catch (error) {
-        console.warn('Erro ao chamar logout no servidor:', error);
-      } finally {
-        // Limpar dados locais independentemente do resultado da API
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userAvatar');
-        alert('Deslogado!');
-        window.location.reload();
-        mobileMenu.classList.add('hidden');
-      }
+      mobileMenu.classList.add('hidden');
+      // Mostrar modal personalizado de logout
+      showLogoutModal();
     });
     mobileAuthContainer.appendChild(mobileProfileLink);
     mobileAuthContainer.appendChild(mobileLogoutLink);

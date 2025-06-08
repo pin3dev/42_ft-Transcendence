@@ -448,28 +448,8 @@ export async function renderTestPage(): Promise<void> {
   mainContainer.appendChild(gridContainer);
   pageContainer.appendChild(mainContainer);
 
-
-  const deleteButton = document.createElement('button');
-  deleteButton.id = 'delete-profile-btn';
-  deleteButton.className = `
-    mx-auto mt-6 mb-10 block
-    text-xs text-red-400 hover:text-red-300
-    hover:text-red-300
-    transition-colors duration-200
-  `;
-  deleteButton.textContent = 'Excluir conta';
-  deleteButton.title = 'Remover sua conta do sistema';
-  
-  deleteButton.addEventListener('click', () => {
-    const deleteModal = document.querySelector('#confirm-delete')?.closest('.fixed');
-    if (deleteModal) deleteModal.classList.remove('hidden');
-  });
-  
-  pageContainer.appendChild(deleteButton);
-
   // Adiciona o footer
   pageContainer.appendChild(createFooter());
-
 
   root.appendChild(pageContainer);
 }
