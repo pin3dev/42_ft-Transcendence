@@ -41,7 +41,7 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
       
       const menuItems = [
         { text: 'Meu Perfil', action: 'profile', href: '/Profile' },
-        { text: 'Apagar Conta', action: 'delete', href: '#' },
+        { text: 'Excluir Conta', action: 'delete', href: '#' },
         { text: 'Sair', action: 'logout', href: '#' },
       ];
 
@@ -56,11 +56,27 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
           console.log(`Ação do menu: ${item.action}`);
           
           if (item.action === 'logout') {
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userAvatar');
-            alert('Deslogado!');
-            window.location.reload();
+            try {
+              // Chamar a rota /auth/logout primeiro
+              const response = await fetchWithAuth('/auth/logout', {
+                method: 'POST'
+              });
+
+              if (response.ok) {
+                console.log('Logout realizado com sucesso no servidor');
+              } else {
+                console.warn('Erro no logout do servidor, mas continuando com logout local');
+              }
+            } catch (error) {
+              console.warn('Erro ao chamar logout no servidor:', error);
+            } finally {
+              // Limpar dados locais independentemente do resultado da API
+              localStorage.removeItem('userToken');
+              localStorage.removeItem('userName');
+              localStorage.removeItem('userAvatar');
+              alert('Deslogado!');
+              window.location.reload();
+            }
           } else if (item.action === 'delete') {
             // Implementar a funcionalidade de deletar conta
             const confirmed = confirm('Tem certeza que deseja deletar seu perfil? Essa ação é irreversível e todos os seus dados serão apagados.');
@@ -220,14 +236,31 @@ export function createNavbar(): HTMLElement {
     const mobileLogoutLink = document.createElement('a');
     mobileLogoutLink.textContent = 'Sair';
     mobileLogoutLink.className = 'text-neon-pink hover:underline p-2 transition-colors cursor-pointer block';
-    mobileLogoutLink.addEventListener('click', (e) => {
+    mobileLogoutLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      localStorage.removeItem('userToken');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userAvatar');
-      alert('Deslogado!');
-      window.location.reload();
-      mobileMenu.classList.add('hidden');
+      
+      try {
+        // Chamar a rota /auth/logout primeiro
+        const response = await fetchWithAuth('/auth/logout', {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          console.log('Logout realizado com sucesso no servidor');
+        } else {
+          console.warn('Erro no logout do servidor, mas continuando com logout local');
+        }
+      } catch (error) {
+        console.warn('Erro ao chamar logout no servidor:', error);
+      } finally {
+        // Limpar dados locais independentemente do resultado da API
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userAvatar');
+        alert('Deslogado!');
+        window.location.reload();
+        mobileMenu.classList.add('hidden');
+      }
     });
     mobileAuthContainer.appendChild(mobileProfileLink);
     mobileAuthContainer.appendChild(mobileLogoutLink);
