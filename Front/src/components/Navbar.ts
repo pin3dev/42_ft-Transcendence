@@ -1,5 +1,6 @@
 // Supondo que navigateTo e createProfileButtonWithDropdown estão corretamente importados ou globalmente disponíveis
 import { navigateTo } from '../router/index'; // Seu import original
+import { fetchWithAuth } from '../utils/fetchWithAuth'; // Importar fetchWithAuth
 
 
 function createProfileButtonWithDropdown(container: HTMLElement): void {
@@ -12,21 +13,16 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
   let isDropdownOpen = false;
   let dropdownElement: HTMLDivElement | null = null;
 
-  const userName = localStorage.getItem('userName') || 'Usuário';
-  const userAvatar = localStorage.getItem('userAvatar') || 'https://via.placeholder.com/32/FFFFFF/000000/?text=U';
+  // Dados do usuário
+  const userName = localStorage.getItem('userName') || 'Configurações';
 
   const profBtn = document.createElement('button');
   profBtn.className = 'border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-arcade-darker px-4 py-2 rounded border transition-all flex items-center gap-2';
 
-  const avatarImg = document.createElement('img');
-  avatarImg.src = userAvatar;
-  avatarImg.alt = userName;
-  avatarImg.className = 'w-6 h-6 rounded-full';
-
+  // Removido o avatar - apenas o nome do usuário
   const nameSpan = document.createElement('span');
   nameSpan.textContent = userName;
 
-  profBtn.appendChild(avatarImg);
   profBtn.appendChild(nameSpan);
 
   const toggleDropdown = () => {
@@ -40,12 +36,12 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
       if (existing) existing.remove();
 
       dropdownElement = document.createElement('div');
-      // Corrige a posição: top-full + mt-2 para ficar logo abaixo do botão
-      dropdownElement.className = 'profile-menu-dropdown absolute right-0 top-full mt-2 w-48 bg-arcade-darker border border-neon-purple rounded-lg shadow-lg z-50';
-
+      // Corrigido o posicionamento - removido mt-2 e adicionado top-full para ficar logo abaixo do botão
+      dropdownElement.className = 'profile-menu-dropdown absolute right-0 top-full w-48 bg-arcade-darker border border-neon-purple rounded-lg shadow-lg z-50';
+      
       const menuItems = [
         { text: 'Meu Perfil', action: 'profile', href: '/Profile' },
-        { text: 'Configurações', action: 'settings', href: '/Settings' },
+        { text: 'Apagar Conta', action: 'delete', href: '#' },
         { text: 'Sair', action: 'logout', href: '#' },
       ];
 
@@ -54,19 +50,45 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
         link.href = item.href;
         link.className = 'block px-4 py-3 text-neon-blue hover:bg-neon-blue hover:text-arcade-darker transition-all cursor-pointer';
         link.textContent = item.text;
-
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
+        
+        link.addEventListener('click', async (e) => {
+          e.preventDefault(); 
+          console.log(`Ação do menu: ${item.action}`);
+          
           if (item.action === 'logout') {
             localStorage.removeItem('userToken');
             localStorage.removeItem('userName');
             localStorage.removeItem('userAvatar');
             alert('Deslogado!');
             window.location.reload();
+          } else if (item.action === 'delete') {
+            // Implementar a funcionalidade de deletar conta
+            const confirmed = confirm('Tem certeza que deseja deletar seu perfil? Essa ação é irreversível e todos os seus dados serão apagados.');
+            
+            if (confirmed) {
+              try {
+                const response = await fetchWithAuth('/user/profile', {
+                  method: 'DELETE'
+                });
+
+                if (response.status === 204) {
+                  alert('Perfil deletado com sucesso!');
+                  localStorage.removeItem('userToken');
+                  localStorage.removeItem('userName');
+                  localStorage.removeItem('userAvatar');
+                  window.location.href = '/';
+                } else {
+                  throw new Error('Falha ao deletar o perfil');
+                }
+              } catch (error) {
+                alert('Erro ao deletar perfil.');
+                console.error(error);
+              }
+            }
           } else {
             navigateTo(item.href);
           }
-          toggleDropdown();
+          toggleDropdown(); 
         });
         dropdownElement!.appendChild(link);
       });
@@ -188,7 +210,7 @@ export function createNavbar(): HTMLElement {
 
     // Mobile: perfil e logout
     const mobileProfileLink = document.createElement('a');
-    mobileProfileLink.textContent = `Perfil (${localStorage.getItem('userName') || 'Usuário'})`;
+    mobileProfileLink.textContent = `Perfil (${localStorage.getItem('userName') || 'Configurações'})`;
     mobileProfileLink.className = 'text-white hover:text-neon-green p-2 transition-colors cursor-pointer block';
     mobileProfileLink.addEventListener('click', (e) => {
       e.preventDefault();
