@@ -43,10 +43,12 @@ export class API {
 			return;
 		}
 
-		// process game type messages
-		if (Message.gameMessageTypeRequest.has(messageFromClient.getType)) {
+		// process game type messages, if tour
+		if (Message.gameMessageTypeRequest.has(messageFromClient.getType) && ws.getTournamentId == 0) {
 			this.gameHandlerAPI.message(ws, messageFromClient);
 		}
+
+		//se a mensagem for to tipo game mas o torneio id for diferente de 0, logo, o game eh de um torneio, usar o handler de torneios
 
 	}
 

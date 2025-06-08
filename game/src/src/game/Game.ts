@@ -11,10 +11,11 @@ export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 
 export class Game {
 
+	public static readonly MAX_POINTS = 10;
+	public static readonly WINNING_SCORE = (this.MAX_POINTS / 2) + 1;
 	private static matchIdCounter: number = 1;
 	private static readonly START_COUNT_DOWN_VALUE = 3;
-	private static readonly MAX_POINT = 10;
-	private static readonly WINNING_SCORE = (this.MAX_POINT / 2) + 1;
+
 
 	private userSessions: WebSocketUserSession[] = [];
 	private players: Player[] = [];
@@ -265,7 +266,7 @@ export class Game {
 			this.gameStatus = 'FINISHED';
 			this.sendMessageToWinner(this.players[1]);
 			this.stop();
-		} else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINT) {
+		} else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINTS) {
 			this.gameStatus = 'FINISHED';
 			this.sendMessageDraw();
 			this.stop();
