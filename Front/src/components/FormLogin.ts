@@ -44,7 +44,7 @@ export class FormLogin {
     formContainer.appendChild(this.loginForm);
 
     // Adiciona footer com link para registro
-    this.addFormFooter(formContainer);
+    //this.addFormFooter(formContainer);
 
     return formContainer;
   }
@@ -94,15 +94,8 @@ export class FormLogin {
     // Adiciona campo de senha
     form.appendChild(this.createPasswordInput());
 
-    // Adiciona lembrar senha e esqueci senha
-    form.appendChild(this.createRememberForgotSection());
-
     // Adiciona botão de submit
     form.appendChild(this.createSubmitButton());
-
-    // Adiciona divisão "ou continue com"
-    form.appendChild(this.createDivider());
-
 
     return form;
   }
@@ -178,40 +171,6 @@ export class FormLogin {
     inputContainer.appendChild(this.togglePasswordButton);
     container.appendChild(label);
     container.appendChild(inputContainer);
-
-    return container;
-  }
-
-  // Cria seção "Lembrar de mim" e "Esqueceu a senha"
-  private createRememberForgotSection(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'flex items-center justify-between';
-
-    // Checkbox "Lembrar de mim"
-    const rememberContainer = document.createElement('div');
-    rememberContainer.className = 'flex items-center space-x-2';
-
-    const checkbox = document.createElement('input');
-    checkbox.id = 'remember';
-    checkbox.type = 'checkbox';
-    checkbox.className = 'h-4 w-4 border border-neon-blue/50 bg-arcade-dark rounded';
-
-    const checkboxLabel = document.createElement('label');
-    checkboxLabel.htmlFor = 'remember';
-    checkboxLabel.className = 'text-sm text-gray-300 cursor-pointer';
-    checkboxLabel.textContent = 'Lembrar de mim';
-
-    rememberContainer.appendChild(checkbox);
-    rememberContainer.appendChild(checkboxLabel);
-
-    // Link "Esqueceu a senha"
-    const forgotLink = document.createElement('a');
-    forgotLink.href = '#forgot-password';
-    forgotLink.className = 'text-sm text-neon-blue hover:text-neon-green transition-colors';
-    forgotLink.textContent = 'Esqueceu a senha?';
-
-    container.appendChild(rememberContainer);
-    container.appendChild(forgotLink);
 
     return container;
   }
@@ -369,32 +328,9 @@ private async verify2FACode(code: string): Promise<void> {
   }*/
   
 
-  // Cria divisão "ou continue com"
-  private createDivider(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'relative flex items-center justify-center';
-
-    const line1 = document.createElement('div');
-    line1.className = 'h-px bg-gray-600 flex-grow';
-    
-    container.appendChild(line1);
-
-
-    return container;
-  }
-
-
   // Adiciona footer do formulário
   private addFormFooter(container: HTMLElement): void {
-    const footer = document.createElement('div');
-    footer.className = 'flex flex-col space-y-4 items-center justify-center mt-6';
-
-    const text = document.createElement('p');
-    text.className = 'text-sm text-gray-300';
-    text.innerHTML = 'Não possui uma conta? <a href="#register" class="text-neon-pink hover:text-neon-purple transition-colors font-medium">Registre-se</a>';
-
-    footer.appendChild(text);
-    container.appendChild(footer);
+    // Footer removido - não há mais links extras
   }
 
   // Factory method para criar ícones SVG

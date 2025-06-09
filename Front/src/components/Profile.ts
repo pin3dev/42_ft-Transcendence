@@ -123,20 +123,6 @@ private render(): void {
   `;
   document.body.appendChild(modal);
 
-  const deleteModal = document.createElement('div');
-  deleteModal.className = 'fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden transition-opacity';
-  deleteModal.innerHTML = `
-    <div class="bg-arcade-darker p-6 rounded-xl border border-neon-pink w-full max-w-md text-white space-y-4">
-      <h3 class="text-xl font-bold text-neon-pink">Tem certeza que deseja deletar seu perfil?</h3>
-      <p class="text-sm text-white/80">Essa ação é irreversível e todos os seus dados serão apagados.</p>
-      <div class="flex justify-end gap-4 mt-4">
-        <button id="cancel-delete" class="text-white border border-white px-4 py-2 rounded hover:bg-white/10">Cancelar</button>
-        <button id="confirm-delete" class="bg-red-600 px-4 py-2 rounded text-white font-bold hover:bg-red-700">Deletar</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(deleteModal);
-  
   const editBtn = this.element.querySelector('#edit-profile-btn');
   editBtn?.addEventListener('click', () => {
     modal.classList.remove('hidden');
@@ -231,40 +217,6 @@ private render(): void {
   if (button) {
     button.addEventListener('click', onPlay);
   }
-
-  const deleteBtn = this.element.querySelector('#delete-profile-btn');
-  deleteBtn?.addEventListener('click', () => {
-    deleteModal.classList.remove('hidden');
-  });
-
-  deleteModal.querySelector('#cancel-delete')?.addEventListener('click', () => {
-    deleteModal.classList.add('hidden');
-  });
-
-  deleteModal.querySelector('#confirm-delete')?.addEventListener('click', async () => {
-    const confirmButton = deleteModal.querySelector('#confirm-delete') as HTMLButtonElement;
-    confirmButton.textContent = 'Deletando...';
-    confirmButton.disabled = true;
-
-    try {
-      const response = await fetchWithAuth('/user/profile', {
-        method: 'DELETE'
-      });
-
-      if (response.status === 204) {
-        window.location.href = '/';
-      } else {
-        throw new Error('Falha ao deletar o perfil');
-      }
-    } catch (error) {
-      alert('Erro ao deletar perfil.');
-      console.error(error);
-    } finally {
-      confirmButton.textContent = 'Deletar';
-      confirmButton.disabled = false;
-      deleteModal.classList.add('hidden');
-    }
-  });
 }
 
   public getElement(): HTMLElement {
