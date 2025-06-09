@@ -16,11 +16,10 @@ async function login_controller(request, reply) {
         user_id: result.user_id,
         status: "2FA_REQUIRED",
         message: "Autenticação de dois fatores necessária",
-        ...(result.qr_code && { qr_code: result.qr_code })  // 🔁 usa qr_code diretamente
+        ...(result.qr_code && { qr_code: result.qr_code })
       });
     }
 
-    // ⚠️ Se não for 2FA_REQUIRED, adicionar comportamento aqui se necessário
     return reply.code(400).send({ error: "Estado inesperado" });
 
   } catch (err) {

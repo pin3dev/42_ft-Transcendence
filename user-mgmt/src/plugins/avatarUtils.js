@@ -36,56 +36,6 @@ async function saveAvatar(file, userId) {
   }
 }
 
-/**
- * Obtém informações sobre um arquivo de avatar
- * @param {string} avatarPath - Caminho relativo do avatar
- * @returns {Object|null} Informações sobre o arquivo ou null se não existir
- */
-// function getAvatarFileInfo(avatarPath) {
-//   if (!avatarPath) return null;
-  
-//   const filename = path.basename(avatarPath);
-//   const filepath = path.join(AVATAR_DIR, filename);
-  
-//   console.log(`Tentando localizar avatar: ${filepath}`);
-  
-//   if (!fs.existsSync(filepath)) {
-//     console.log(`Arquivo de avatar não encontrado: ${filepath}`);
-    
-//     // Se o arquivo não for encontrado e for o default.png, vamos verificar diretamente no diretório de avatares
-//     if (filename === 'default.png') {
-//       const defaultPath = path.join(AVATAR_DIR, 'default.png');
-//       console.log(`Tentando localizar avatar padrão: ${defaultPath}`);
-      
-//       if (fs.existsSync(defaultPath)) {
-//         console.log('Avatar padrão encontrado!');
-//         const ext = '.png';
-//         const mimetype = 'image/png';
-        
-//         return {
-//           filepath: defaultPath,
-//           mimetype,
-//           filename
-//         };
-//       } else {
-//         console.log(`Avatar padrão não encontrado: ${defaultPath}`);
-//       }
-//     }
-//     return null;
-//   }
-  
-//   const ext = path.extname(filepath).toLowerCase();
-//   const mimetype = ext === '.png' ? 'image/png' : 'image/jpeg';
-  
-//   console.log(`Avatar encontrado: ${filepath}, mimetype: ${mimetype}`);
-  
-//   return {
-//     filepath,
-//     mimetype,
-//     filename
-//   };
-// }
-
 module.exports = {
   saveAvatar,
   // getAvatarFileInfo

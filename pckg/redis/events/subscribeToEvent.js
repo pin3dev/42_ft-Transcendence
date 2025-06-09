@@ -1,5 +1,4 @@
 const Redis = require("ioredis");
-// const { EventTypes } = require("./eventsHelper.js");
 
 const eventCnn = new Redis({
   host: "event-bus",
