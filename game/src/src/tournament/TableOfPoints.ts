@@ -1,35 +1,31 @@
 import { GameScoreboard } from "../game/GameScoreboard";
-import { WebSocketUserSession } from "../WebSocketUserSession";
 import { SortTablePointMemberArray } from "./SortTablePointMemberArray";
-import { TableOfPointRow } from "./TableOfPointRow";
+
+import { TournamentPlayer } from "./TournamentPlayer";
 
 export class TableOfPoints {
 
-	private _playersOfTournament: Map<WebSocketUserSession, TableOfPointRow>;
+	private _playersOfTournament: TournamentPlayer[];
 
 	constructor() {
-		this._playersOfTournament = new Map<WebSocketUserSession, TableOfPointRow>;
+		this._playersOfTournament = [];
 	}
 
-	public addPlayer(webSocketUserSession: WebSocketUserSession) {
-		this._playersOfTournament.set(webSocketUserSession, new TableOfPointRow(webSocketUserSession));
+	public addPlayer(tournamentPlayer: TournamentPlayer) {
+		this._playersOfTournament.push(tournamentPlayer);
 	}
 
 	public addPlayerScore(gameScoreboard: GameScoreboard): void {
 
 		if (gameScoreboard.isDraw()) {
-			this.makeDraw(this._playersOfTournament.get(gameScoreboard.player1)!, gameScoreboard);
-			this.makeDraw(this._playersOfTournament.get(gameScoreboard.player2)!, gameScoreboard);
+			this.makeDraw(gameScoreboard.player1!, gameScoreboard);
+			this.makeDraw(gameScoreboard.player2!, gameScoreboard);
 		} else {
-			let playerWinner: TableOfPointRow = this._playersOfTournament.get(gameScoreboard.getWinner()!)!;
-			let playerLoser: TableOfPointRow = this._playersOfTournament.get(gameScoreboard.getLoser()!)!;
+			let playerWinner: TournamentPlayer = gameScoreboard.getWinner()!;
+			let playerLoser: TournamentPlayer = gameScoreboard.getLoser()!;
 
 			this.makeVictory(playerWinner, playerLoser, gameScoreboard);
 		}
-	}
-
-	public addTableOfPointRow(webSocketUserSession: WebSocketUserSession, tableOfPointRow : TableOfPointRow){
-		this._playersOfTournament.set(webSocketUserSession, tableOfPointRow);
 	}
 
 	public getTable(): any[] {
@@ -72,25 +68,24 @@ export class TableOfPoints {
 
 	}
 
-
 	//  ------------------- private method members  -------------------
 
-	private makeDraw(playerWhoTied: TableOfPointRow, gameScoreboard: GameScoreboard) {
+	private makeDraw(playerWhoTied: TournamentPlayer, gameScoreboard: GameScoreboard) {
 		playerWhoTied.numOfMatch = playerWhoTied.numOfMatch + 1;
 		playerWhoTied.starts = playerWhoTied.starts + 1;
-		playerWhoTied.pointsMake = playerWhoTied.pointsMake + gameScoreboard.getPlayerPoints(playerWhoTied.webSocketUserSession)!
+		playerWhoTied.pointsMake = playerWhoTied.pointsMake + gameScoreboard.getPlayerPoints(playerWhoTied)!
 	}
 
-	private makeVictory(playerWinner: TableOfPointRow, playerLoser: TableOfPointRow, gameScoreboard: GameScoreboard) {
+	private makeVictory(playerWinner: TournamentPlayer, playerLoser: TournamentPlayer, gameScoreboard: GameScoreboard) {
 
 		playerWinner.numOfMatch = playerWinner.numOfMatch + 1;
 		playerWinner.starts = playerWinner.starts + 3;
 		playerWinner.numberOfVictories = playerWinner.numberOfVictories + 3;
-		playerWinner.pointsBalance = playerWinner.pointsBalance + (gameScoreboard.getPlayerPoints(playerWinner.webSocketUserSession)! - gameScoreboard.getPlayerPoints(playerLoser.webSocketUserSession)!);
-		playerWinner.pointsMake = playerWinner.pointsMake + gameScoreboard.getPlayerPoints(playerWinner.webSocketUserSession)!
+		playerWinner.pointsBalance = playerWinner.pointsBalance + (gameScoreboard.getPlayerPoints(playerWinner)! - gameScoreboard.getPlayerPoints(playerLoser)!);
+		playerWinner.pointsMake = playerWinner.pointsMake + gameScoreboard.getPlayerPoints(playerWinner)!
 
 		playerLoser.numOfMatch = playerLoser.numOfMatch + 1;
-		playerLoser.pointsBalance = playerLoser.pointsBalance + (gameScoreboard.getPlayerPoints(playerLoser.webSocketUserSession)! - gameScoreboard.getPlayerPoints(playerWinner.webSocketUserSession)!);
-		playerLoser.pointsMake = playerLoser.pointsMake + gameScoreboard.getPlayerPoints(playerLoser.webSocketUserSession)!
+		playerLoser.pointsBalance = playerLoser.pointsBalance + (gameScoreboard.getPlayerPoints(playerLoser)! - gameScoreboard.getPlayerPoints(playerWinner)!);
+		playerLoser.pointsMake = playerLoser.pointsMake + gameScoreboard.getPlayerPoints(playerLoser)!
 	}
 }

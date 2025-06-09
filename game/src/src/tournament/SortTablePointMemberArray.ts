@@ -1,19 +1,16 @@
-import { WebSocketUserSession } from "../WebSocketUserSession";
-import { TableOfPointRow } from "./TableOfPointRow";
+import { TournamentPlayer } from "./TournamentPlayer";
 
 export class SortTablePointMemberArray{
 
-	private _playersOfTournament: Map<WebSocketUserSession, TableOfPointRow>;
+	private _playersOfTournament: TournamentPlayer[];
 
-	constructor(playersOfTournament: Map<WebSocketUserSession, TableOfPointRow>){
+	constructor(playersOfTournament: TournamentPlayer[]){
 		this._playersOfTournament = playersOfTournament;
 	}
 
-	public sort() : TableOfPointRow[]{
+	public sort() : TournamentPlayer[]{
 
-		const playersOfTournament: TableOfPointRow[] = Array.from(this._playersOfTournament.values());
-
-		const sortedTable = playersOfTournament.sort((a, b) => {
+		const sortedTable = this._playersOfTournament.sort((a, b) => {
 			if (b.starts !== a.starts) return b.starts - a.starts;
 			if (b.numberOfVictories !== a.numberOfVictories) return b.numberOfVictories - a.numberOfVictories;
 			if (b.pointsBalance !== a.pointsBalance) return b.pointsBalance - a.pointsBalance;

@@ -1,43 +1,32 @@
+import { TournamentPlayer } from "./TournamentPlayer";
 
+export class MakeRounds {
 
-function gerarRodadas(jogadores: string[]): [string, string][][] {
-	if (jogadores.length % 2 !== 0) {
-		throw new Error("Número de jogadores deve ser par.");
+	private fixPlayers: TournamentPlayer[];
+
+	constructor(tournamentPlayer: TournamentPlayer[]) {
+		this.fixPlayers = [...tournamentPlayer];
 	}
 
-	const totalRodadas = jogadores.length - 1;
-	const metade = jogadores.length / 2;
+	public getARound(): [TournamentPlayer, TournamentPlayer][] {
 
-	const jogadoresFixos = [...jogadores]; // para não alterar o original
-	const rodadas: [string, string][][] = [];
+		const middle = this.fixPlayers.length - 1;
 
-	for (let rodada = 0; rodada < totalRodadas; rodada++) {
-		const pares: [string, string][] = [];
+		const round: [TournamentPlayer, TournamentPlayer][] = [];
 
-		for (let i = 0; i < metade; i++) {
-			const jogador1 = jogadoresFixos[i];
-			const jogador2 = jogadoresFixos[jogadoresFixos.length - 1 - i];
-			pares.push([jogador1, jogador2]);
+		for (let i = 0; i < middle; i++) {
+			const player1 = this.fixPlayers[i];
+			const player2 = this.fixPlayers[this.fixPlayers.length - 1 - i];
+			round.push([player1, player2]);
 		}
 
-		rodadas.push(pares);
+		// Rotates players (except the first one)
+		const rotate = this.fixPlayers.splice(1);
+		rotate.unshift(rotate.pop()!); // turn right
+		this.fixPlayers.splice(1, 0, ...rotate);
 
-		// Rotaciona os jogadores (exceto o primeiro)
-		const fixo = jogadoresFixos[0];
-		const rotacionar = jogadoresFixos.splice(1);
-		rotacionar.unshift(rotacionar.pop()!); // gira para a direita
-		jogadoresFixos.splice(1, 0, ...rotacionar);
+		return round;
 	}
 
-	return rodadas;
 }
-
-// Exemplo de uso:
-const jogadores = ["A", "B", "C", "D"];
-const rodadas = gerarRodadas(jogadores);
-
-rodadas.forEach((rodada, i) => {
-	console.log(`Rodada ${i + 1}:`);
-	rodada.forEach(([j1, j2]) => console.log(`  ${j1} vs ${j2}`));
-});
 

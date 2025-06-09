@@ -2,6 +2,9 @@ import WebSocket from 'ws';
 
 export class WebSocketUserSession {
 
+	private static sessionCountId: number = 1;
+
+	private id: number;
 	private userId: string = "";
 	private gameId: number = 0;
 	private tournamentId: number = 0;
@@ -9,7 +12,12 @@ export class WebSocketUserSession {
 	private ws;
 
 	constructor(webSocket: WebSocket) {
+		this.id = WebSocketUserSession.sessionCountId++;
 		this.ws = webSocket;
+	}
+
+	public get getId() {
+		return this.id;
 	}
 
 	public get getUserId() {
@@ -24,7 +32,7 @@ export class WebSocketUserSession {
 		return this.userName;
 	}
 
-	public set setUserName(userName : string) {
+	public set setUserName(userName: string) {
 		this.userName = userName;
 	}
 
