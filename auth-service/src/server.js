@@ -8,7 +8,7 @@ const auth_routes = require("./api/routes/auth_routes");
 
 const userRepo = require("./infrastructure/db/user_repository");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
-const { handleUserDeleted } = require("./events/handler");
+const { userDeleted_listener } = require("./events/userDeleted_listener");
 
 
 const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
@@ -44,7 +44,7 @@ async function start() {
   // app.register(loginRoutes);
   // app.register(twoFARoutes);
   // app.register(testeRoutes);
-  handleUserDeleted();
+  userDeleted_listener();
 
   try {
     await app.listen({ port: 4000, host: '0.0.0.0' });

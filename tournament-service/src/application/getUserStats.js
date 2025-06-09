@@ -1,5 +1,5 @@
-const matchRepo = require("../infrastructure/db/match_repository");
-const rankingRepo = require("../infrastructure/db/ranking_repository");
+const matchRepo = require("../infrastructure/repositories/match_repository");
+const rankingRepo = require("../infrastructure/repositories/ranking_repository");
 
 async function getUserStats(userId) {
   // Busca estatísticas de vitórias e derrotas no match repository

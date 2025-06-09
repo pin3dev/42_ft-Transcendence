@@ -1,8 +1,8 @@
 const Fastify = require("fastify");
 
-mRepo = require("./infrastructure/db/match_repository.js");
-rRepo = require("./infrastructure/db/ranking_repository.js");
-tRepo = require("./infrastructure/db/tournament_repository.js");
+mRepo = require("./infrastructure/repositories/match_repository.js");
+rRepo = require("./infrastructure/repositories/ranking_repository.js");
+tRepo = require("./infrastructure/repositories/tournament_repository.js");
 
 const { matchFinished_listener } = require("./events/matchFinished_listener");
 const { tournamentCreated_listener } = require("./events/tournamentCreated_listener");
