@@ -4,6 +4,7 @@ import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
 import { renderTestPage } from './TestPage';
 import type { UserStats } from '../components/Profile';
+import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 
 export async function renderUserProfilePage(user: any): Promise<void> {
   const root = document.getElementById('root');
@@ -38,15 +39,40 @@ export async function renderUserProfilePage(user: any): Promise<void> {
   
   mainContainer.appendChild(backButton);
 
-  // Define as estatísticas iniciais com os dados já disponíveis
   let userStats: UserStats = {
     name: user.name,
-    wins: user.wins || 0,
-    losses: user.losses || 0,
+    wins: 0,
+    losses: 0,
     avatar: user.avatar_url,
     user_id: user.user_id,
-    score: user.score || 0,
+    score: 1000, // padrão
   };
+
+  if (!userStats.user_id) {
+    console.error("user_id do amigo é indefinido!");
+    return;
+  }
+
+  try {
+    const response = await fetchWithAuth(`/tournament/ranking/user?user_id=${encodeURIComponent(userStats.user_id)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const stats = await response.json();
+      userStats.wins = stats.total_wins;
+      userStats.losses = stats.total_losses;
+      userStats.score = stats.score;
+    } else {
+      console.warn("Não foi possível buscar estatísticas do amigo.");
+    }
+  } catch (err) {
+    console.error("Erro ao buscar estatísticas do amigo:", err);
+  }
+
 
   // Cria e adiciona a seção de perfil sem a barra de busca e botão de jogar
   const customProfile = document.createElement('div');
@@ -80,6 +106,10 @@ export async function renderUserProfilePage(user: any): Promise<void> {
       <div class="text-center">
         <div class="text-3xl font-bold text-neon-red">${userStats.losses}</div>
         <div class="text-sm text-gray-400">Derrotas</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-neon-yellow">${userStats.score}</div>
+        <div class="text-sm text-gray-400">Score</div>
       </div>
     </div>
   `;
@@ -173,8 +203,16 @@ export async function renderUserProfilePage(user: any): Promise<void> {
     customProfile.appendChild(userInfo);
 
     mainContainer.appendChild(customProfile);
+
+    // Chama o leaderboard depois que a página foi renderizada
+    setTimeout(async () => {
+      const leaderboardSection = await createLeaderboardPreview();
+      mainContainer.appendChild(leaderboardSection);
+    }, 0);
+
     pageContainer.appendChild(mainContainer);
     pageContainer.appendChild(createFooter());
 
     root.appendChild(pageContainer);
+
 }

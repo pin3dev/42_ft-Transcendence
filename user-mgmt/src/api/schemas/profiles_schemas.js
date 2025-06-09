@@ -45,10 +45,14 @@ const searchProfile_schema = {
   headers: gateway_headers,
   querystring: {
     type: "object",
-    required: ["name"],
     properties: {
-      name: { type: "string", minLength: 2, maxLength: 20 }
-    }
+      name: { type: "string", minLength: 2, maxLength: 20 },
+      id: { type: "string", minLength: 1 }
+    },
+    anyOf: [
+      { required: ["name"] },
+      { required: ["id"] }
+    ]
   },
   response: {
     200: {
