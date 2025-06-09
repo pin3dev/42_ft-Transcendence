@@ -1,4 +1,5 @@
 const profileRepo = require("../infrastructure/db/profile_repository");
+const friendsRepo = require("../infrastructure/db/friends_repository");
 const { publishEvent, EventTypes, setCache } = require("../../pckg/redis/modules.js"); 
 
 async function deleteUserProfile(userId) {
@@ -16,6 +17,10 @@ async function deleteUserProfile(userId) {
   }, "user-mgmt");
 
   await setCache(`delUser:${existing.user_id}`, true, null);
+  
+  // Remove todas as relações de amizade do usuário
+  await friendsRepo.deleteAllUserRelations(userId);
+  
   await profileRepo.delete(userId);
 }
 
