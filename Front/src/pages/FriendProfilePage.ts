@@ -155,9 +155,9 @@ export async function renderUserProfilePage(user: any): Promise<void> {
           
           // Verifica se já existe uma relação
           if (errorData.error && errorData.error.includes("Já existe uma relação")) {
-            addFriendBtn.className = 'mt-6 px-4 py-2 bg-gray-500 text-white rounded-full cursor-default mx-auto';
+            addFriendBtn.className = 'mt-6 px-4 py-2 bg-gray-500 text-black rounded-full flex items-center justify-center gap-2 mx-auto w-fit whitespace-nowrap';
             addFriendBtn.innerHTML = `
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
               </svg>
               <span>Já existe uma solicitação</span>
@@ -175,7 +175,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
             
             // Mostra mensagem de erro
             const errorMsg = document.createElement('div');
-            errorMsg.className = 'text-neon-red text-sm mt-2';
+            errorMsg.className = 'text-white text-sm mt-2';
             errorMsg.textContent = errorData.error || 'Erro ao enviar solicitação de amizade';
             userInfo.appendChild(errorMsg);
             
