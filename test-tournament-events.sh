@@ -152,8 +152,8 @@ echo "==========================================="
 
 # Várias partidas para popular o histórico - TODOS os campos sempre preenchidos
 for i in {3..6}; do
-    PLAYER1="user-$((RANDOM % 4 + 1))00"
-    PLAYER2="user-$((RANDOM % 4 + 2))00"
+    PLAYER1="$((RANDOM % 4 + 1))"
+    PLAYER2="$((RANDOM % 4 + 2))"
     WINNER=$([[ $((RANDOM % 2)) -eq 0 ]] && echo "$PLAYER1" || echo "$PLAYER2")
     SCORE1=$((RANDOM % 5 + 10))
     SCORE2=$((RANDOM % 8 + 5))
@@ -171,7 +171,7 @@ for i in {3..6}; do
   "timestamp": "$ENDED_TIME",
   "source": "test-script",
   "data": {
-    "id": "M2",
+    "id": "M$i",
     "tournamentId": $TOURNAMENT_REF,
     "player1Id": "$PLAYER1",
     "player2Id": "$PLAYER2",

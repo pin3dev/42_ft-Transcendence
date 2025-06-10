@@ -15,48 +15,16 @@ const getMatchHistory_schema = {
       properties: {
         success: { type: "boolean" },
         data: {
-          type: "object",
-          properties: {
-            matches: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  matchId: { type: "string" },
-                  opponent: {
-                    type: "object",
-                    properties: {
-                      userId: { type: "string" }
-                    }
-                  },
-                  result: {
-                    type: "object",
-                    properties: {
-                      won: { type: "boolean" },
-                      status: { type: "string" }
-                    }
-                  },
-                  score: { type: "string" },
-                  date: { type: "string", format: "date-time" },
-                  duration: {
-                    type: "object",
-                    properties: {
-                      total_seconds: { type: "integer" },
-                      formatted: { type: "string" }
-                    }
-                  },
-                  gameType: { type: "string" },
-                  tournament: {
-                    type: ["object", "null"],
-                    properties: {
-                      id: { type: "string" },
-                      isPrivate: { type: "boolean" }
-                    }
-                  }
-                }
-              }
-            },
-            total: { type: "integer" }
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              adversario_id: { type: "string" },
+              resultado: { type: "string" },
+              placar: { type: "string" },
+              data: { type: "string", format: "date-time" },
+              tipo: { type: "string" }
+            }
           }
         }
       }
