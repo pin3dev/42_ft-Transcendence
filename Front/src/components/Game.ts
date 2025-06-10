@@ -207,9 +207,9 @@ export function renderPongGame(container: HTMLElement): () => void {
 
     // 4. Adicionar as paradas de cor (color stops)
     // O CSS `linear-gradient` com 3 cores sem porcentagens as distribui igualmente (0%, 50%, 100%)
-    for (const offset in colors) {
-      grad.addColorStop(offset, colors[offset]);
-    }
+    // for (const offset in colors) {
+    //   grad.addColorStop(offset, colors[offset]);
+    // }
 
     // 5. Preencher o retângulo com o gradiente
     ctx.fillStyle = grad;
