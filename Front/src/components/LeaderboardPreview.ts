@@ -57,8 +57,8 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
   const headers = ['Adversário', 'Resultado', 'Placar', 'Data', 'Tipo'];
   headers.forEach((headerText, index) => {
     const th = document.createElement('th');
-    th.className = 'text-neon-green p-4 text-left';
-    if (index >= 2) th.className += ' text-right';
+    th.className = 'text-neon-green p-4 text-center';
+    //if (index >= 2) th.className += ' text-right';
     th.textContent = headerText;
     headerRow.appendChild(th);
   });
@@ -95,32 +95,32 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     // Adversário cell
     const adversarioName = await getAdversarioName(match.adversario_id);
     const adversarioCell = document.createElement('td');
-    adversarioCell.className = 'font-medium p-4 text-white';
+    adversarioCell.className = 'font-medium p-4 text-white text-center';
     adversarioCell.textContent = adversarioName; // Agora exibe o nome do adversário
     row.appendChild(adversarioCell);
 
     // Resultado cell
     const resultadoCell = document.createElement('td');
-    resultadoCell.className = 'font-medium p-4 text-white';
+    resultadoCell.className = 'font-medium p-4 text-white text-center';
     resultadoCell.textContent = match.resultado; // Vitoria ou Derrota
     row.appendChild(resultadoCell);
 
     // Placar cell
     const placarCell = document.createElement('td');
-    placarCell.className = 'font-medium p-4 text-white';
+    placarCell.className = 'font-medium p-4 text-white text-center';
     placarCell.textContent = match.placar; // Placar ex: 10-8
     row.appendChild(placarCell);
 
     // Data cell
     const dataCell = document.createElement('td');
-    dataCell.className = 'font-medium p-4 text-white';
+    dataCell.className = 'font-medium p-4 text-white text-center';
     const date = new Date(match.data);
     dataCell.textContent = date.toLocaleString(); // Formatar a data
     row.appendChild(dataCell);
 
     // Tipo cell
     const tipoCell = document.createElement('td');
-    tipoCell.className = 'font-medium p-4 text-white';
+    tipoCell.className = 'font-medium p-4 text-white text-center';
     tipoCell.textContent = match.tipo === '1v1' ? '1v1' : match.tipo; // Se o tipo for 1v1, mostrar '1v1'
     row.appendChild(tipoCell);
 
