@@ -2,6 +2,12 @@ const { gateway_headers, error_responses } = require("./common_schemas");
 
 const getMatchHistory_schema = {
   headers: gateway_headers,
+  querystring: {
+    type: "object",
+    properties: {
+      user_id: { type: "string" }
+    }
+  },
   response: {
     200: {
       type: "object",
@@ -23,6 +29,13 @@ const getMatchHistory_schema = {
       }
     },
     400: error_responses[400],
+    404: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        error: { type: "string" }
+      }
+    },
     500: error_responses[500]
   }
 };

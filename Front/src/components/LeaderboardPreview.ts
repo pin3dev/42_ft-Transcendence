@@ -28,7 +28,7 @@ const getAdversarioName = async (adversarioId: string): Promise<string> => {
   }
 };
 
-export async function createLeaderboardPreview(): Promise<HTMLElement> {
+export async function createLeaderboardPreview(targetUserId?: string): Promise<HTMLElement> {
   const section = document.createElement('section');
   section.className = 'py-16 ';
   
@@ -70,7 +70,11 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
 
   let matchHistory: Match[] = [];
   try {
-    const response = await fetchWithAuth('/tournament/matches/history', { // O `1` é o user_id, deve ser dinâmico
+    const url = targetUserId 
+      ? `/tournament/matches/history?user_id=${encodeURIComponent(targetUserId)}`
+      : '/tournament/matches/history';
+
+    const response = await fetchWithAuth(url, { // O `1` é o user_id, deve ser dinâmico
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

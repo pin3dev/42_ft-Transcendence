@@ -206,7 +206,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
 
     // Chama o leaderboard depois que a página foi renderizada
     setTimeout(async () => {
-      const matchHistorySection = await createLeaderboardPreview();
+      const matchHistorySection = await createLeaderboardPreview(userStats.user_id);
       mainContainer.appendChild(matchHistorySection);
     }, 0);
 

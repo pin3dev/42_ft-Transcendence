@@ -2,8 +2,7 @@ const { getMatchHistory } = require("../../application/getMatchHistory");
 
 async function getMatchHistory_controller(request, reply) {
   try {
-    const userId = request.headers["x-user-id"];
-
+    const userId = request.query.user_id || request.headers["x-user-id"];
 
     if (!userId) {
       return reply.status(400).send({
