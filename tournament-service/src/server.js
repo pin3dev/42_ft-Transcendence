@@ -8,7 +8,7 @@ const { matchFinished_listener } = require("./events/matchFinished_listener");
 const { tournamentCreated_listener } = require("./events/tournamentCreated_listener");
 
 const ranking_routes = require("./api/routes/ranking_routes");
-
+const match_routes = require("./api/routes/match_routes");
 
 const fastify = Fastify({ 
     logger: true,
@@ -20,6 +20,7 @@ const fastify = Fastify({
 
   fastify.register(require("@fastify/cookie"));
   fastify.register(ranking_routes);
+  fastify.register(match_routes);
 
   fastify.listen({ port: 8000, host: "0.0.0.0" }, (err) => {
     if (err) {
