@@ -3,6 +3,7 @@ import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
 import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 import { renderPongGame } from '../components/Game';
+import { createMatchSchedule } from '../components/MatchSchedule';
 
 // Um bom lugar para armazenar a função de cleanup da página atual
 let cleanupCurrentPage: () => void = () => {};
@@ -37,6 +38,7 @@ export function GamePage(): void { // Esta função agora renderiza uma página 
   const cleanupGame = renderPongGame(gameSectionContainer); 
   mainContentArea.appendChild(gameSectionContainer);
   GamePageContainer.appendChild(mainContentArea);
+  GamePageContainer.appendChild(createMatchSchedule()); // Adiciona o preview do leaderboard
   
  
   GamePageContainer.appendChild(createFooter());
