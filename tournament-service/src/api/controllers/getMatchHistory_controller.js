@@ -4,6 +4,7 @@ async function getMatchHistory_controller(request, reply) {
   try {
     const { userId } = request.params;
 
+
     if (!userId) {
       return reply.status(400).send({
         success: false,
@@ -12,6 +13,13 @@ async function getMatchHistory_controller(request, reply) {
     }
 
     const matchHistory = await getMatchHistory(userId);
+
+    if (!matchHistory || matchHistory.length === 0) {
+      return reply.status(404).send({
+        success: false,
+        error: 'Nenhum histórico de partidas encontrado para este usuário'
+      });
+    }
 
     return reply.send({
       success: true,
