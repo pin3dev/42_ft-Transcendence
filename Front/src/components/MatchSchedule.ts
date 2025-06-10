@@ -48,7 +48,7 @@ function createMatchBlock(match: MatchData): HTMLElement {
     // FIX: Using the actual score from the 'match' object.
     score1Element.textContent = match.score1.toString();
   
-    player1Info.append(score1Element, player1NameElement); // Swapped order to match scoreboard style (Score | Name)
+    player1Info.append(player1NameElement, score1Element); // Swapped order to match scoreboard style (Score | Name)
   
     // --- "VS" Separator ---
     const vsElement = document.createElement('span');
@@ -69,7 +69,7 @@ function createMatchBlock(match: MatchData): HTMLElement {
     // FIX: Using the actual score from the 'match' object.
     score2Element.textContent = match.score2.toString();
   
-    player2Info.append(player2NameElement, score2Element);
+    player2Info.append(score2Element, player2NameElement);
     
     scoreboardContainer.append(player1Info, vsElement, player2Info);
     

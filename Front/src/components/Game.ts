@@ -205,12 +205,10 @@ export function renderPongGame(container: HTMLElement): () => void {
     // 3. Criar o objeto de gradiente linear com as coordenadas calculadas
     const grad = ctx.createLinearGradient(x0, y0, x1, y1);
 
-    // 4. Adicionar as paradas de cor (color stops)
-    // O CSS `linear-gradient` com 3 cores sem porcentagens as distribui igualmente (0%, 50%, 100%)
-    // for (const offset in colors) {
-    //   grad.addColorStop(offset, colors[offset]);
-    // }
-
+    Object.entries(colors).forEach(([offset, color]) => {
+      // O 'offset' aqui ainda é uma string, então a conversão é necessária
+      grad.addColorStop(parseFloat(offset), color);
+    });
     // 5. Preencher o retângulo com o gradiente
     ctx.fillStyle = grad;
     ctx.fillRect(rectX, rectY, width, height);
