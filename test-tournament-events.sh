@@ -104,7 +104,7 @@ MATCH_EVENT_2=$(cat <<EOF
     "id": "M1",
     "tournamentId": null,
     "player1Id": "1",
-    "player2Id": "2",
+    "player2Id": "3",
     "winnerId": "1",
     "score": "10-8",
     "startedAt": "$STARTED_TIME_2",

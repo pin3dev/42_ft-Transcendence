@@ -2,7 +2,7 @@ const { getMatchHistory_controller } = require("../controllers/getMatchHistory_c
 const { getMatchHistory_schema } = require("../schemas/match_schemas");
 
 module.exports = async function (fastify) {
-  fastify.get("/tournament/matches/history/:userId", {
+  fastify.get("/tournament/matches/history", {
     schema: getMatchHistory_schema,
     handler: getMatchHistory_controller,
   });

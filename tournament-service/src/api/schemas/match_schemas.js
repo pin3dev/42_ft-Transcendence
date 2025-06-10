@@ -2,13 +2,6 @@ const { gateway_headers, error_responses } = require("./common_schemas");
 
 const getMatchHistory_schema = {
   headers: gateway_headers,
-  params: {
-    type: "object",
-    properties: {
-      userId: { type: "string" }
-    },
-    required: ["userId"]
-  },
   response: {
     200: {
       type: "object",
