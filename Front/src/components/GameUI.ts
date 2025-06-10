@@ -2,7 +2,6 @@
 
 export interface UIElements {
   pageContainer: HTMLDivElement;
-  mainContent: HTMLDivElement;
   backgroundTableContainer: HTMLDivElement; // O container da mesa de fundo que se tornará o jogo
   pingPongTableElement: HTMLDivElement; // A div específica da mesa para sobrepor o canvas
   scoreDisplay: HTMLDivElement;
@@ -105,7 +104,6 @@ export function createFullGameUI(): UIElements {
 
   return { 
     pageContainer, 
-    mainContent, 
     backgroundTableContainer,
     pingPongTableElement, 
     scoreDisplay, 
