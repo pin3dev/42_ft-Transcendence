@@ -38,7 +38,7 @@ export function GamePage(): void { // Esta função agora renderiza uma página 
   mainContentArea.appendChild(gameSectionContainer);
   GamePageContainer.appendChild(mainContentArea);
   
-  GamePageContainer.appendChild(createLeaderboardPreview());
+ 
   GamePageContainer.appendChild(createFooter());
   root.appendChild(GamePageContainer);
 
