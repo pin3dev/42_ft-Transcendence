@@ -295,10 +295,11 @@ export async function renderTestPage(): Promise<void> {
   userSearchInput.className = `
   w-full max-w-xs
   appearance-none
-  bg-black text-neon-pink placeholder-white/60
+  bg-black text-white placeholder-white/50
   px-4 py-2 rounded-full
+  border border-neon-pink
   focus:outline-none focus:ring-0 focus:border-neon-pink
-  animate-pulse-neon
+  shadow-none
   transition-all duration-300 ease-in-out
   text-sm
 `;
@@ -307,8 +308,8 @@ export async function renderTestPage(): Promise<void> {
   const userSearchResults = document.createElement('div');
   userSearchResults.className = `
     absolute top-full left-0 mt-2 w-full
-    bg-black bg-opacity-90 border border-neon-purple
-    rounded-lg shadow-lg text-sm z-50 overflow-hidden
+    bg-black bg-opacity-90 border border-transparent
+    rounded-lg shadow-none text-sm z-50 overflow-hidden
   `;
 
   // Wrapper com posicionamento relativo
@@ -316,7 +317,7 @@ export async function renderTestPage(): Promise<void> {
   userSearchBox.className = `
   relative z-20 w-full max-w-xs
   bg-black rounded-full 
-  shadow-[0_0_8px_#00FFFF]
+  shadow-none
 `;
   userSearchBox.appendChild(userSearchInput);
   userSearchBox.appendChild(userSearchResults);

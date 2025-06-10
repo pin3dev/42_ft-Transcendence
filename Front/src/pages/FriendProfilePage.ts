@@ -80,12 +80,12 @@ export async function renderUserProfilePage(user: any): Promise<void> {
   
   // Header com background
   const profileHeader = document.createElement('div');
-  profileHeader.className = 'h-32 bg-gradient-to-r from-neon-purple to-neon-blue';
+  profileHeader.className = 'h-24 bg-gradient-to-r from-neon-purple to-neon-blue rounded-t-lg';
   customProfile.appendChild(profileHeader);
   
   // Avatar
   const avatarContainer = document.createElement('div');
-  avatarContainer.className = 'absolute top-16 left-1/2 transform -translate-x-1/2';
+  avatarContainer.className = 'absolute top-24 left-1/2 transform -translate-x-1/2 z-10';
   avatarContainer.innerHTML = `
     <div class="w-32 h-32 rounded-full border-4 border-arcade-dark overflow-hidden bg-arcade-dark">
       <img src="${userStats.avatar}" alt="${userStats.name}" class="w-full h-full object-cover" />
@@ -95,20 +95,20 @@ export async function renderUserProfilePage(user: any): Promise<void> {
   
   // Informações do usuário
   const userInfo = document.createElement('div');
-  userInfo.className = 'mt-20 text-center p-4';
+  userInfo.className = 'mt-28 text-center p-6 bg-arcade-dark rounded-b-lg';
   userInfo.innerHTML = `
-    <h2 class="text-2xl font-bold text-neon-blue">${userStats.name}</h2>
+    <h2 class="text-2xl font-bold text-neon-blue !bg-transparent">${userStats.name}</h2>
     <div class="mt-4 flex justify-center space-x-8">
-      <div class="text-center">
-        <div class="text-3xl font-bold text-neon-green">${userStats.wins}</div>
+      <div class="text-center !bg-transparent">
+        <div class="text-3xl font-bold text-green-400">${userStats.wins}</div>
         <div class="text-sm text-gray-400">Vitórias</div>
       </div>
-      <div class="text-center">
-        <div class="text-3xl font-bold text-neon-red">${userStats.losses}</div>
+      <div class="text-center !bg-transparent">
+        <div class="text-3xl font-bold text-red-500">${userStats.losses}</div>
         <div class="text-sm text-gray-400">Derrotas</div>
       </div>
-      <div class="text-center">
-        <div class="text-3xl font-bold text-neon-yellow">${userStats.score}</div>
+      <div class="text-center !bg-transparent">
+        <div class="text-3xl font-bold text-yellow-300">${userStats.score}</div>
         <div class="text-sm text-gray-400">Score</div>
       </div>
     </div>
@@ -143,9 +143,9 @@ export async function renderUserProfilePage(user: any): Promise<void> {
         
         if (response.ok) {
           // Atualiza o botão para mostrar que a solicitação foi enviada
-          addFriendBtn.className = 'mt-6 px-4 py-2 bg-neon-green text-white rounded-full cursor-default mx-auto';
+          addFriendBtn.className = 'mt-6 px-4 py-2 bg-neon-green text-black rounded-full flex items-center justify-center gap-2 mx-auto w-fit whitespace-nowrap';
           addFriendBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <span>Solicitação Enviada</span>
