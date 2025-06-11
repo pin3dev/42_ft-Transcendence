@@ -118,7 +118,7 @@ export function createMatchSchedule(): HTMLElement {
 
     // The main "arcade box" container
     const arcadeContainer = document.createElement('div');
-    arcadeContainer.className = 'arcade-container bg-black rounded-lg overflow-hidden border-2 border-neon-green max-w-xl mx-auto';
+    arcadeContainer.className = 'arcade-container bg-black rounded-lg overflow-hidden border-2 border-neon-green max-w-md mx-auto';
 
     // This div will hold the dynamic list of matches
     const matchListContainer = document.createElement('div');
