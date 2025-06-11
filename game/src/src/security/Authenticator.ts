@@ -8,5 +8,7 @@ export interface Authenticator<T>{
      *
      * return: If the user is authenticated a true is returned otherwise false is returned
      */
-    makeLogin(ws : WebSocketUserSession, message : Message<T>) : boolean;
+    makeLogin(ws : WebSocketUserSession, message : Message) : boolean;
+
+	makeLogout(ws : WebSocketUserSession): void;
 }

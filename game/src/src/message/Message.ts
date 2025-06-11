@@ -1,5 +1,6 @@
 
-export type AuthenticationMessageTypeRequest = 'AUTHENTICATION_MAKE';
+export type AuthenticationMessageTypeRequest = 'AUTHENTICATION_LOGIN' |
+                                               'AUTHENTICATION_LOGOUT';
 
 export type GameMessageTypeRequest = 'GAME_CREATE_GLOBAL_MATCH' |
 	'GAME_START_MATCH' |
@@ -19,7 +20,7 @@ export type FatalErrorMessageTypeResponse = 'FATAL_ERROR_INVALID_JSON_SYNTAX' |
 export type ErrorMessageTypeResponse =
 	'ERROR_USER_NOT_AUTHENTICATED' |
 	'ERROR_INVALID_CREDENTIALS' |
-	'ERROR_MATCH_DOES_NOT_EXIST'; //quando o usuário manda o id de um match invalido
+	'ERROR_MATCH_DOES_NOT_EXIST';
 
 export type AuthenticationMessageTypeResponse = 'OK_USER_AUTHENTICATED';
 
@@ -44,7 +45,8 @@ export type MessageType = MessageTypeRequest | MessageTypeResponse;
 export class Message {
 
 	public static readonly authenticationMessageTypeRequest = new Map<string, AuthenticationMessageTypeRequest>([
-		['AUTHENTICATION_MAKE', 'AUTHENTICATION_MAKE']
+		['AUTHENTICATION_LOGIN', 'AUTHENTICATION_LOGIN'],
+		['AUTHENTICATION_LOGOUT', 'AUTHENTICATION_LOGOUT']
 	]);
 
 	public static readonly gameMessageTypeRequest = new Map<string, GameMessageTypeRequest>([

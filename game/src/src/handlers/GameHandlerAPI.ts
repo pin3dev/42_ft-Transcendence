@@ -4,42 +4,48 @@ import { Game } from '../game/Game';
 import { Message } from '../message/Message';
 import { Sender } from '../Sender';
 import WebSocket from 'ws';
+import { GamePlayer } from '../game/GamePlayer';
+import { GameGlobal } from '../game/GameGlobal';
 
 export class GameHandlerAPI implements WebSocketUserSessionListener {
 
-	private waitingPlayer: WebSocketUserSession | null = null;
+	private waitingPlayer: GamePlayer | null = null;
 
 	private gamesGlobal = new Map<Number, Game>();
-
+	private gamePlayers = new Map<WebSocketUserSession, GamePlayer>();
 
 	message(ws: WebSocketUserSession, messageFromClient: Message): void {
 
 		const sender = new Sender(ws.getWebsocket);
 
+		let gamePlayer = this.gamePlayers.get(ws);
+		if (!gamePlayer){
+			gamePlayer = new GamePlayer(true, ws);
+			this.gamePlayers.set(ws, gamePlayer);
+		}
+
 		if (messageFromClient.getType === 'GAME_CREATE_GLOBAL_MATCH') {
 
-			if (this.waitingPlayer === ws) {
-				return;
-			} else if (this.waitingPlayer === null || (this.waitingPlayer.getWebsocket.readyState !== WebSocket.OPEN)) {
-				this.waitingPlayer = ws;
+			if (this.waitingPlayer === gamePlayer || this.waitingPlayer === null || (this.waitingPlayer.webSocketUserSession.getWebsocket.readyState !== WebSocket.OPEN)) {
+				this.waitingPlayer = gamePlayer;
 				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER'));
 			} else {
-				let game = new Game();
+				let game = new GameGlobal();
 
 				const gameId = game.getId;
 
-				this.waitingPlayer.setGameId = gameId;
+				this.waitingPlayer.webSocketUserSession.setGameId = gameId;
 				ws.setGameId = gameId;
 
 				this.gamesGlobal.set(gameId, game);
 
-				game.createMatch(this.waitingPlayer, ws);
+				game.createMatch(this.waitingPlayer, gamePlayer);
 				this.waitingPlayer = null;
 			}
 			return;
 		}
 
-		if (messageFromClient.getType === 'GAME_ABORT' && ws === this.waitingPlayer) {
+		if (messageFromClient.getType === 'GAME_ABORT' && gamePlayer === this.waitingPlayer) {
 			this.waitingPlayer = null;
 			sender.sendMessage(new Message('GAME_ABORTED'));
 			return;
@@ -68,13 +74,16 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 			messageFromClient.getType === 'GAME_PADDLE_UP_KEYDOWN' ||
 			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYUP' ||
 			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYDOWN') {
-			playerGame.movePaddle(ws, messageFromClient.getType);
+			playerGame.movePaddle(gamePlayer, messageFromClient.getType);
 		}
 
 	}
 
 	close(ws: WebSocketUserSession): void {
-		if (ws === this.waitingPlayer) {
+
+		let gamePlayer = this.gamePlayers.get(ws);
+
+		if (gamePlayer === this.waitingPlayer) {
 			this.waitingPlayer === null;
 			return;
 		}
@@ -84,7 +93,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 			return;
 		}
 
-		playerGame.playerExit(ws);
+		playerGame.playerExit(gamePlayer!);
 	}
 
 	private getPlayerGame(wsSession: WebSocketUserSession): Game | undefined {

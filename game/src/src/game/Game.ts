@@ -1,26 +1,32 @@
 import { Ball } from "./Ball";
 import { Field } from "./Field";
-import { Paddle } from "./Paddle";
-import { Player } from "./Player";
-import { MessageType } from "../message/Message";
+import { Paddle } from "./Paddle"
+import { Message, MessageType } from "../message/Message";
 import { MessageWithValue } from "../message/MessageWithValue";
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Sender } from "../Sender";
+import { GamePlayer } from "./GamePlayer";
 
 export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
+export type GamePlayersStatus = 'ON_LINE' | 'PLAYER_1_DISCONNECTED' | 'PLAYER_2_DISCONNECTED';
 
-export class Game {
+export abstract class Game {
 
+	private static readonly PLAYER_1: number = 0;
+	private static readonly PLAYER_2: number = 1;
+
+	public static readonly MAX_POINTS = 10;
+	public static readonly WINNING_SCORE = (this.MAX_POINTS / 2) + 1;
 	private static matchIdCounter: number = 1;
 	private static readonly START_COUNT_DOWN_VALUE = 3;
-	private static readonly MAX_POINT = 10;
-	private static readonly WINNING_SCORE = (this.MAX_POINT/2) + 1;
 
-	private userSessions: WebSocketUserSession[] = [];
-	private players: Player[] = [];
+	private gamePlayers: GamePlayer[];
+	private players: Paddle[] = [];
+	private scoreboard: number[] = [0, 0];
 	private ball: Ball;
 
 	private gameStatus: GameStatus2;
+	private gamePlayersStatus: GamePlayersStatus;
 
 	private id: number = 0;
 
@@ -39,11 +45,13 @@ export class Game {
 	};
 
 	constructor() {
+		this.gamePlayers = [];
+		this.players[0] = new Paddle(Paddle.SPACE_FROM_SIDE, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0);
+		this.players[1] = new Paddle(Field.WIDTH - Paddle.SPACE_FROM_SIDE - Paddle.WIDTH, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0);
 		this.ball = new Ball(Field.WIDTH / 2, Field.HEIGHT / 2);
-		this.players[0] = new Player(Paddle.SPACE_FROM_SIDE, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0, 0);
-		this.players[1] = new Player(Field.WIDTH - Paddle.SPACE_FROM_SIDE - Paddle.WIDTH, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0, 0);
 
 		this.gameStatus = 'NOT_READY';
+		this.gamePlayersStatus = 'ON_LINE';
 
 		this.id = Game.matchIdCounter++;
 		this.confirmed = new Set<WebSocketUserSession>();
@@ -52,11 +60,17 @@ export class Game {
 		this.countDownInterval = undefined;
 	}
 
-	public createMatch(player1: WebSocketUserSession, player2: WebSocketUserSession) {
-		this.userSessions[0] = player1;
-		this.userSessions[1] = player2;
+	public createMatch(player1: GamePlayer, player2: GamePlayer) {
+		this.gamePlayers[Game.PLAYER_1] = player1;
+		this.gamePlayers[Game.PLAYER_2] = player2;
 
-		this.sendMessageGameCanStart();
+		if (!player1.isOnline) {
+			this.gameEndedWithWO(player2);
+		} else if (!player2.isOnline) {
+			this.gameEndedWithWO(player1);
+		} else {
+			this.sendMessageGameCanStart();
+		}
 	}
 
 	public addConfirmation(wsSession: WebSocketUserSession): number {
@@ -70,11 +84,11 @@ export class Game {
 		this.makeCountDownRoutine();
 	}
 
-	public movePaddle(player: WebSocketUserSession, paddleDirection: MessageType) {
+	public movePaddle(player: GamePlayer, paddleDirection: MessageType) {
 
 		if (this.gameStatus !== 'RUNNING') return;
 
-		if (player === this.userSessions[0]) {
+		if (player === this.gamePlayers[0]) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_left_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -86,7 +100,7 @@ export class Game {
 			}
 			this.updatePaddleSpeeds();
 		}
-		else if (player === this.userSessions[1]) {
+		else if (player === this.gamePlayers[1]) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_right_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -102,16 +116,23 @@ export class Game {
 
 	public abort() {
 		if (this.gameStatus !== 'RUNNING') return;
-		this.broadcast('GAME_ABORTED', '');
+		this.broadcast('GAME_ABORTED');
 		this.stop();
 	}
 
 
-	public playerExit(wsSession: WebSocketUserSession) {
+	public playerExit(playerDisconnected: GamePlayer) {
 
-		let playerSession = (wsSession === this.userSessions[0]) ? this.players[0] : this.players[1];
-		this.broadcast('GAME_ABORTED', '');
-		this.stop();
+		if (this.gameStatus !== 'RUNNING') {
+			this.gameStatus = 'RUNNING';
+			this.abort();
+		}
+
+		if (playerDisconnected === this.gamePlayers[Game.PLAYER_1]) {
+			this.gamePlayersStatus = 'PLAYER_1_DISCONNECTED';
+		} else if (playerDisconnected === this.gamePlayers[Game.PLAYER_2]) {
+			this.gamePlayersStatus = 'PLAYER_2_DISCONNECTED';
+		}
 	}
 
 	public get getId() {
@@ -203,18 +224,28 @@ export class Game {
 
 		// Check if someone scored a point
 		if (this.ball.x < 0) {
-			this.players[1].score++;
-			this.checkIfAnyPlayerWon();
+			this.scoreboard[Game.PLAYER_2]++;
+			this.playerMakePoint(this.gamePlayers[Game.PLAYER_2]);
 			this.resetBall();
 		} else if (this.ball.x > Field.WIDTH) {
-			this.players[0].score++;
-			this.checkIfAnyPlayerWon();
+			this.scoreboard[Game.PLAYER_1]++;
+			this.playerMakePoint(this.gamePlayers[Game.PLAYER_1]);
 			this.resetBall();
 		}
+
+		if (this.checkIfAnyPlayerWon() || this.checkIfAPlayerHasDisconnected()) {
+
+			//------------------------------------------------------------------------------------------
+			//save game in database
+			//------------------------------------------------------------------------------------------
+			this.gameEnd();
+			this.stop();
+		}
+
 	}
 
 	// Check collision with a paddle
-	private checkPaddleCollision(player: Player, isLeftPaddle: boolean) {
+	private checkPaddleCollision(player: Paddle, isLeftPaddle: boolean) {
 
 		const paddleRight = player.x + Paddle.WIDTH;
 		const paddleBottom = player.y + Paddle.HEIGHT;
@@ -253,42 +284,67 @@ export class Game {
 		this.ball.speedY = (Math.random() * Ball.INITIAL_BALL_SPEED * 2) - Ball.INITIAL_BALL_SPEED;
 	}
 
+	private checkIfAPlayerHasDisconnected(): boolean {
+
+		// check by player disconnect
+		if (this.gamePlayersStatus === 'PLAYER_1_DISCONNECTED') {
+			if (this.scoreboard[Game.PLAYER_2] < this.scoreboard[Game.PLAYER_1]) {
+				this.gameEndedInADraw();
+			} else {
+				this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_2], this.gamePlayers[Game.PLAYER_1]);
+			}
+			return true;
+		} else if (this.gamePlayersStatus === 'PLAYER_2_DISCONNECTED') {
+			if (this.scoreboard[Game.PLAYER_1] < this.scoreboard[Game.PLAYER_2]) {
+				this.gameEndedInADraw();
+			} else {
+				this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_1], this.gamePlayers[Game.PLAYER_2]);
+			}
+			return true;
+		}
+		return false;
+	}
+
 	// Update the scoreboard
 	private checkIfAnyPlayerWon() {
 
 		// Check if someone won
-		if (this.players[0].score >= Game.WINNING_SCORE) {
-			this.gameStatus = 'FINISHED';
-			this.sendMessageToWinner(this.players[0]);
-			this.stop();
-		}else if (this.players[1].score >= Game.WINNING_SCORE) {
-			this.gameStatus = 'FINISHED';
-			this.sendMessageToWinner(this.players[1]);
-			this.stop();
-		}else if ((this.players[0].score + this.players[1].score) == Game.MAX_POINT) {
-			this.gameStatus = 'FINISHED';
+		if (this.scoreboard[Game.PLAYER_1] >= Game.WINNING_SCORE) {
+			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_1], this.gamePlayers[Game.PLAYER_1]);
+			return true;
+		} else if (this.scoreboard[Game.PLAYER_2] >= Game.WINNING_SCORE) {
+			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_2], this.gamePlayers[2]);
+			return true;
+		} else if ((this.scoreboard[Game.PLAYER_1] + this.scoreboard[Game.PLAYER_2]) == Game.MAX_POINTS) {
 			this.sendMessageDraw();
-			this.stop();
+			return true;
 		}
+		return false;
+	}
+
+	private gameEndedWithWO(winner: GamePlayer){
+		this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN');
+
+		winner == this.gamePlayers[Game.PLAYER_1] ? this.scoreboard[Game.PLAYER_1] = 3 : this.scoreboard[Game.PLAYER_2] = 3;
+
+		this.gameEnd();
+	}
+
+	private gameEndedWithVictory(winner: GamePlayer, loser: GamePlayer) {
+
+		this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN')
+		this.sendMessageToPlayer(loser, 'GAME_PLAYER_LOSE')
 
 	}
 
-	//------------------------------ messages --------------------------------------
+	private gameEndedInADraw() {
 
-	private sendMessageToWinner(player : Player){
-		if (player == this.players[0]){
-			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_WIN', '')
-			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_LOSE', '')
-		}else if (player == this.players[1]){
-			this.sendMessageToPlayer(this.userSessions[0], 'GAME_PLAYER_LOSE', '')
-			this.sendMessageToPlayer(this.userSessions[1], 'GAME_PLAYER_WIN', '')
-		}
+		this.broadcast('GAME_PLAYER_DRAW');
 	}
 
-	private sendMessageDraw(){
-		this.broadcast('GAME_PLAYER_DRAW', '');
+	private sendMessageDraw() {
+		this.broadcast('GAME_PLAYER_DRAW');
 	}
-
 
 	private sendMessageGameCountdown(second: number) {
 		this.broadcast('GAME_COUNT_DOWN', second);
@@ -296,48 +352,98 @@ export class Game {
 
 	private sendMessageGameFull() {
 		this.broadcast('GAME_FULL', {
-			id: this.id,
-			field_width: Field.WIDTH,
-			field_height: Field.HEIGHT,
-			paddle_height: Paddle.HEIGHT,
-			paddle_width: Paddle.WIDTH,
-			paddle_player_1_height_position: this.players[0].y,
-			paddle_player_1_width_position: this.players[0].x,
-			paddle_player_2_height_position: this.players[1].y,
-			paddle_player_2_width_position: this.players[1].x,
-			ball_size: Ball.BALL_SIZE,
-			ball_y_position: this.ball.y,
-			ball_x_position: this.ball.x,
-			scoreboard_player_1: this.players[0].score,
-			scoreboard_player_2: this.players[1].score
+			"id": this.id,
+			"sizes": {
+				"field": {
+					"width": Field.WIDTH,
+					"height": Field.HEIGHT
+				},
+				"paddles": {
+					"width": Paddle.WIDTH,
+					"height": Paddle.HEIGHT
+				},
+				"ball": Ball.BALL_SIZE,
+				"player_info": {
+					"player_1": {
+						"nome": "jonh"
+					},
+					"player_2": {
+						"nome": "mary"
+					}
+				}
+			},
+			"positions": {
+				"paddles": {
+					"player_1": {
+						"x": this.players[0].x,
+						"y": this.players[0].y
+					},
+					"player_2": {
+						"x": this.players[1].x,
+						"y": this.players[1].y
+					}
+				},
+				"ball": {
+					"x": this.ball.x,
+					"y": this.ball.y
+				}
+			},
+			"scoreboard": {
+				"player_1": this.scoreboard[Game.PLAYER_1],
+				"player_2": this.scoreboard[Game.PLAYER_2],
+			}
 		});
 	}
 
 	private sendMessageGameCanStart(): void {
-		this.broadcast('GAME_CAN_START', '');
+		this.broadcast('GAME_CAN_START');
 	}
 
 	private sendMessageGameStatus() {
 		this.broadcast('GAME_STATUS', {
-			paddle_player_1_height_position: this.players[0].y,
-			paddle_player_2_height_position: this.players[1].y,
-			ball_y_position: this.ball.y,
-			ball_x_position: this.ball.x,
-			scoreboard_player_1: this.players[0].score,
-			scoreboard_player_2: this.players[1].score
+			"positions": {
+				"paddles": {
+					"player_1": {
+						"x": this.players[0].x,
+						"y": this.players[0].y
+					},
+					"player_2": {
+						"x": this.players[1].x,
+						"y": this.players[1].y
+					}
+				},
+				"ball": {
+					"x": this.ball.x,
+					"y": this.ball.y
+				}
+			},
+			"scoreboard": {
+				"player_1": this.scoreboard[Game.PLAYER_1],
+				"player_2": this.scoreboard[Game.PLAYER_2],
+			}
 		});
 	}
 
-	private broadcast(messageType: MessageType, obj: Object) {
-		this.sendMessageToPlayer(this.userSessions[0], messageType, obj);
-		this.sendMessageToPlayer(this.userSessions[1], messageType, obj);
+	private broadcast(messageType: MessageType, obj?: Object) {
+		this.sendMessageToPlayer(this.gamePlayers[0], messageType, obj);
+		this.sendMessageToPlayer(this.gamePlayers[1], messageType, obj);
 	}
 
-	private sendMessageToPlayer(player: WebSocketUserSession, messageType: MessageType, obj: Object) {
-		let sender = new Sender(player.getWebsocket);
+	private sendMessageToPlayer(player: GamePlayer, messageType: MessageType, obj?: Object) {
+		if (this.gameStatus == 'FINISHED') return;
 
-		let messageToSend = new MessageWithValue(messageType, obj);
+		if (!player.isOnline) return;
+
+		let sender = new Sender(player.webSocketUserSession.getWebsocket);
+
+		let messageToSend = (obj === undefined)
+			? new Message(messageType)
+			: new MessageWithValue(messageType, obj);
 
 		sender.sendMessage(messageToSend);
 	}
+
+	public abstract playerMakePoint(player: GamePlayer): void;
+
+	public abstract gameEnd(): void;
 }
