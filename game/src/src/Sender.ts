@@ -1,7 +1,6 @@
 import WebSocket from 'ws';
 import { Message } from './message/Message';
 
-
 export class Sender {
     webSocket: WebSocket;
 
@@ -25,10 +24,4 @@ export class Sender {
         }
         return false;
     }
-
-    /*
-    criar o teste para o JSON.stringify para ver se as mensagens estao saindo com JSON
-    validos!
-    Criar o Makefile e explicar todas as mensagens!
-    */
 }
