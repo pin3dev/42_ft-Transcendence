@@ -1,6 +1,7 @@
 // Supondo que navigateTo e createProfileButtonWithDropdown estão corretamente importados ou globalmente disponíveis
 import { navigateTo } from '../router/index'; // Seu import original
 import { fetchWithAuth } from '../utils/fetchWithAuth'; // Importar fetchWithAuth
+import { hasLocalToken, hasJWTCookie } from '../utils/auth'; // Importar verificação de autenticação
 
 // Função para mostrar modal personalizado de logout
 function showLogoutModal(): void {
@@ -126,8 +127,8 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
   let isDropdownOpen = false;
   let dropdownElement: HTMLDivElement | null = null;
 
-  // Dados do usuário
-  const userName = localStorage.getItem('userName') || 'Configurações';
+  // Dados do usuário - sempre mostrar "Configurações"
+  const userName = 'Configurações';
 
   const profBtn = document.createElement('button');
   profBtn.className = 'border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-arcade-darker px-4 py-2 rounded border transition-all flex items-center gap-2';
@@ -255,15 +256,21 @@ export function createNavbar(): HTMLElement {
   mobileMenu.appendChild(mobileNavContent);
   mobileNavContent.appendChild(mobileAuthContainer);
 
-  // --- Lógica de exibição dos botões conforme rota ---
-  const path = window.location.pathname;
-  const showAuthButtons =
-    path === '/' ||
-    path.toLowerCase() === '/login' ||
-    path.toLowerCase() === '/registro' ||
-    path.toLowerCase() === '/register';
+  // --- Lógica de exibição dos botões baseada na autenticação ---
+  // Debug: vamos ver os resultados das verificações
+  const hasLocal = hasLocalToken();
+  const hasJWT = hasJWTCookie();
+  
+  console.log('🔐 Verificação de autenticação:');
+  console.log('📱 hasLocalToken:', hasLocal);
+  console.log('🍪 hasJWTCookie:', hasJWT);
+  
+  // Verifica tanto localStorage quanto JWT cookie
+  const isUserAuthenticated = hasLocal || hasJWT;
+  console.log('✅ isUserAuthenticated:', isUserAuthenticated);
 
-  if (showAuthButtons) {
+  if (!isUserAuthenticated) {
+    console.log('👤 Exibindo botões de Login/Registrar');
     // Botões de Login e Registrar (desktop)
     const loginBtn = document.createElement('button');
     loginBtn.className = 'border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-arcade-darker px-4 py-2 rounded border';
@@ -294,6 +301,7 @@ export function createNavbar(): HTMLElement {
     mobileAuthContainer.appendChild(mobileBtnsFlex);
 
   } else {
+    console.log('⚙️ Exibindo menu de configurações');
     // Botão de perfil com dropdown (desktop)
     createProfileButtonWithDropdown(authArea);
 
