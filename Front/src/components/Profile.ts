@@ -215,7 +215,11 @@ private render(): void {
   // Adiciona o event listener ao botão
   const button = this.element.querySelector('.play-button');
   if (button) {
-    button.addEventListener('click', onPlay);
+    button.addEventListener('click', () => {
+      // Esta linha navega para a rota /Game.
+      // Lembre-se que isso causa um recarregamento da página.
+      window.location.href = '/Game';
+    });
   }
 }
 
