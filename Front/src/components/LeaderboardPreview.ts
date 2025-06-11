@@ -1,43 +1,23 @@
-
 import { fetchWithAuth } from '../utils/fetchWithAuth';
 
-interface Match {
-  adversario_id: string;
-  resultado: string;
-  placar: string;
-  data: string;
-  tipo: string;
+interface Player {
+  rank: number;
+  username: string;
+  total_wins: number;
+  total_losses: number;
+  win_rate: string;
+  user_id: string;
 }
 
-const getAdversarioName = async (adversarioId: string): Promise<string> => {
-  try {
-    const response = await fetchWithAuth(`/user/search?id=${adversarioId}`);
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        return data[0].name; // Corrigido: pega o nome do primeiro usuário encontrado
-      }
-      return 'Desconhecido';
-    } else {
-      console.error("Erro ao buscar nome do adversário.");
-      return 'Desconhecido'; // Caso haja erro na requisição
-    }
-  } catch (err) {
-    console.error("Erro ao buscar nome do adversário:", err);
-    return 'Desconhecido'; // Caso haja erro na requisição
-  }
-};
-
-export async function createLeaderboardPreview(targetUserId?: string): Promise<HTMLElement> {
+/**
+ * Cria um preview do leaderboard mostrando os top 5 jogadores
+ */
+export async function createLeaderboardPreview(): Promise<HTMLElement> {
   const section = document.createElement('section');
-  section.className = 'py-16 ';
+  section.className = 'py-16';
   
   const container = document.createElement('div');
   container.className = 'container mx-auto px-6';
-  
-  // Header
-  const header = document.createElement('div');
-  header.className = 'text-center mb-8';
   
   // Leaderboard table
   const tableWrapper = document.createElement('div');
@@ -54,11 +34,11 @@ export async function createLeaderboardPreview(targetUserId?: string): Promise<H
   const headerRow = document.createElement('tr');
   headerRow.className = 'border-neon-green/50 hover:bg-transparent';
   
-  const headers = ['Adversário', 'Resultado', 'Placar', 'Data', 'Tipo'];
+  const headers = ['Rank', 'Jogador', 'V/D', 'Taxa de Vitória'];
   headers.forEach((headerText, index) => {
     const th = document.createElement('th');
-    th.className = 'text-neon-green p-4 text-center';
-    //if (index >= 2) th.className += ' text-right';
+    th.className = 'text-neon-green p-4 text-left';
+    if (index >= 2) th.className += ' text-right';
     th.textContent = headerText;
     headerRow.appendChild(th);
   });
@@ -68,13 +48,10 @@ export async function createLeaderboardPreview(targetUserId?: string): Promise<H
   // Table body
   const tbody = document.createElement('tbody');
 
-  let matchHistory: Match[] = [];
+  // Fetch players data
+  let topPlayers: Player[] = [];
   try {
-    const url = targetUserId 
-      ? `/tournament/matches/history?user_id=${encodeURIComponent(targetUserId)}`
-      : '/tournament/matches/history';
-
-    const response = await fetchWithAuth(url, { // O `1` é o user_id, deve ser dinâmico
+    const response = await fetchWithAuth('/tournament/ranking/top', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -83,52 +60,109 @@ export async function createLeaderboardPreview(targetUserId?: string): Promise<H
 
     if (response.ok) {
       const data = await response.json();
-      matchHistory = data.data || [];  // Assumindo que a chave de dados é `data`
+      topPlayers = data.slice(0, 5).map((player: any, index: number) => ({
+        ...player,
+        rank: index + 1,
+      }));
     } else {
-      console.error("Erro ao carregar dados do histórico de partidas");
+      console.error("Erro ao carregar dados do ranking");
     }
   } catch (err) {
-    console.error("Erro ao buscar histórico de partidas:", err);
+    console.error("Erro ao buscar ranking:", err);
   }
 
-  // Renderiza os jogos na tabela
-  for (const match of matchHistory) {
+  // Helper function to get player name
+  const getPlayerName = async (userId: string): Promise<string> => {
+    try {
+      const response = await fetchWithAuth(`/user/search?id=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return data[0].name;
+        }
+        return 'Desconhecido';
+      } else {
+        console.error("Erro ao buscar nome do jogador.");
+        return 'Desconhecido';
+      }
+    } catch (err) {
+      console.error("Erro ao buscar nome do jogador:", err);
+      return 'Desconhecido';
+    }
+  };
+  
+  // Create table rows
+  for (const player of topPlayers) {
     const row = document.createElement('tr');
-    row.className = 'border-neon-green/30 hover:bg-neon-green/5 transition-colors';
-
-    // Adversário cell
-    const adversarioName = await getAdversarioName(match.adversario_id);
-    const adversarioCell = document.createElement('td');
-    adversarioCell.className = 'font-medium p-4 text-white text-center';
-    adversarioCell.textContent = adversarioName; // Agora exibe o nome do adversário
-    row.appendChild(adversarioCell);
-
-    // Resultado cell
-    const resultadoCell = document.createElement('td');
-    resultadoCell.className = 'font-medium p-4 text-white text-center';
-    resultadoCell.textContent = match.resultado; // Vitoria ou Derrota
-    row.appendChild(resultadoCell);
-
-    // Placar cell
-    const placarCell = document.createElement('td');
-    placarCell.className = 'font-medium p-4 text-white text-center';
-    placarCell.textContent = match.placar; // Placar ex: 10-8
-    row.appendChild(placarCell);
-
-    // Data cell
-    const dataCell = document.createElement('td');
-    dataCell.className = 'font-medium p-4 text-white text-center';
-    const date = new Date(match.data);
-    dataCell.textContent = date.toLocaleString(); // Formatar a data
-    row.appendChild(dataCell);
-
-    // Tipo cell
-    const tipoCell = document.createElement('td');
-    tipoCell.className = 'font-medium p-4 text-white text-center';
-    tipoCell.textContent = match.tipo === '1v1' ? '1v1' : match.tipo; // Se o tipo for 1v1, mostrar '1v1'
-    row.appendChild(tipoCell);
-
-    // Adiciona a linha na tabela
+    row.className = `border-neon-green/30 hover:bg-neon-green/5 transition-colors ${player.rank === 1 ? "bg-neon-green/10" : ""}`;
+  
+    // Rank cell
+    const rankCell = document.createElement('td');
+    rankCell.className = 'font-medium p-4';
+    if (player.rank === 1) {
+      rankCell.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="inline mr-1 text-neon-green" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="6"/>
+          <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+        </svg>
+        ${player.rank}
+      `;
+    } else {
+      rankCell.textContent = player.rank.toString();
+      rankCell.className += ' text-white';
+    }
+    
+    // Player cell
+    const playerCell = document.createElement('td');
+    playerCell.className = 'font-medium p-4';
+    
+    const playerNameWrapper = document.createElement('div');
+    playerNameWrapper.className = 'flex items-center gap-2';
+    
+    const playerName = document.createElement('span');
+    playerName.className = player.rank <= 3 ? 'text-neon-green' : 'text-white';
+    const name = await getPlayerName(player.user_id);
+    playerName.textContent = name;
+    
+    playerNameWrapper.appendChild(playerName);
+    
+    // Add stars for top 3
+    if (player.rank <= 3) {
+      const starsDiv = document.createElement('div');
+      starsDiv.className = 'flex';
+      
+      const starsCount = 4 - player.rank;
+      for (let i = 0; i < starsCount; i++) {
+        const star = document.createElement('span');
+        star.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="text-neon-green" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        `;
+        starsDiv.appendChild(star);
+      }
+      
+      playerNameWrapper.appendChild(starsDiv);
+    }
+    
+    playerCell.appendChild(playerNameWrapper);
+    
+    // W/L cell
+    const wlCell = document.createElement('td');
+    wlCell.className = 'text-right p-4 text-white';
+    wlCell.textContent = `${player.total_wins}/${player.total_losses}`;
+    
+    // Win rate cell
+    const winRateCell = document.createElement('td');
+    winRateCell.className = `text-right p-4 ${player.rank === 1 ? "text-neon-green" : "text-white"}`;
+    winRateCell.textContent = player.win_rate;
+    
+    // Add cells to row
+    row.appendChild(rankCell);
+    row.appendChild(playerCell);
+    row.appendChild(wlCell);
+    row.appendChild(winRateCell);
+    
     tbody.appendChild(row);
   }
   
@@ -141,8 +175,9 @@ export async function createLeaderboardPreview(targetUserId?: string): Promise<H
   tableWrapper.appendChild(tableContainer);
   container.appendChild(tableWrapper);
   section.appendChild(container);
-
-  return section; // Sempre retorna o section com a tabela
+  
+  return section;
 }
 
-
+// Exportação nomeada adicional para compatibilidade
+export { createLeaderboardPreview as default };

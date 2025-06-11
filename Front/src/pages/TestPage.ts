@@ -3,7 +3,7 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
 import { ProfileSection, type UserStats } from '../components/Profile';
 import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
-import { createLeaderboardPreview } from '../components/LeaderboardPreview';
+import { createMatchHistory } from '../components/MatchHistory';
 import { FriendsList, type Friend } from '../components/friends-list';
 import { renderUserProfilePage } from '../pages/FriendProfilePage';
 // Mock data - em produção viria de uma API
