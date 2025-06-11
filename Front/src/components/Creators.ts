@@ -75,12 +75,12 @@ function createCreatorCard(creator: Creator): HTMLElement {
 
   const name = document.createElement('h3');
   // Reduzido tamanho da fonte (text-lg)
-  name.className = 'text-lg font-bold text-neon-green mb-1';
+  name.className = 'text-lg font-bold text-neon-green !bg-transparent mb-1';
   name.textContent = creator.name;
 
   const role = document.createElement('p');
   // Reduzido tamanho da fonte (text-xs), margem (mb-2)
-  role.className = 'text-xs text-neon-blue mb-2 font-semibold';
+  role.className = 'text-xs text-neon-blue !bg-transparent mb-2 font-semibold';
   role.textContent = creator.role;
 
   const bio = document.createElement('p');

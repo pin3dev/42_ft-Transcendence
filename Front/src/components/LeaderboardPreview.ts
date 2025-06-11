@@ -101,7 +101,7 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     rankCell.className = 'font-medium p-4';
     if (player.rank === 1) {
       rankCell.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="inline mr-1 text-neon-green" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="inline mr-1 text-white" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="8" r="6"/>
           <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
         </svg>
@@ -154,7 +154,7 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     
     // Win rate cell
     const winRateCell = document.createElement('td');
-    winRateCell.className = `text-right p-4 ${player.rank === 1 ? "text-neon-green" : "text-white"}`;
+    winRateCell.className = `text-right p-4 "text-white"}`;
     winRateCell.textContent = player.win_rate;
     
     // Add cells to row

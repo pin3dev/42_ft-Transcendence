@@ -14,7 +14,7 @@ export async function renderHome(): Promise<void> {
   
   // Cria a estrutura da página
   const container = document.createElement('div');
-  container.className = 'min-h-screen flex flex-col bg-arcade-darkPurple';
+  container.className = 'bgp-arcade-darkPurple';
   
   // Adiciona os componentes
   container.appendChild(createNavbar());
@@ -35,7 +35,7 @@ export async function renderHome(): Promise<void> {
   
   const subtitle = document.createElement('p');
   subtitle.className = 'text-xl text-gray-300 max-w-3xl mx-auto';
-  subtitle.textContent = 'Os melhores jogadores de PingPong Arcade. Você pode ser o próximo?';
+  subtitle.textContent = 'Os melhores jogadores de PingPong Arcade. Você pode ser o próximo!';
   
   header.appendChild(title);
   header.appendChild(subtitle);

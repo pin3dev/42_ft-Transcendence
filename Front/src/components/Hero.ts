@@ -29,7 +29,7 @@ export function createHero(): HTMLElement {
   
   const heroDescription = document.createElement('p');
   heroDescription.className = 'text-xl text-gray-300 mb-8';
-  heroDescription.textContent = 'Pronto para um Pong turbinado? Criámos este site com torneios, multiplayer e muito mais. Chega de conversa, é hora de jogar e brilhar!';
+  heroDescription.textContent = 'Pronto para um Pong turbinado? Criamos este site com torneios, multiplayer e muito mais. Chega de conversa, é hora de jogar e brilhar!';
   
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'flex flex-col sm:flex-row gap-4 justify-center lg:justify-start';
