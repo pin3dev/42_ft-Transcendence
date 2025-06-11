@@ -36,15 +36,15 @@ function createMatchBlock(match: MatchData): HTMLElement {
 
     // --- Player 1 Side ---
     const player1Info = document.createElement('div');
-    player1Info.className = 'flex flex-1 justify-end items-center gap-3';
+    player1Info.className = 'flex flex-1 justify-end items-center gap-2';
   
     const player1NameElement = document.createElement('span');
-    player1NameElement.className = 'text-base font-semibold text-gray-300';
+    player1NameElement.className = 'text-sm font-semibold text-gray-300';
     // FIX: Using the actual data from the 'match' object passed into the function.
     player1NameElement.textContent = match.player1Name;
   
     const score1Element = document.createElement('span');
-    score1Element.className = 'text-3xl font-bold font-mono text-neon-green';
+    score1Element.className = 'text-2xl font-bold font-mono text-neon-pink';
     // FIX: Using the actual score from the 'match' object.
     score1Element.textContent = match.score1.toString();
   
@@ -52,20 +52,20 @@ function createMatchBlock(match: MatchData): HTMLElement {
   
     // --- "VS" Separator ---
     const vsElement = document.createElement('span');
-    vsElement.className = 'text-lg font-semibold text-gray-400 mx-4';
+    vsElement.className = 'text-base font-semibold text-gray-400 mx-3';
     vsElement.textContent = 'VS';
   
     // --- Player 2 Side ---
     const player2Info = document.createElement('div');
-    player2Info.className = 'flex flex-1 justify-start items-center gap-3'; // Removed flex-row-reverse for consistency
+    player2Info.className = 'flex flex-1 justify-start items-center gap-2'; // Removed flex-row-reverse for consistency
   
     const player2NameElement = document.createElement('span');
-    player2NameElement.className = 'text-base font-semibold text-gray-300';
+    player2NameElement.className = 'text-sm font-semibold text-gray-300';
     // FIX: Using the actual data from the 'match' object.
     player2NameElement.textContent = match.player2Name;
   
     const score2Element = document.createElement('span');
-    score2Element.className = 'text-3xl font-bold font-mono text-neon-pink';
+    score2Element.className = 'text-2xl font-bold font-mono text-neon-pink';
     // FIX: Using the actual score from the 'match' object.
     score2Element.textContent = match.score2.toString();
   
@@ -108,17 +108,17 @@ export function createMatchSchedule(): HTMLElement {
     section.className = 'py-4';
 
     const container = document.createElement('div');
-    container.className = 'container mx-auto px-6';
+    container.className = 'container mx-auto';
     section.appendChild(container);
 
     const mainTitle = document.createElement('h2');
-    mainTitle.className = 'text-2xl font-bold mb-4 text-white text-center';
+    mainTitle.className = 'text-xl font-bold mb-3 text-white text-center';
     mainTitle.textContent = 'PARTIDAS';
     container.appendChild(mainTitle);
 
     // The main "arcade box" container
     const arcadeContainer = document.createElement('div');
-    arcadeContainer.className = 'arcade-container bg-black rounded-lg overflow-hidden border-2 border-neon-green max-w-md mx-auto';
+    arcadeContainer.className = 'arcade-container bg-black rounded-lg overflow-hidden border-2 border-neon-green w-full';
 
     // This div will hold the dynamic list of matches
     const matchListContainer = document.createElement('div');
