@@ -2,7 +2,6 @@
 
 export interface UIElements {
   pageContainer: HTMLDivElement;
-  mainContent: HTMLElement;
   backgroundTableContainer: HTMLDivElement; // O container da mesa de fundo que se tornará o jogo
   pingPongTableElement: HTMLDivElement; // A div específica da mesa para sobrepor o canvas
   scoreDisplay: HTMLDivElement;
@@ -105,7 +104,6 @@ export function createFullGameUI(): UIElements {
 
   return { 
     pageContainer, 
-    mainContent, 
     backgroundTableContainer,
     pingPongTableElement, 
     scoreDisplay, 
@@ -127,51 +125,54 @@ export interface GameState {
   canvasDimensions?: { width: number; height: number };
 }
 
-const PADDLE_COLOR = '#39FF14'; 
-const PADDLE_COLOR_P2 = '#D946EF'; 
-const BALL_COLOR = '#FFA500';   
+// const PADDLE_COLOR = '#39FF14'; 
+// const PADDLE_COLOR_P2 = '#D946EF'; 
+// const BALL_COLOR = '#FFA500';   
 
-export function drawGame(
-  ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
-  gameState: GameState
-): void {
-  const canvasWidth = gameState.canvasDimensions?.width || canvas.width;
-  const canvasHeight = gameState.canvasDimensions?.height || canvas.height;
+// export function drawGame(
+//   ctx: CanvasRenderingContext2D,
+//   canvas: HTMLCanvasElement,
+//   gameState: GameState
+// ): void {
+//   const canvasWidth = gameState.canvasDimensions?.width || canvas.width;
+//   const canvasHeight = gameState.canvasDimensions?.height || canvas.height;
 
-  if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-  }
+//   if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+//     canvas.width = canvasWidth;
+//     canvas.height = canvasHeight;
+//   }
 
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+//   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  ctx.fillStyle = PADDLE_COLOR; 
-  const p1 = gameState.paddle1;
-  ctx.fillRect(
-    p1.x * canvasWidth - (p1.width * canvasWidth) / 2,
-    p1.y * canvasHeight - (p1.height * canvasHeight) / 2,
-    p1.width * canvasWidth,
-    p1.height * canvasHeight
-  );
+//   // Desenha paddle 1 (centralizado)
+//   ctx.fillStyle = PADDLE_COLOR; 
+//   const p1 = gameState.paddle1;
+//   ctx.fillRect(
+//     gameState.paddle1.x * canvas.width,
+//     gameState.paddle1.y * canvas.height,
+//     gameState.paddle1.width * canvas.width,
+//     gameState.paddle1.height * canvas.height
+//   );
 
-  ctx.fillStyle = PADDLE_COLOR_P2;
-  const p2 = gameState.paddle2;
-  ctx.fillRect(
-    p2.x * canvasWidth - (p2.width * canvasWidth) / 2,
-    p2.y * canvasHeight - (p2.height * canvasHeight) / 2,
-    p2.width * canvasWidth,
-    p2.height * canvasHeight
-  );
+//   // Desenha paddle 2 (centralizado)
+//   ctx.fillStyle = PADDLE_COLOR_P2;
+//   const p2 = gameState.paddle2;
+//   ctx.fillRect(
+//     gameState.paddle2.x * canvas.width,
+//     gameState.paddle2.y * canvas.height,
+//     gameState.paddle2.width * canvas.width,
+//     gameState.paddle2.height * canvas.height
+//   );
 
-  ctx.fillStyle = BALL_COLOR;
-  ctx.beginPath();
-  ctx.arc(
-    gameState.ball.x * canvasWidth,
-    gameState.ball.y * canvasHeight,
-    gameState.ball.radius * Math.min(canvasWidth, canvasHeight), 
-    0,
-    Math.PI * 2
-  );
-  ctx.fill();
-}
+//    // Desenha a bola
+//   ctx.fillStyle = BALL_COLOR;
+//   ctx.beginPath();
+//   ctx.arc(
+//     gameState.ball.x * canvasWidth,
+//     gameState.ball.y * canvasHeight,
+//     gameState.ball.radius * Math.min(canvasWidth, canvasHeight), 
+//     0,
+//     Math.PI * 2
+//   );
+//   ctx.fill();
+// }

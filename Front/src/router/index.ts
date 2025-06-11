@@ -2,7 +2,7 @@ import { renderHome } from '../pages/HomePage';
 import { renderNotFound } from '../pages/NotFoundPage';
 import { renderLogin } from '../pages/LoginPage';
 import { renderHowToPlayPage } from '../pages/HowToPlayPage';
-import { renderGamePage } from '../pages/GamePage';
+import { GamePage } from '../pages/GamePage';
 import { renderRegister } from '../pages/RegisterPage';
 import { renderTestPage } from '../pages/TestPage';
 
@@ -12,7 +12,7 @@ const routes: Record<string, () => void> = {
   '*': renderNotFound,
   '/Login': renderLogin,
   '/ComoJogar': renderHowToPlayPage,
-  '/Game': renderGamePage,
+  '/Game': GamePage,
   '/Register': renderRegister,
   '/Profile': renderTestPage
 };
