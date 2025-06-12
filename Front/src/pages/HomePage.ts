@@ -4,6 +4,7 @@ import { createCreatorsSection } from '../components/Creators';
 import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 import { createFooter } from '../components/Footer';
 import { hasJWTCookie, hasLocalToken } from '../utils/auth';
+import { navigateTo } from '../router/index';
 
 export async function renderHome(): Promise<void> {
   const root = document.getElementById('root');
@@ -81,11 +82,11 @@ export async function renderHome(): Promise<void> {
     const registerBtnHomepage = loginPromptDiv.querySelector('#register-btn-homepage');
     
     loginBtnHomepage?.addEventListener('click', () => {
-      window.location.hash = '#/Login';
+      navigateTo('/Login')
     });
     
     registerBtnHomepage?.addEventListener('click', () => {
-      window.location.hash = '#/Register';
+      navigateTo('/Register')
     });
     
     main.appendChild(loginPromptDiv);
