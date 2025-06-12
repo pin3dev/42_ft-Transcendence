@@ -2,7 +2,7 @@ const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
 const UserProfile = require("../domain/UserProfile.js");
 const profileRepo = require("../infrastructure/db/profile_repository.js");
 
-function handleUserRegistered() {
+function userRegistered_listener() {
   subscribeToEvent(EventTypes.USER_REGISTERED, async (event) => {
     const { user_id, email } = event.data;
 
@@ -17,5 +17,5 @@ function handleUserRegistered() {
 }
 
 module.exports = {
-  handleUserRegistered,
+  userRegistered_listener,
 };

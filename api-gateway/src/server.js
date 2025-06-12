@@ -91,6 +91,36 @@ async function buildServer() {
     }
   });
 
+  // // Rota para validação de JWT (para serviços internos como game-service)
+  // app.post("/auth/validate-jwt", {
+  //   schema: {
+  //     headers: {
+  //       type: "object",
+  //       required: ["authorization"],
+  //       properties: {
+  //         authorization: { type: "string" }
+  //       }
+  //     }
+  //   }
+  // }, async (request, reply) => {
+  //   try {
+  //     // Reutiliza a validação existente (JWT + usuário deletado)
+  //     await app.authenticate(request, reply);
+      
+  //     // Retorna as informações do usuário do token validado
+  //     return reply.code(200).send({ 
+  //       valid: true,
+  //       user_id: request.user.user_id.toString(),
+  //     });
+  //   } catch (error) {
+  //     // O middleware authenticate já trata usuários deletados e tokens inválidos
+  //     return reply.code(401).send({ 
+  //       valid: false, 
+  //       error: error.message || "Invalid token" 
+  //     });
+  //   }
+  // });
+
   // Proxy: Auth
   app.register(createServiceProxy({
     prefix: "/auth",

@@ -1,5 +1,4 @@
 const Redis = require("ioredis");
-// const { EventTypes } = require("./eventsHelper.js");
 
 const eventCnn = new Redis({
   host: "event-bus",
@@ -7,12 +6,19 @@ const eventCnn = new Redis({
 });
 
 function subscribeToEvent(channel, callback) {
-    eventCnn.subscribe(channel);
+  eventCnn.subscribe(channel);
 
-    eventCnn.on("message", (receivedChannel, message) => {
+  eventCnn.on("message", (receivedChannel, message) => {
     if (receivedChannel === channel) {
-      const event = JSON.parse(message);
-      callback(event);
+      try {
+        // Tenta fazer o parse do JSON
+        const parsedEvent = JSON.parse(message);
+        callback(parsedEvent);
+      } catch (err) {
+        console.error(`[Redis] Erro ao fazer parse do evento: ${err.message}`);
+        console.error(`[Redis] Mensagem recebida: ${message}`);
+        return;
+      }
     }
   });
 }

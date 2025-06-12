@@ -15,8 +15,8 @@ const creatorsData: Creator[] = [
     bio: '',
     imageUrl: '/creators/clara.jpeg',
     links: [
-      { platform: 'GitHub', url: 'https://github.com/anasilva' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
+      { platform: 'GitHub', url: 'https://github.com/clima-fr' },
+      { platform: 'LinkedIn', url: 'https://linkedin.com/in/claralfranco' }
     ]
   },
   {
@@ -25,8 +25,8 @@ const creatorsData: Creator[] = [
     bio: '',
     imageUrl: '/creators/dmanoel-.jpeg',
     links: [
-      { platform: 'GitHub', url: 'https://github.com/anasilva' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
+      { platform: 'GitHub', url: 'https://github.com/phrxn' },
+      { platform: 'LinkedIn', url: 'https://linkedin.com/in/phrxn' }
     ]
   },
   {
@@ -35,8 +35,8 @@ const creatorsData: Creator[] = [
     bio: '',
     imageUrl: '/creators/isa.jpeg',
     links: [
-      { platform: 'GitHub', url: 'https://github.com/anasilva' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
+      { platform: 'GitHub', url: 'https://github.com/IsabelaGenial' },
+      { platform: 'LinkedIn', url: 'https://linkedin.com/in/isabela-genial' }
     ]
   },
   {
@@ -45,8 +45,8 @@ const creatorsData: Creator[] = [
     bio: '',
     imageUrl: '/creators/Ivy.jpeg', 
     links: [
-      { platform: 'GitHub', url: 'https://github.com/anasilva' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
+      { platform: 'GitHub', url: 'https://github.com/pin3dev' },
+      { platform: 'LinkedIn', url: 'https://linkedin.com/in/ivanypinheiro' }
     ]
   },
   {
@@ -55,8 +55,8 @@ const creatorsData: Creator[] = [
     bio: '',
     imageUrl: '/creators/Jaque.png', 
     links: [
-      { platform: 'GitHub', url: 'https://github.com/anasilva' },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/anasilva' }
+      { platform: 'GitHub', url: 'https://github.com/jaqezita' },
+      { platform: 'LinkedIn', url: 'https://linkedin.com/in/jaqueline-ribeiro-inocencio' }
     ]
   },
 ];
@@ -75,12 +75,12 @@ function createCreatorCard(creator: Creator): HTMLElement {
 
   const name = document.createElement('h3');
   // Reduzido tamanho da fonte (text-lg)
-  name.className = 'text-lg font-bold text-neon-green mb-1';
+  name.className = 'text-lg font-bold text-neon-green !bg-transparent mb-1';
   name.textContent = creator.name;
 
   const role = document.createElement('p');
   // Reduzido tamanho da fonte (text-xs), margem (mb-2)
-  role.className = 'text-xs text-neon-blue mb-2 font-semibold';
+  role.className = 'text-xs text-neon-blue !bg-transparent mb-2 font-semibold';
   role.textContent = creator.role;
 
   const bio = document.createElement('p');

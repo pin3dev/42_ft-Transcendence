@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:/app/data/test.sqlite" //env("TOURNAMENT_DB_URL") // Vem do .env
+}
+
+model Tournament {
+  id         String    @id
+  is_private Boolean
+  owner_id   String
+  password   String?
+  started    DateTime
+  ended      DateTime?
+  created_at DateTime  @default(now())
+
+  players    Player[]
+  matches    Match[]
+}
+
+model Player {
+  tournament_id String
+  player_id     String
+  joined_at     DateTime @default(now())
+
+  tournament Tournament? @relation(fields: [tournament_id], references: [id])
+
+  @@id([tournament_id, player_id])
+}
+
+model Ranking {
+  player_id     String   @id
+  score         Int      @default(1000)
+  last_updated  DateTime @default(now())
+}
+
+model Match {
+  id            String   @id
+  tournament_id String?
+  player1_id    String
+  player2_id    String
+  winner_id     String
+  score         String
+  started_at    DateTime
+  ended_at      DateTime
+
+  tournament Tournament? @relation(fields: [tournament_id], references: [id])
+}

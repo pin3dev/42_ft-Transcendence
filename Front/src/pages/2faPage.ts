@@ -89,7 +89,27 @@ function render2FAInput(container?: HTMLElement): void {
         throw new Error('Código inválido.');
       }
 
-            showToast('Autenticação concluída com sucesso!', 'success');
+      // Após autenticação bem-sucedida, buscar dados do usuário para salvar no localStorage
+      try {
+        const profileResponse = await fetch('/user/profile', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          // Salvar dados do usuário no localStorage para a navbar detectar
+          localStorage.setItem('userName', profileData.name);
+          if (profileData.avatar_url) {
+            localStorage.setItem('userAvatar', profileData.avatar_url);
+          }
+          console.log('✅ Dados do usuário salvos no localStorage:', profileData);
+        }
+      } catch (profileError) {
+        console.warn('Não foi possível carregar dados do perfil, mas login foi bem-sucedido:', profileError);
+      }
+
+      showToast('Autenticação concluída com sucesso!', 'success');
       localStorage.removeItem('user_id');
       window.location.href = '/Profile';
     } catch (error) {

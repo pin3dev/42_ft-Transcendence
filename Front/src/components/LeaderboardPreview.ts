@@ -1,4 +1,3 @@
-
 import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 interface Player {
@@ -7,18 +6,18 @@ interface Player {
   total_wins: number;
   total_losses: number;
   win_rate: string;
+  user_id: string;
 }
 
+/**
+ * Cria um preview do leaderboard mostrando os top 5 jogadores
+ */
 export async function createLeaderboardPreview(): Promise<HTMLElement> {
   const section = document.createElement('section');
-  section.className = 'py-16 ';
+  section.className = 'py-16';
   
   const container = document.createElement('div');
   container.className = 'container mx-auto px-6';
-  
-  // Header
-  const header = document.createElement('div');
-  header.className = 'text-center mb-8';
   
   // Leaderboard table
   const tableWrapper = document.createElement('div');
@@ -49,8 +48,9 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
   // Table body
   const tbody = document.createElement('tbody');
 
-  let topPlayers = [];
-    try {
+  // Fetch players data
+  let topPlayers: Player[] = [];
+  try {
     const response = await fetchWithAuth('/tournament/ranking/top', {
       method: 'GET',
       headers: {
@@ -60,11 +60,9 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
 
     if (response.ok) {
       const data = await response.json();
-
-      // Adicionando rank aos jogadores
-      topPlayers = data.slice(0, 5).map((player: Player, index: number) => ({
+      topPlayers = data.slice(0, 5).map((player: any, index: number) => ({
         ...player,
-        rank: index + 1, // Rank baseado na posição (0 é o primeiro, 1 é o segundo...)
+        rank: index + 1,
       }));
     } else {
       console.error("Erro ao carregar dados do ranking");
@@ -73,38 +71,37 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     console.error("Erro ao buscar ranking:", err);
   }
 
-    const getPlayerName = async (userId: string) => {
-      try {
-        const response = await fetchWithAuth(`/user/search?id=${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            return data[0].name; // Corrigido: pega o nome do primeiro usuário encontrado
-          }
-          return 'Desconhecido';
-        } else {
-          console.error("Erro ao buscar nome do jogador.");
-          return 'Desconhecido';
+  // Helper function to get player name
+  const getPlayerName = async (userId: string): Promise<string> => {
+    try {
+      const response = await fetchWithAuth(`/user/search?id=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return data[0].name;
         }
-      } catch (err) {
-        console.error("Erro ao buscar nome do jogador:", err);
+        return 'Desconhecido';
+      } else {
+        console.error("Erro ao buscar nome do jogador.");
         return 'Desconhecido';
       }
-    };
-    
-    for (const player of topPlayers) {
-      const row = document.createElement('tr');
-      row.className = `
-        border-neon-green/30 hover:bg-neon-green/5 transition-colors
-        ${player.rank === 1 ? "bg-neon-green/10" : ""}
-      `;
-    
+    } catch (err) {
+      console.error("Erro ao buscar nome do jogador:", err);
+      return 'Desconhecido';
+    }
+  };
+  
+  // Create table rows
+  for (const player of topPlayers) {
+    const row = document.createElement('tr');
+    row.className = `border-neon-green/30 hover:bg-neon-green/5 transition-colors ${player.rank === 1 ? "bg-neon-green/10" : ""}`;
+  
     // Rank cell
     const rankCell = document.createElement('td');
     rankCell.className = 'font-medium p-4';
     if (player.rank === 1) {
       rankCell.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="inline mr-1 text-neon-green" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" class="inline mr-1 text-white" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="8" r="6"/>
           <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
         </svg>
@@ -112,6 +109,7 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
       `;
     } else {
       rankCell.textContent = player.rank.toString();
+      rankCell.className += ' text-white';
     }
     
     // Player cell
@@ -120,8 +118,6 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     
     const playerNameWrapper = document.createElement('div');
     playerNameWrapper.className = 'flex items-center gap-2';
-
-
     
     const playerName = document.createElement('span');
     playerName.className = player.rank <= 3 ? 'text-neon-green' : 'text-white';
@@ -135,7 +131,7 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
       const starsDiv = document.createElement('div');
       starsDiv.className = 'flex';
       
-      const starsCount = 4 - player.rank; // 3 stars for rank 1, 2 for rank 2, 1 for rank 3
+      const starsCount = 4 - player.rank;
       for (let i = 0; i < starsCount; i++) {
         const star = document.createElement('span');
         star.innerHTML = `
@@ -154,11 +150,11 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
     // W/L cell
     const wlCell = document.createElement('td');
     wlCell.className = 'text-right p-4 text-white';
-    wlCell.textContent = `${player.total_wins}/${player.total_losses} `;
+    wlCell.textContent = `${player.total_wins}/${player.total_losses}`;
     
     // Win rate cell
     const winRateCell = document.createElement('td');
-    winRateCell.className = `text-right p-4 ${player.rank === 1 ? "text-neon-green" : "text-white"}`;
+    winRateCell.className = `text-right p-4 "text-white"}`;
     winRateCell.textContent = player.win_rate;
     
     // Add cells to row
@@ -175,8 +171,6 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
   table.appendChild(tbody);
   tableContainer.appendChild(table);
   
-
-  
   // Assemble components
   tableWrapper.appendChild(tableContainer);
   container.appendChild(tableWrapper);
@@ -184,3 +178,6 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
   
   return section;
 }
+
+// Exportação nomeada adicional para compatibilidade
+export { createLeaderboardPreview as default };

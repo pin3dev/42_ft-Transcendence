@@ -2,7 +2,7 @@ const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
 
 const userRepo = require("../infrastructure/db/user_repository.js");
 
-function handleUserDeleted() {
+function userDeleted_listener() {
   subscribeToEvent(EventTypes.USER_DELETED, async (event) => {
     const { user_id, email } = event.data;
 
@@ -17,5 +17,5 @@ function handleUserDeleted() {
 }
 
 module.exports = {
-  handleUserDeleted,
+  userDeleted_listener,
 };
