@@ -1,6 +1,6 @@
 
 export type AuthenticationMessageTypeRequest = 'AUTHENTICATION_LOGIN' |
-                                               'AUTHENTICATION_LOGOUT';
+	'AUTHENTICATION_LOGOUT';
 
 export type GameMessageTypeRequest = 'GAME_CREATE_GLOBAL_MATCH' |
 	'GAME_START_MATCH' |
@@ -34,10 +34,18 @@ export type GameMessageTypeResponse = 'GAME_WAITING_NEW_PLAYER' |
 	'GAME_PLAYER_LOSE' |
 	'GAME_ABORTED';
 
+export type TournamentMessageTypeResponse =
+	'ERROR_TOURNAMENT_FULL' |
+	'ERROR_TOURNAMENT_IN_PROGRESS' |
+	'ERROR_TOURNAMENT_FINISHED' |
+	'TOURNAMENT_WAITING_PLAYER' |
+	'TOURNAMENT_COUNT_DOWN';
+
 export type MessageTypeResponse = FatalErrorMessageTypeResponse |
 	ErrorMessageTypeResponse |
 	AuthenticationMessageTypeResponse |
-	GameMessageTypeResponse;
+	GameMessageTypeResponse |
+	TournamentMessageTypeResponse;
 
 export type MessageType = MessageTypeRequest | MessageTypeResponse;
 
@@ -52,10 +60,10 @@ export class Message {
 	public static readonly gameMessageTypeRequest = new Map<string, GameMessageTypeRequest>([
 		['GAME_CREATE_GLOBAL_MATCH', 'GAME_CREATE_GLOBAL_MATCH'],
 		['GAME_START_MATCH', 'GAME_START_MATCH'],
-		['GAME_PADDLE_UP_KEYDOWN','GAME_PADDLE_UP_KEYDOWN'],
-	    ['GAME_PADDLE_UP_KEYUP','GAME_PADDLE_UP_KEYUP'],
-	    ['GAME_PADDLE_DOWN_KEYDOWN','GAME_PADDLE_DOWN_KEYDOWN'],
-	    ['GAME_PADDLE_DOWN_KEYUP','GAME_PADDLE_DOWN_KEYUP'],
+		['GAME_PADDLE_UP_KEYDOWN', 'GAME_PADDLE_UP_KEYDOWN'],
+		['GAME_PADDLE_UP_KEYUP', 'GAME_PADDLE_UP_KEYUP'],
+		['GAME_PADDLE_DOWN_KEYDOWN', 'GAME_PADDLE_DOWN_KEYDOWN'],
+		['GAME_PADDLE_DOWN_KEYUP', 'GAME_PADDLE_DOWN_KEYUP'],
 		['GAME_ABORT', 'GAME_ABORT']
 	]);
 
@@ -90,6 +98,14 @@ export class Message {
 		['GAME_PLAYER_WIN', 'GAME_PLAYER_WIN'],
 		['GAME_PLAYER_LOSE', 'GAME_PLAYER_LOSE'],
 		['GAME_ABORTED', 'GAME_ABORTED']
+	]);
+
+	public static readonly tournamentMessageTypeResponse = new Map<string, TournamentMessageTypeResponse>([
+		['ERROR_TOURNAMENT_FULL', 'ERROR_TOURNAMENT_FULL'],
+		['ERROR_TOURNAMENT_IN_PROGRESS', 'ERROR_TOURNAMENT_IN_PROGRESS'],
+		['ERROR_TOURNAMENT_FINISHED', 'ERROR_TOURNAMENT_FINISHED'],
+		['TOURNAMENT_WAITING_PLAYER', 'TOURNAMENT_WAITING_PLAYER'],
+		['TOURNAMENT_COUNT_DOWN', 'TOURNAMENT_COUNT_DOWN']
 	]);
 
 	public static readonly messageTypeResponse = new Map<string, MessageTypeResponse>([

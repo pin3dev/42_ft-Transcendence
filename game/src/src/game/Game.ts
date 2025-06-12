@@ -114,7 +114,6 @@ export abstract class Game {
 		}
 	}
 
-
 	// 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 
 	public abort() {
