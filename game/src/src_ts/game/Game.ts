@@ -6,6 +6,10 @@ import { MessageWithValue } from "../message/MessageWithValue";
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Sender } from "../Sender";
 import { GamePlayer } from "./GamePlayer";
+import { SaveRating } from "./SaveRating";
+import { GameScoreboard } from "./GameScoreboard";
+import { Tournament } from "../tournament/Tournament";
+import { TournamentPlayer } from "../tournament/TournamentPlayer";
 
 export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 export type GamePlayersStatus = 'ON_LINE' | 'PLAYER_1_DISCONNECTED' | 'PLAYER_2_DISCONNECTED';
@@ -37,6 +41,8 @@ export abstract class Game {
 
 	private countDown = Game.START_COUNT_DOWN_VALUE;
 
+	private saveRating : SaveRating;
+
 	private keys = {
 		paddle_left_up: false,
 		paddle_left_down: false,
@@ -58,6 +64,8 @@ export abstract class Game {
 
 		this.gameLoopInterval = undefined;
 		this.countDownInterval = undefined;
+
+		this.saveRating = new SaveRating();
 	}
 
 	public createMatch(player1: GamePlayer, player2: GamePlayer) {
@@ -238,9 +246,15 @@ export abstract class Game {
 
 		if (this.checkIfAnyPlayerWon() || this.checkIfAPlayerHasDisconnected()) {
 
-			//------------------------------------------------------------------------------------------
-			//save game in database
-			//------------------------------------------------------------------------------------------
+			let player1 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_1].webSocketUserSession);
+			let player2 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_2].webSocketUserSession);
+
+			let gameScoreboard = new GameScoreboard(player1, player2);
+			gameScoreboard.playerMakePoint(player1, this.scoreboard[Game.PLAYER_1]);
+			gameScoreboard.playerMakePoint(player1, this.scoreboard[Game.PLAYER_2]);
+
+			this.saveRating.saveRating(gameScoreboard);
+
 			this.gameEnd();
 			this.stop();
 		}

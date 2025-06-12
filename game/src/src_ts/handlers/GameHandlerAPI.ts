@@ -11,7 +11,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 	private waitingPlayer: GamePlayer | null = null;
 
-	private gamesGlobal = new Map<Number, Game>();
+	private gamesGlobal = new Map<number, Game>();
 	private gamePlayers = new Map<WebSocketUserSession, GamePlayer>();
 
 	message(ws: WebSocketUserSession, messageFromClient: Message): void {
@@ -94,6 +94,10 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 		}
 
 		playerGame.playerExit(gamePlayer!);
+	}
+
+	public getMapgamesGlobal() : Map<number, Game>{
+		return this.gamesGlobal;
 	}
 
 	private getPlayerGame(wsSession: WebSocketUserSession): Game | undefined {

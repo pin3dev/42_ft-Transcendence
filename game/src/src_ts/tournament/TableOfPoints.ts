@@ -17,9 +17,11 @@ export class TableOfPoints {
 
 	public addPlayerScore(gameScoreboard: GameScoreboard): void {
 
+		if (this.areBothPlayersOffline(gameScoreboard)) return;
+
 		if (gameScoreboard.isDraw()) {
-			this.makeDraw(gameScoreboard.player1!, gameScoreboard);
-			this.makeDraw(gameScoreboard.player2!, gameScoreboard);
+			this.makeDraw(gameScoreboard.player1, gameScoreboard);
+			this.makeDraw(gameScoreboard.player2, gameScoreboard);
 		} else {
 			let playerWinner: TournamentPlayer = gameScoreboard.getWinner()!;
 			let playerLoser: TournamentPlayer = gameScoreboard.getLoser()!;
@@ -28,10 +30,13 @@ export class TableOfPoints {
 		}
 	}
 
-	public getTable(): any[] {
+	public areBothPlayersOffline(gameScoreboard: GameScoreboard){
+		return (!gameScoreboard.player1.isOnline && !gameScoreboard.player2.isOnline)
+	}
 
-		const sorter = new SortTablePointMemberArray(this._playersOfTournament);
-		const sortedTable = sorter.sort();
+	public getTableJSONToclients(): any[] {
+
+		const sortedTable = this.getTableSorted();
 
 		const table = [];
 		let lastStats: any = null;
@@ -68,6 +73,11 @@ export class TableOfPoints {
 
 	}
 
+	public getTableSorted() : TournamentPlayer[]{
+		const sorter = new SortTablePointMemberArray(this._playersOfTournament);
+		return sorter.sort();
+	}
+
 	//  ------------------- private method members  -------------------
 
 	private makeDraw(playerWhoTied: TournamentPlayer, gameScoreboard: GameScoreboard) {
@@ -80,7 +90,7 @@ export class TableOfPoints {
 
 		playerWinner.numOfMatch = playerWinner.numOfMatch + 1;
 		playerWinner.starts = playerWinner.starts + 3;
-		playerWinner.numberOfVictories = playerWinner.numberOfVictories + 3;
+		playerWinner.numberOfVictories = playerWinner.numberOfVictories + 1;
 		playerWinner.pointsBalance = playerWinner.pointsBalance + (gameScoreboard.getPlayerPoints(playerWinner)! - gameScoreboard.getPlayerPoints(playerLoser)!);
 		playerWinner.pointsMake = playerWinner.pointsMake + gameScoreboard.getPlayerPoints(playerWinner)!
 

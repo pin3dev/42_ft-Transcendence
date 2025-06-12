@@ -1,7 +1,6 @@
 import { GameScoreboard } from "../game/GameScoreboard";
 
-
-export class MatchesScoreboard {
+export class OverallScoreboardOfTheRound {
 
 	private allScoreboardInTheRound: Map<number, GameScoreboard>;
 
@@ -13,7 +12,7 @@ export class MatchesScoreboard {
 		this.allScoreboardInTheRound.set(gameScoreboard.id, gameScoreboard);
 	}
 
-	public getRoundScoreboard(): any[] {
+	public getRoundScoreboardJSONToClients(): any[] {
 
 		const json = Array.from(this.allScoreboardInTheRound.values()).map(scoreboard => {
 			return {
@@ -26,3 +25,5 @@ export class MatchesScoreboard {
 		return json;
 	}
 }
+
+//overall scoreboard of the round

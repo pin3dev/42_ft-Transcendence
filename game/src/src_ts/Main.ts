@@ -9,5 +9,3 @@ if (!envVariables.loadParameters(args)) process.exit(1);
 
 const server = new Server(envVariables);
 server.startServer();
-
-

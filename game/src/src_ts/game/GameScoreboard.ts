@@ -26,9 +26,9 @@ export class GameScoreboard {
 
 	public playerMakePoint(webSocketUserSession: GamePlayer, points: number = 1) {
 		if (webSocketUserSession === this._player1) {
-			this._player1Points += points;
-		} else if (webSocketUserSession == this._player2) {
-			this._player2Points += points;
+			this._player1Points = this._player1Points + points;
+		} else if (webSocketUserSession === this._player2) {
+			this._player2Points = this._player2Points + points;
 		}
 	}
 
@@ -51,7 +51,7 @@ export class GameScoreboard {
 	}
 
 	public isDraw(): boolean {
-		return (this._player1Points + this._player2Points == Game.MAX_POINTS)
+		return (this._player1Points + this._player2Points === Game.MAX_POINTS)
 	}
 
 	public get player1(): TournamentPlayer{
