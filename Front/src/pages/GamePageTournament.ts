@@ -1,13 +1,14 @@
 // Front/src/pages/GamePages.ts
 import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
-import { renderPongGame } from '../components/Game';
-
+import { createLeaderboardPreview } from '../components/LeaderboardPreview';
+import { renderPongGameTournament } from '../components/GameTournament';
+import { createMatchSchedule } from '../components/MatchSchedule';
 
 // Um bom lugar para armazenar a função de cleanup da página atual
 let cleanupCurrentPage: () => void = () => {};
 
-export function GamePage(): void { // Esta função agora renderiza uma página que INCLUI o jogo
+export function GamePageTournament(): void { // Esta função agora renderiza uma página que INCLUI o jogo
   const root = document.getElementById('root');
   if (!root) {
     console.error("Elemento 'root' não encontrado!");
@@ -34,8 +35,9 @@ export function GamePage(): void { // Esta função agora renderiza uma página 
   gameSectionContainer.id = 'pong-game-section'; 
   gameSectionContainer.className = 'my-8 p-4 sm:p-6 rounded-lg bgp-arcade-darkPurple flex flex-col items-center'; 
   // MUDANÇA 3: Chama a função refatorada, que agora preencherá `gameSectionContainer`
-  const cleanupGame = renderPongGame(gameSectionContainer); 
+  const cleanupGame = renderPongGameTournament(gameSectionContainer); 
   mainContentArea.appendChild(gameSectionContainer);
+  mainContentArea.appendChild(createMatchSchedule()); 
   GamePageContainer.appendChild(mainContentArea); 
  
   GamePageContainer.appendChild(createFooter());

@@ -3,6 +3,7 @@ import { renderNotFound } from '../pages/NotFoundPage';
 import { renderLogin } from '../pages/LoginPage';
 import { renderHowToPlayPage } from '../pages/HowToPlayPage';
 import { GamePage } from '../pages/GamePage';
+import { GamePageTournament } from '../pages/GamePageTournament';
 import { renderRegister } from '../pages/RegisterPage';
 import { renderTestPage } from '../pages/TestPage';
 
@@ -13,6 +14,7 @@ const routes: Record<string, () => void> = {
   '/Login': renderLogin,
   '/ComoJogar': renderHowToPlayPage,
   '/Game': GamePage,
+  '/GameTournament': GamePageTournament,
   '/Register': renderRegister,
   '/Profile': renderTestPage
 };
