@@ -3,7 +3,7 @@ import { createHero } from '../components/Hero';
 import { createCreatorsSection } from '../components/Creators';
 import { createLeaderboardPreview } from '../components/LeaderboardPreview';
 import { createFooter } from '../components/Footer';
-import { hasJWTCookie, hasLocalToken } from '../utils/auth';
+import { hasJWTCookie, hasLocalToken, validateAndCleanAuthState } from '../utils/auth';
 import { navigateTo } from '../router/index';
 
 export async function renderHome(): Promise<void> {
@@ -43,8 +43,16 @@ export async function renderHome(): Promise<void> {
 
   main.appendChild(header);
 
-  // Só tenta carregar o leaderboard se o usuário estiver autenticado
-  const isAuthenticated = hasJWTCookie() || hasLocalToken();
+  // Só tenta carregar o leaderboard se o usuário estiver realmente autenticado
+  // Faz uma verificação mais robusta da autenticação
+  let isAuthenticated = false;
+  
+  try {
+    isAuthenticated = await validateAndCleanAuthState();
+  } catch (error) {
+    console.error('Erro ao validar autenticação:', error);
+    isAuthenticated = false;
+  }
   
   if (isAuthenticated) {
     try {

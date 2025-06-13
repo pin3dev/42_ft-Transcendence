@@ -1,4 +1,5 @@
 import { showToast } from './toast';
+import { clearAllAuthData } from './auth';
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
   try {
@@ -9,6 +10,11 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
    
   // Se receber 401 (Unauthorized) ou 403 (Forbidden)
   if (response.status === 401 || response.status === 403) {
+    console.log('🚨 Sessão expirada ou inválida - limpando dados de autenticação');
+    
+    // Limpa automaticamente os dados de autenticação inválidos
+    clearAllAuthData();
+    
     // Apenas lança um erro sem mostrar toast automaticamente
     throw new Error('Sessão expirada');
   }
