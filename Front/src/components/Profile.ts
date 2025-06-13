@@ -90,8 +90,8 @@ private render(): void {
             <div class="text-neon-pink text-sm">Lose</div>
           </div>
           <div class="text-center">
-            <div class="text-neon-yellow text-xl">${userStats.score}</div>
-            <div class="text-neon-yellow text-sm">Score</div>
+            <div class="text-white text-xl font-semibold">${userStats.score}</div>
+            <div class="text-white text-sm">Score</div>
           </div>
         </div>
       </div>

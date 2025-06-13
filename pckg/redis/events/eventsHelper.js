@@ -3,8 +3,6 @@ const EventTypes = {
     USER_DELETED: "user.deleted",
     MATCH_FINISHED: "match.finished",
     TOURNAMENT_CREATED: "tournament.created",
-    // USER_2FA_VERIFIED: "user.2fa.verified",
-    // EMAIL_SENT: "email.sent"
 };
   
 function buildEvent({ event, source, data, version = "1.0" }) {

@@ -1,6 +1,6 @@
 const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
-const { insertMatch } = require("../infrastructure/db/match_repository");
-const ranking = require("../infrastructure/db/ranking_repository");
+const { insertMatch } = require("../infrastructure/repositories/match_repository");
+const ranking = require("../infrastructure/repositories/ranking_repository");
 const { Match } = require("../domain/Match");
 
 function matchFinished_listener() {

@@ -59,6 +59,12 @@ async function listPending(userId) {
   `, [userId]);
 }
 
+async function deleteAllUserRelations(userId) {
+  return run(
+    `DELETE FROM friends WHERE user_id = ? OR friend_id = ?`,
+    [userId, userId]
+  );
+}
 
 module.exports = {
   findRelation,
@@ -67,4 +73,5 @@ module.exports = {
   listAccepted,
   deleteRelation,
   listPending,
+  deleteAllUserRelations,
 };

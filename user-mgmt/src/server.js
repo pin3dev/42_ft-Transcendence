@@ -1,7 +1,7 @@
 // File: src/server.js
 // Description: This file sets up a Fastify server and registers the profile routes.
 
-const { handleUserRegistered } = require("./events/profile_eventsHandler");
+const { userRegistered_listener } = require("./events/userRegistered_listener");
 const Fastify = require("fastify");
 const fastifyMultipart = require("@fastify/multipart");
 const fastifyStatic = require("@fastify/static");
@@ -63,4 +63,4 @@ fastify.listen({ port: 5000, host: "0.0.0.0" }, (err) => {
   }
 });
 
-handleUserRegistered();
+userRegistered_listener();

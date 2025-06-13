@@ -1,7 +1,7 @@
 async function logout_controller(request, reply) {
   reply
     .clearCookie('jwt', {
-      path: '/', // Garante que está limpando corretamente em todas as rotas
+      path: '/', 
       httpOnly: true,
       sameSite: 'lax',
       secure: false // true se usar HTTPS

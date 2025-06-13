@@ -21,4 +21,6 @@ COPY . .
 RUN mkdir -p /app/data
 
 # Comando padrão de execução
-CMD ["node", "src/server.js"]
+# CMD ["node", "src/server.js"]
+CMD ["sh", "-c", "npx prisma db push --schema=src/infrastructure/schema.prisma && node src/server.js"]
+

@@ -1,6 +1,6 @@
 const { subscribeToEvent, EventTypes } = require("../../pckg/redis/modules.js");
 const { Tournament } = require("../domain/Tournament");
-const { insertTournament, insertPlayers } = require("../infrastructure/db/tournament_repository");
+const { insertTournament, insertPlayers } = require("../infrastructure/repositories/tournament_repository");
 
 
 function tournamentCreated_listener() {

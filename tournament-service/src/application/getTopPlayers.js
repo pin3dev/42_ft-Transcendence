@@ -1,5 +1,5 @@
-const rankingRepo = require("../infrastructure/db/ranking_repository");
-const matchRepo = require("../infrastructure/db/match_repository");
+const rankingRepo = require("../infrastructure/repositories/ranking_repository");
+const matchRepo = require("../infrastructure/repositories/match_repository");
 
 async function getTopPlayers(limit = 5) {
   // Busca os top jogadores do ranking
