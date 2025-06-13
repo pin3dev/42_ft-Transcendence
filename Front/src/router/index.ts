@@ -57,6 +57,10 @@ export function initializeRouter() {
 
 // Função para navegar sem recarregar a página
 export function navigateTo(url: string) {
+  if (window.location.pathname === url) {
+    // Já está na rota desejada, não faz nada
+    return;
+  }
   window.history.pushState(null, '', url);
   renderPage();
 }
