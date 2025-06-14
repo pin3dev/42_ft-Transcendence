@@ -10,14 +10,16 @@ import { ParametersVariables } from './ParametersVariables';
 export class Server{
 
 private _parametersVariables : ParametersVariables;
+private _JWTpublicKey : string;
 
-constructor(paratersVariables: ParametersVariables){
+constructor(paratersVariables: ParametersVariables, JWTpublicKey : string){
 	this._parametersVariables = paratersVariables;
+	this._JWTpublicKey = JWTpublicKey;
 }
 
 public startServer() {
 
-	const api = new API();
+	const api = new API(this._JWTpublicKey);
 
 	const clients = new Map<WebSocket, WebSocketUserSession>();
 
