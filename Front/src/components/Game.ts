@@ -279,8 +279,8 @@ export function renderPongGame(container: HTMLElement): () => void {
       const userId = localStorage.getItem('user_id');
       
       // Exemplo de autenticação
-      ws?.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken, userId } }));
-      console.log('Enviando autenticação:', { type: "AUTHENTICATION_MAKE", value: { userToken, userId } });
+      ws?.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken, userId } }));
+      console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
     ws.onmessage = (event) => {
