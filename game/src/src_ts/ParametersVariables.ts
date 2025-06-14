@@ -101,7 +101,7 @@ export class ParametersVariables {
 	}
 
 	public getTypeOfEnvironment() : TypeOfEnvironment{
-		return (this._isTestEnviroment) ? TypeOfEnvironment.TEST : TypeOfEnvironment.TEST;
+		return (this._isTestEnviroment) ? TypeOfEnvironment.TEST : TypeOfEnvironment.PROD;
 	}
 
 	private printErrorParameterDoesntExist(parameterName: string): void {
