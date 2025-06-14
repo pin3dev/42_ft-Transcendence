@@ -1,3 +1,4 @@
+import { TypeOfEnvironment } from "../ParametersVariables";
 import { NetUserStatusLogin } from "./net/NetUserStatusLogin";
 import { TestUserStatusLogin } from "./test/TestUserStatusLogin";
 import { Status, UserStatusLogin } from "./UserStatusLogin";
@@ -6,8 +7,8 @@ export class UserStatusLoginStrategy implements UserStatusLogin {
 
 	private _userStatusLogin: UserStatusLogin;
 
-	constructor(typeOfEnvironment: string) {
-		if (typeOfEnvironment === 'test') {
+	constructor(typeOfEnvironment: TypeOfEnvironment) {
+			if (typeOfEnvironment === TypeOfEnvironment.TEST) {
 			this._userStatusLogin = new TestUserStatusLogin();
 		} else {
 			this._userStatusLogin = new NetUserStatusLogin();

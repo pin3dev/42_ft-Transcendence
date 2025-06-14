@@ -18,11 +18,11 @@ export class API {
 	private authenticationHandlerAPI: AuthenticationHandlerAPI;
 	private tournamentHandlerAPI : TournamentHandlerAPI;
 
-	constructor() {
+	constructor(JWTpublicKey : string) {
 		this._userStatus = new UserStatus();
 
 		this.gameHandlerAPI = new GameHandlerAPI();
-		this.authenticationHandlerAPI = new AuthenticationHandlerAPI(this._userStatus);
+		this.authenticationHandlerAPI = new AuthenticationHandlerAPI(this._userStatus, JWTpublicKey);
 		this.tournamentHandlerAPI = new TournamentHandlerAPI(this.gameHandlerAPI.getMapgamesGlobal());
 	}
 

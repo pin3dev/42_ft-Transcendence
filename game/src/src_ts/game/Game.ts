@@ -10,6 +10,7 @@ import { SaveRating } from "./SaveRating";
 import { GameScoreboard } from "./GameScoreboard";
 import { Tournament } from "../tournament/Tournament";
 import { TournamentPlayer } from "../tournament/TournamentPlayer";
+import { TypeOfEnvironment } from "../ParametersVariables";
 
 export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 export type GamePlayersStatus = 'ON_LINE' | 'PLAYER_1_DISCONNECTED' | 'PLAYER_2_DISCONNECTED';
