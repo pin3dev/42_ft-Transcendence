@@ -6,6 +6,7 @@ import { createFooter } from '../components/Footer';
 import { createMatchHistory } from '../components/MatchHistory';
 import { FriendsList, type Friend } from '../components/friends-list';
 import { renderUserProfilePage } from '../pages/FriendProfilePage';
+import { userStatusSocket } from '../services/UserStatusSocket'; // 1. IMPORTAR O NOVO MÓDULO
 // Mock data - em produção viria de uma API
 const mockUserProfile = {
   name: 'Player1',
@@ -277,6 +278,11 @@ export async function renderTestPage(): Promise<void> {
       });
     }
   });
+
+  if (userStats && userStats.user_id) { // Garante que não é o mock data
+    userStatusSocket.connect();
+  }
+
   
   const profileElement = profileSection.getElement();
 
