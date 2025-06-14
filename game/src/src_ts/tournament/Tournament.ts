@@ -26,7 +26,7 @@ export enum RoundStatus {
 	ROUND_GOING_ON
 }
 
-export class Tournament implements GameTournamentListener, WebSocketUserSessionListener {
+export class Tournament implements GameTournamentListener {
 
 	public static readonly MAX_PLAYERS = 16;
 
@@ -148,6 +148,7 @@ export class Tournament implements GameTournamentListener, WebSocketUserSessionL
 		if (tournamentPlayer !== undefined) {
 			tournamentPlayer.isOnline = false;
 		}
+
 	}
 
 	public start() {
@@ -307,28 +308,7 @@ export class Tournament implements GameTournamentListener, WebSocketUserSessionL
 		}
 	}
 
-
 	// ------------------- interfaces methods start -------------------
-
-	// messages from user
-	// all messages here MUST BE of the GAME type
-	message(ws: WebSocketUserSession, messageFromClient: Message): void {
-		console.warn('Tournament: message was called');
-	}
-
-	close(ws: WebSocketUserSession): void {
-
-		let gamePlayer = this._tournamentPlayers.get(ws);
-
-		let playerGame = this.getPlayerGame(ws);
-		if (!playerGame) {
-			return;
-		}
-
-		playerGame.playerExit(gamePlayer!);
-
-		this._globalGamesMap.delete(playerGame.getId);
-	}
 
 	playerMakePoint(gameScoreboard: GameScoreboard): void {
 		this._overallScoreboardOfTheRound.addGameScoreboard(gameScoreboard);
