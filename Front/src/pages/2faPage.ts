@@ -1,6 +1,8 @@
 import { createFooter } from '../components/Footer';
 import { createNavbar } from '../components/Navbar';
 import { showToast } from '../utils/toast';
+import { extractAndStoreAuthData } from '../utils/cookieUtils';
+import { ensureAuthDataAvailable } from '../utils/auth';
 
 export function render2FAPage(qrCode?: string | null): void {
   const root = document.getElementById('root');
@@ -89,28 +91,11 @@ function render2FAInput(container?: HTMLElement): void {
         throw new Error('Código inválido.');
       }
 
-      // Após autenticação bem-sucedida, buscar dados do usuário para salvar no localStorage
-      try {
-        const profileResponse = await fetch('/user/profile', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          // Salvar dados do usuário no localStorage para a navbar detectar
-          localStorage.setItem('userName', profileData.name);
-          if (profileData.avatar_url) {
-            localStorage.setItem('userAvatar', profileData.avatar_url);
-          }
-          console.log('✅ Dados do usuário salvos no localStorage:', profileData);
-        }
-      } catch (profileError) {
-        console.warn('Não foi possível carregar dados do perfil, mas login foi bem-sucedido:', profileError);
-      }
+      // Garante que todos os dados de autenticação estejam disponíveis
+      await ensureAuthDataAvailable();
 
       showToast('Autenticação concluída com sucesso!', 'success');
-      localStorage.removeItem('user_id');
+      // Não remove o user_id pois é necessário para outras funcionalidades
       window.location.href = '/Profile';
     } catch (error) {
       console.error('Erro ao verificar o código 2FA:', error);

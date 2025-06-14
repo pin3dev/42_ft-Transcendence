@@ -192,3 +192,86 @@ export async function recheckAuthenticationState(): Promise<boolean> {
   console.log('✅ Autenticação válida confirmada');
   return true;
 }
+
+/**
+ * Busca e armazena dados essenciais de autenticação quando necessário
+ * Esta função é útil para quando os dados não estão no localStorage
+ * @returns Promise<boolean> - true se conseguiu obter os dados necessários
+ */
+export async function ensureAuthDataAvailable(): Promise<boolean> {
+  // Se já temos os dados essenciais, não precisa fazer nada
+  const hasToken = localStorage.getItem('userToken');
+  const hasUserId = localStorage.getItem('user_id');
+  
+  if (hasToken && hasUserId) {
+    console.log('✅ Dados de autenticação já disponíveis');
+    return true;
+  }
+  
+  console.log('🔍 Buscando dados de autenticação...');
+  
+  try {
+    // Tenta buscar dados do perfil do usuário
+    const profileResponse = await fetch('/user/profile', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (profileResponse.ok) {
+      const profileData = await profileResponse.json();
+      
+      // Armazena user_id se disponível
+      if (profileData.id && !hasUserId) {
+        localStorage.setItem('user_id', profileData.id.toString());
+        console.log('✅ user_id armazenado:', profileData.id);
+      }
+      
+      // Se não temos token, tenta várias estratégias para obter o JWT
+      if (!hasToken) {
+        // Estratégia 1: Busca JWT no cookie (pode não funcionar se for HTTP-only)
+        const cookies = document.cookie.split(';');
+        const jwtCookie = cookies.find(cookie => cookie.trim().startsWith('jwt='));
+        
+        if (jwtCookie) {
+          const token = jwtCookie.split('=')[1];
+          localStorage.setItem('userToken', token);
+          console.log('✅ JWT extraído do cookie');
+        } else {
+          // Estratégia 2: Solicita um novo JWT ao servidor
+          console.log('🔄 Tentando obter JWT do servidor...');
+          try {
+            const jwtResponse = await fetch('/auth/get-token', {
+              method: 'GET',
+              credentials: 'include'
+            });
+            
+            if (jwtResponse.ok) {
+              const jwtData = await jwtResponse.json();
+              if (jwtData.token) {
+                localStorage.setItem('userToken', jwtData.token);
+                console.log('✅ JWT obtido do servidor');
+              } else {
+                console.warn('❌ Servidor não retornou token JWT');
+                return false; // Falha na autenticação
+              }
+            } else {
+              console.warn('❌ Não foi possível obter JWT do servidor');
+              return false; // Falha na autenticação
+            }
+          } catch (error) {
+            console.warn('❌ Erro ao solicitar JWT:', error);
+            return false; // Falha na autenticação
+          }
+        }
+      }
+      
+      return true;
+    } else {
+      console.warn('❌ Não foi possível buscar dados do perfil');
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Erro ao buscar dados de autenticação:', error);
+    return false;
+  }
+}

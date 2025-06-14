@@ -3,6 +3,7 @@ const { twoFA_controller } = require("../controllers/twoFA_controller");
 const { register_controller } = require("../controllers/register_controller");
 const { login_controller } = require("../controllers/login_controller");
 const { logout_controller } = require("../controllers/logout_controller");
+const { getToken_controller } = require("../controllers/getToken_controller");
 
 module.exports = async function (fastify) {
   fastify.post("/auth/2fa", {
@@ -22,5 +23,10 @@ module.exports = async function (fastify) {
 
   fastify.post("/auth/logout", {
     handler: logout_controller
+  });
+
+  // Rota protegida para obter JWT token (para WebSocket)
+  fastify.get("/auth/get-token", {
+    handler: getToken_controller
   });
 };
