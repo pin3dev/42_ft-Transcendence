@@ -1,5 +1,6 @@
 const { listAccepted } = require("../infrastructure/db/friends_repository");
 const profileRepo = require("../infrastructure/db/profile_repository");
+const { getCache } = require("../../pckg/redis/modules");
 
 async function getFriends(userId) {
   try {
@@ -16,25 +17,40 @@ async function getFriends(userId) {
 
     const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
 
-    return rows.map(row => {
-      const fid = row.user_id === userId ? row.friend_id : row.user_id;
-      // const profile = profiles.find(p => p.user_id === fid);
+    // Mapear os amigos com status online/offline
+    const friendsWithStatus = await Promise.all(
+      rows.map(async (row) => {
+        const fid = row.user_id === userId ? row.friend_id : row.user_id;
 
-      let profile = null;
-      if (Array.isArray(profiles)) {
-        profile = profiles.find(p => p.user_id === fid);
-      }
+        let profile = null;
+        if (Array.isArray(profiles)) {
+          profile = profiles.find(p => p.user_id === fid);
+        }
 
-      return {
-        user_id: fid,
-        status: row.status || "ACCEPTED",
-        name: profile?.name || "Desconhecido",
-        avatar_url: profile?.avatar_path
-          ? `${GATEWAY}/static${profile.avatar_path}`
-          : `${GATEWAY}/static/avatars/default.png`,
-        since: row.updated_at,
-      };
-    });
+        // Verificar status online no cache
+        let isOnline = false;
+        try {
+          const onlineStatus = await getCache(`user_id:${fid}`);
+          isOnline = onlineStatus ? JSON.parse(onlineStatus) === true : false;
+        } catch (error) {
+          console.warn(`⚠️ Erro ao verificar status online para user ${fid}:`, error);
+          isOnline = false;
+        }
+
+        return {
+          user_id: fid,
+          status: row.status || "ACCEPTED",
+          name: profile?.name || "Desconhecido",
+          avatar_url: profile?.avatar_path
+            ? `${GATEWAY}/static${profile.avatar_path}`
+            : `${GATEWAY}/static/avatars/default.png`,
+          since: row.updated_at,
+          is_online: isOnline,
+        };
+      })
+    );
+
+    return friendsWithStatus;
   } catch (err) {
     console.error("❌ Erro ao buscar amigos:", err);
     throw new Error("Erro ao listar amizades.");
