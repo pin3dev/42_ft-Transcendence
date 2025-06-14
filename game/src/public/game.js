@@ -37,118 +37,131 @@ function connect() {
 
 	ws.onopen = () => {
 
-		ws.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken: "123456", userId: "xxxxx" } }));
+		ws.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken: "123456", userId: "xxxxx" } }));
 
-		statusDiv.textContent = 'Conectado! Aguardando outro jogador...';
-		ws.send(JSON.stringify({ type: 'GAME_CREATE_GLOBAL_MATCH' }));
-	};
-
-	ws.onmessage = (event) => {
-		const data = JSON.parse(event.data);
-
-		switch (data.type) {
-			case 'OK_USER_AUTHENTICATED':
-				break;
-
-			case 'GAME_WAITING_NEW_PLAYER':
-				statusDiv.textContent = 'Esperando outro jogador se conectar...';
-				break;
-
-			case 'GAME_CAN_START':
-				statusDiv.textContent = 'Jogador encontrado! Clique em Start para começar.';
-				startButton.style.display = 'inline-block';
-				break;
-
-			case 'GAME_FULL':
-				playerIndex = data.paddle_player_1_width_position === 10 ? 0 : 1;
-				statusDiv.textContent = 'Jogo completo! Preparando para iniciar...';
-				updateInformation(data.value);
-				updateGameState(data.value);
-				drawGame();
-				break;
-
-			case 'GAME_COUNT_DOWN':
-				statusDiv.textContent = `Começando em: ${data.value}`;
-				if (data.value === 0) {
-					matchStarted = true;
-					statusDiv.textContent = 'Jogo iniciado! Use ↑ e ↓ para mover o paddle.';
-				}
-				break;
-
-			case 'GAME_STATUS':
-				updateGameState(data.value);
-				drawGame();
-				break;
-
-			case 'GAME_PLAYER_WIN':
-				statusDiv.textContent = `Você venceu!`;
-				matchStarted = false;
-				startButton.style.display = 'none';
-				break;
-
-			case 'GAME_PLAYER_LOSE':
-				statusDiv.textContent = `Você perdeu!`;
-				matchStarted = false;
-				startButton.style.display = 'none';
-				break;
-			case 'GAME_PLAYER_DRAW':
-				statusDiv.textContent = 'Empate!';
-				matchStarted = false;
-				startButton.style.display = 'none';
-				break;
-			case 'GAME_ABORTED':
-				statusDiv.textContent = 'Partida abortada. Um jogador saiu.';
-				matchStarted = false;
-				startButton.style.display = 'none';
-				break;
-
-			default:
-				console.warn('Tipo de mensagem não tratado:', data.type);
-		}
-	};
-
-	ws.onclose = () => {
-		statusDiv.textContent = 'Conexão perdida com o servidor.';
-		matchStarted = false;
-		startButton.style.display = 'none';
+		//statusDiv.textContent = 'Conectado! Aguardando outro jogador...';
+		//ws.send(JSON.stringify({ type: 'GAME_CREATE_GLOBAL_MATCH' }));
 	};
 }
 
-function updateGameState(value) {
-	if (value.positions.paddles.player_1.y !== undefined)
-		gameState.paddle1.y = value.positions.paddles.player_1.y;
+ws.onmessage = (event) => {
+	const data = JSON.parse(event.data);
 
-	if (value.positions.paddles.player_1.x !== undefined)
-		gameState.paddle1.x = value.positions.paddles.player_1.x;
+	switch (data.type) {
+		case 'OK_USER_AUTHENTICATED':
+			break;
 
-	if (value.positions.paddles.player_2.y !== undefined)
-		gameState.paddle2.y = value.positions.paddles.player_2.y;
+		case 'GAME_WAITING_NEW_PLAYER':
+			statusDiv.textContent = 'Esperando outro jogador se conectar...';
+			break;
 
-	if (value.positions.paddles.player_2.x !== undefined)
-		gameState.paddle2.x = value.positions.paddles.player_2.x;
+		case 'GAME_CAN_START':
+			statusDiv.textContent = 'Jogador encontrado! Clique em Start para começar.';
+			startButton.style.display = 'inline-block';
+			break;
 
-	if (value.positions.ball.y !== undefined)
-		gameState.ball.y = value.positions.ball.y;
+		case 'GAME_FULL':
+			playerIndex = data.paddle_player_1_width_position === 10 ? 0 : 1;
+			statusDiv.textContent = 'Jogo completo! Preparando para iniciar...';
+			updateInformation(data.value);
+			updateGameState(data);
+			drawGame();
+			break;
 
-	if (value.positions.ball.x !== undefined)
-		gameState.ball.x = value.positions.ball.x;
+		case 'GAME_COUNT_DOWN':
+			statusDiv.textContent = `Começando em: ${data.value}`;
+			if (data.value === 0) {
+				matchStarted = true;
+				statusDiv.textContent = 'Jogo iniciado! Use ↑ e ↓ para mover o paddle.';
+			}
+			break;
 
-	if (value.scoreboard.player_1 !== undefined)
-		gameState.score1 = value.scoreboard.player_1;
+		case 'GAME_STATUS':
+			updateGameState(data.value);
+			drawGame();
+			break;
 
-	if (value.scoreboard.player_2 !== undefined)
-		gameState.score2 = value.scoreboard.player_2;
+		case 'GAME_PLAYER_WIN':
+			statusDiv.textContent = `Você venceu!`;
+			matchStarted = false;
+			startButton.style.display = 'none';
+			break;
+
+		case 'GAME_PLAYER_LOSE':
+			statusDiv.textContent = `Você perdeu!`;
+			matchStarted = false;
+			startButton.style.display = 'none';
+			break;
+
+		case 'GAME_ABORTED':
+			statusDiv.textContent = 'Partida abortada. Um jogador saiu.';
+			matchStarted = false;
+			startButton.style.display = 'none';
+			break;
+
+		default:
+			console.warn('Tipo de mensagem não tratado:', data.type);
+	}
+};
+
+ws.onclose = () => {
+	statusDiv.textContent = 'Conexão perdida com o servidor.';
+	matchStarted = false;
+	startButton.style.display = 'none';
+};
+
+
+function updateGameState(data) {
+	if (data.paddle_player_1_height_position !== undefined)
+		gameState.paddle1.y = data.paddle_player_1_height_position;
+
+	if (data.paddle_player_1_width_position !== undefined)
+		gameState.paddle1.x = data.paddle_player_1_width_position;
+
+	if (data.paddle_player_2_height_position !== undefined)
+		gameState.paddle2.y = data.paddle_player_2_height_position;
+
+	if (data.paddle_player_2_width_position !== undefined)
+		gameState.paddle2.x = data.paddle_player_2_width_position;
+
+	if (data.ball_height_position !== undefined)
+		gameState.ball.y = data.ball_height_position;
+
+	if (data.ball_width_position !== undefined)
+		gameState.ball.x = data.ball_width_position;
+
+	if (data.scoreboard_player_1 !== undefined)
+		gameState.score1 = data.scoreboard_player_1;
+
+	if (data.scoreboard_player_2 !== undefined)
+		gameState.score2 = data.scoreboard_player_2;
 }
 
-function updateInformation(value) {
+function updateInformation(game) {
 
-	gameState.field_width = value.sizes.field.width;
-	gameState.field_height = value.sizes.field.height;
+	gameState.field_width = game.field_width;
+	gameState.field_height = game.field_height;
 
-	gameState.paddle_width = value.sizes.paddles.width;
-	gameState.paddle_height = value.sizes.paddles.height;
+	gameState.width = game.paddle_width;
+	gameState.paddle_height = game.paddle_height;
 
-	gameState.ball_size = value.sizes.ball;
+	gameState.ball_size = game.ball_size;
+
+	if (game.paddle_player_1_height_position !== undefined)
+		gameState.paddle1.y = game.paddle_player_1_height_position;
+
+	if (game.paddle_player_1_width_position !== undefined)
+		gameState.paddle1.x = game.paddle_player_1_width_position;
+
+	if (game.paddle_player_2_height_position !== undefined)
+		gameState.paddle2.y = game.paddle_player_2_height_position;
+
+	if (game.paddle_player_2_width_position !== undefined)
+		gameState.paddle2.x = game.paddle_player_2_width_position;
+
+	console.log(game);
+	console.log('atualizado');
+
 }
 
 // Desenhar tudo no canvas
@@ -161,10 +174,10 @@ function drawGame() {
 
 	// Paddle 1
 	ctx.fillStyle = 'white';
-	ctx.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.paddle_width, gameState.paddle_height);
+	ctx.fillRect(gameState.paddle1.x, gameState.paddle1.y, gameState.width, gameState.paddle_height);
 
 	// Paddle 2
-	ctx.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.paddle_width, gameState.paddle_height);
+	ctx.fillRect(gameState.paddle2.x, gameState.paddle2.y, gameState.width, gameState.paddle_height);
 
 	// Bola
 	ctx.beginPath();
@@ -204,8 +217,10 @@ window.addEventListener('keyup', (e) => {
 
 	if (e.key === 'ArrowUp') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
+		console.log('soltando a seta')
 	} else if (e.key === 'ArrowDown') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
+		console.log('soltando a seta')
 	}
 
 });
