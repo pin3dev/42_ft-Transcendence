@@ -11,7 +11,7 @@ export class TournamentPlayer extends GamePlayer{
 	private _pointsMake: number = 1;       // points scored in all matches played
 
 	constructor(isOnline: boolean, webSocketUserSession: WebSocketUserSession) {
-		super(webSocketUserSession);
+		super(isOnline, webSocketUserSession);
 	}
 
 	public get position(): number {

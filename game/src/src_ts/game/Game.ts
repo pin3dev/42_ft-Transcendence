@@ -6,6 +6,10 @@ import { MessageWithValue } from "../message/MessageWithValue";
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { Sender } from "../Sender";
 import { GamePlayer } from "./GamePlayer";
+import { SaveRating } from "./SaveRating";
+import { GameScoreboard } from "./GameScoreboard";
+import { Tournament } from "../tournament/Tournament";
+import { TournamentPlayer } from "../tournament/TournamentPlayer";
 
 export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 export type GamePlayersStatus = 'ON_LINE' | 'PLAYER_1_DISCONNECTED' | 'PLAYER_2_DISCONNECTED';
@@ -37,6 +41,8 @@ export abstract class Game {
 
 	private countDown = Game.START_COUNT_DOWN_VALUE;
 
+	private saveRating : SaveRating;
+
 	private keys = {
 		paddle_left_up: false,
 		paddle_left_down: false,
@@ -58,6 +64,8 @@ export abstract class Game {
 
 		this.gameLoopInterval = undefined;
 		this.countDownInterval = undefined;
+
+		this.saveRating = new SaveRating();
 	}
 
 	public createMatch(player1: GamePlayer, player2: GamePlayer) {
@@ -88,7 +96,7 @@ export abstract class Game {
 
 		if (this.gameStatus !== 'RUNNING') return;
 
-		if (player === this.gamePlayers[0]) {
+		if (player === this.gamePlayers[Game.PLAYER_1]) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_left_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -100,7 +108,7 @@ export abstract class Game {
 			}
 			this.updatePaddleSpeeds();
 		}
-		else if (player === this.gamePlayers[1]) {
+		else if (player === this.gamePlayers[Game.PLAYER_2]) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_right_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -114,17 +122,17 @@ export abstract class Game {
 		}
 	}
 
+	// 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
+
 	public abort() {
-		if (this.gameStatus !== 'RUNNING') return;
+		if (this.gameStatus === 'FINISHED') return ;
 		this.broadcast('GAME_ABORTED');
 		this.stop();
 	}
 
-
 	public playerExit(playerDisconnected: GamePlayer) {
 
-		if (this.gameStatus !== 'RUNNING') {
-			this.gameStatus = 'RUNNING';
+		if (this.gameStatus !== 'RUNNING'){
 			this.abort();
 		}
 
@@ -166,6 +174,7 @@ export abstract class Game {
 	// --------------------------- end stop routines ---------------------------
 
 	private stop() {
+
 		this.gameStatus = 'FINISHED';
 
 		this.stopCountDownRoutine();
@@ -227,17 +236,25 @@ export abstract class Game {
 			this.scoreboard[Game.PLAYER_2]++;
 			this.playerMakePoint(this.gamePlayers[Game.PLAYER_2]);
 			this.resetBall();
+			this.sendMessageGameStatus();
 		} else if (this.ball.x > Field.WIDTH) {
 			this.scoreboard[Game.PLAYER_1]++;
 			this.playerMakePoint(this.gamePlayers[Game.PLAYER_1]);
 			this.resetBall();
+			this.sendMessageGameStatus();
 		}
 
 		if (this.checkIfAnyPlayerWon() || this.checkIfAPlayerHasDisconnected()) {
 
-			//------------------------------------------------------------------------------------------
-			//save game in database
-			//------------------------------------------------------------------------------------------
+			let player1 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_1].webSocketUserSession);
+			let player2 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_2].webSocketUserSession);
+
+			let gameScoreboard = new GameScoreboard(player1, player2);
+			gameScoreboard.playerMakePoint(player1, this.scoreboard[Game.PLAYER_1]);
+			gameScoreboard.playerMakePoint(player1, this.scoreboard[Game.PLAYER_2]);
+
+			this.saveRating.saveRating(gameScoreboard);
+
 			this.gameEnd();
 			this.stop();
 		}
@@ -310,10 +327,10 @@ export abstract class Game {
 
 		// Check if someone won
 		if (this.scoreboard[Game.PLAYER_1] >= Game.WINNING_SCORE) {
-			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_1], this.gamePlayers[Game.PLAYER_1]);
+			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_1], this.gamePlayers[Game.PLAYER_2]);
 			return true;
 		} else if (this.scoreboard[Game.PLAYER_2] >= Game.WINNING_SCORE) {
-			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_2], this.gamePlayers[2]);
+			this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_2], this.gamePlayers[Game.PLAYER_1]);
 			return true;
 		} else if ((this.scoreboard[Game.PLAYER_1] + this.scoreboard[Game.PLAYER_2]) == Game.MAX_POINTS) {
 			this.sendMessageDraw();
@@ -425,12 +442,13 @@ export abstract class Game {
 	}
 
 	private broadcast(messageType: MessageType, obj?: Object) {
-		this.sendMessageToPlayer(this.gamePlayers[0], messageType, obj);
-		this.sendMessageToPlayer(this.gamePlayers[1], messageType, obj);
+		this.sendMessageToPlayer(this.gamePlayers[Game.PLAYER_1], messageType, obj);
+		this.sendMessageToPlayer(this.gamePlayers[Game.PLAYER_2], messageType, obj);
 	}
 
 	private sendMessageToPlayer(player: GamePlayer, messageType: MessageType, obj?: Object) {
-		if (this.gameStatus == 'FINISHED') return;
+
+		if (this.gameStatus === 'FINISHED') return;
 
 		if (!player.isOnline) return;
 

@@ -4,9 +4,9 @@ import { FatalErrorMessage } from './FatalErrorMessage';
 import { Message, MessageType } from './Message';
 import { MessageWithValue } from './MessageWithValue';
 
-export class MessageParser{
+export class MessageParser {
 
-	public static messageFromJSON(message: RawData): Message | MessageWithValue<any>{
+	public static messageFromJSON(message: RawData): Message | MessageWithValue<any> {
 
 		let json = undefined;
 
@@ -21,9 +21,22 @@ export class MessageParser{
 		if (Message.authenticationMessageTypeRequest.has(type)) {
 			return MessageParser.createAuthenticationMessage(type, value);
 		} else if (Message.messageTypeRequest.has(type)) {
+			return this.createTournamentMessage(type, value);
+		}
+		else if (Message.messageTypeRequest.has(type)) {
 			return new MessageWithValue<any>(type, value);
 		}
 		return new FatalErrorMessage('FATAL_ERROR_INVALID_TYPE_MESSAGE');
+	}
+
+	private static createTournamentMessage(type: MessageType, value: any) {
+		if (type === 'TOURNAMENT_CREATE') {
+			if (!this.isNumber(value)){
+				return new FatalErrorMessage('FATAL_ERROR_INVALID_VALUE_PROPERTY');
+			}
+			return new MessageWithValue<number>(type, value);
+		}
+		return new Message(type);
 	}
 
 	private static createAuthenticationMessage(type: MessageType, value: object) {
@@ -41,6 +54,10 @@ export class MessageParser{
 			typeof val.userToken === 'string' &&
 			typeof val.userId === 'string'
 		);
+	}
+
+	private static isNumber(val: any): val is number {
+		return typeof val === 'number';
 	}
 
 }

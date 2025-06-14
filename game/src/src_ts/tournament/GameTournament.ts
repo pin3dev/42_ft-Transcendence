@@ -20,7 +20,7 @@ export class GameTournament extends Game{
 	}
 
 	public gameEnd(): void {
-		this._gameListener.playerEnd(this._gameScoreboard);
+		this._gameListener.playEnded(this._gameScoreboard);
 	}
 
 }
