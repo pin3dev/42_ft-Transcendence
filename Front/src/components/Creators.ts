@@ -64,8 +64,7 @@ const creatorsData: Creator[] = [
 // Função auxiliar para criar o card de um colaborador (COM TAMANHOS REDUZIDOS)
 function createCreatorCard(creator: Creator): HTMLElement {
   const card = document.createElement('div');
-  // Reduzido padding (p-4), mantido flex para alinhamento interno.
-  card.className = 'bg-arcade-dark p-4 rounded-lg shadow-lg text-center flex flex-col items-center';
+  card.className = 'bg-arcade-dark p-4 rounded-lg shadow-lg text-center flex flex-col items-center border border-white';
 
   const image = document.createElement('img');
   image.src = creator.imageUrl;
@@ -117,7 +116,7 @@ function createCreatorCard(creator: Creator): HTMLElement {
 
 export function createCreatorsSection(): HTMLElement {
   const section = document.createElement('section');
-  section.className = 'py-12 bg-arcade-darker-creator'; // Pode reduzir o py-16 para py-12 também
+  section.className = 'py-12 bg-transparent'; // Fundo transparente para não cortar o gradiente
 
   const container = document.createElement('div');
   container.className = 'container mx-auto px-4 md:px-6'; // Pode reduzir o px-6 para px-4
