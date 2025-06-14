@@ -124,7 +124,17 @@ async function buildServer() {
   // Proxy: Auth
   app.register(createServiceProxy({
     prefix: "/auth",
-    target: "http://auth-service:4000"
+    target: "http://auth-service:4000",
+    onRequest: async (request, reply) => {
+      if (request.method === 'OPTIONS') return;
+      
+      // Apenas protege a rota /auth/get-token
+      if (request.url === '/auth/get-token') {
+        await app.authenticate(request, reply);
+        request.headers['x-user-id'] = request.user.user_id;
+        request.headers['x-user-email'] = request.user.email;
+      }
+    }
   }));
 
   // Proxy: Teste protegido
