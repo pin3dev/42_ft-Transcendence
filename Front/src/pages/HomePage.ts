@@ -24,7 +24,6 @@ export async function renderHome(): Promise<void> {
   main.className = 'flex-grow container mx-auto px-4 py-8';
   
   main.appendChild(createHero());
-  main.appendChild(createCreatorsSection());
 
   // Header do leaderboard
   const header = document.createElement('div');
@@ -99,6 +98,9 @@ export async function renderHome(): Promise<void> {
     
     main.appendChild(loginPromptDiv);
   }
+
+  // Agora a seção de criadores vem por último
+  main.appendChild(createCreatorsSection());
 
   container.appendChild(main);
   container.appendChild(createFooter());
