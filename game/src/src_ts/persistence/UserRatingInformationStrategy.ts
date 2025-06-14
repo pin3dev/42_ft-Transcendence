@@ -1,3 +1,4 @@
+import { TypeOfEnvironment } from "../ParametersVariables";
 import { NetUserRatingInformation } from "./net/NetUserRatingInformation";
 import { TestUserRatingInformation } from "./test/TestUserRatingInformation";
 import { UserRatingInformation } from "./UserRatingInformation";
@@ -6,8 +7,8 @@ export class UserRatingInformationStrategy implements UserRatingInformation {
 
 	private _userRatingInformation: UserRatingInformation;
 
-	constructor(typeOfEnvironment: string) {
-		if (typeOfEnvironment === 'test') {
+	constructor(typeOfEnvironment: TypeOfEnvironment) {
+			if (typeOfEnvironment === TypeOfEnvironment.TEST) {
 			this._userRatingInformation = new TestUserRatingInformation();
 		} else {
 			this._userRatingInformation = new NetUserRatingInformation();

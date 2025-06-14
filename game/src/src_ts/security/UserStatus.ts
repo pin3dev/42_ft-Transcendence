@@ -1,3 +1,4 @@
+import { GameAPISingleton } from "../GameAPISingleton";
 import { Status, UserStatusLogin } from "../persistence/UserStatusLogin";
 import { UserStatusLoginStrategy } from "../persistence/UserStatusLoginStrategy";
 
@@ -8,7 +9,7 @@ export class UserStatus {
 
 	constructor() {
 		this._usersStatus = new Map<string, number>();
-		this._userStatusLogin =  new UserStatusLoginStrategy('test');
+		this._userStatusLogin =  new UserStatusLoginStrategy(GameAPISingleton.getTypeOfEnvironment());
 
 	}
 

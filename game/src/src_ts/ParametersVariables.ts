@@ -1,3 +1,7 @@
+export enum TypeOfEnvironment{
+	TEST,
+	PROD
+}
 
 export class ParametersVariables {
 
@@ -94,6 +98,10 @@ export class ParametersVariables {
 		this._isTestEnviroment = isTestEnv;
 
 		return true;
+	}
+
+	public getTypeOfEnvironment() : TypeOfEnvironment{
+		return (this._isTestEnviroment) ? TypeOfEnvironment.TEST : TypeOfEnvironment.TEST;
 	}
 
 	private printErrorParameterDoesntExist(parameterName: string): void {

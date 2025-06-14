@@ -22,7 +22,7 @@ services:
       - "443:443"
     depends_on:
       - auth-service
-      - event-bus 
+      - event-bus
       - user-mgmt
     volumes:
       - ./user-mgmt/avatars:/app/static/avatars # acesso a avatars do user-mgmt
@@ -43,7 +43,7 @@ services:
     expose:
       - "4000"
     depends_on:
-      - event-bus  
+      - event-bus
     volumes:
       - auth-data:/app/data  # persistência de DB de autenticação
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
@@ -55,7 +55,7 @@ services:
     networks:
       - internal_network
     expose:
-      - "6379" 
+      - "6379"
     volumes:
       - event-data:/data
 
@@ -66,7 +66,7 @@ services:
     networks:
       - internal_network
     expose:
-      - "5000" 
+      - "5000"
     volumes:
       - user-data:/app/data # persistência de DB e avatares de perfil de usuário
       - ./user-mgmt/avatars:/app/avatars  # acesso a avatars do user-mgmt
@@ -83,6 +83,29 @@ services:
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
       - tournament-data:/app/data # persistência de DB de torneios
+    depends_on:
+      - event-bus
+
+  game-server:
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    container_name: game-server
+    environment:
+      - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
+      - SSL_CERT_BASE64=${SSL_CERT_BASE64}
+      - SSL_KEY_BASE64=${SSL_KEY_BASE64}
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    expose:
+      - "3000"
+      - "3001"
+    networks:
+      - internal_network
+      - external_network
+    volumes:
+      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
     depends_on:
       - event-bus
 

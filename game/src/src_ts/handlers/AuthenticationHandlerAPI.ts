@@ -1,6 +1,8 @@
+import { GameAPISingleton } from "../GameAPISingleton";
 import { Message } from "../message/Message";
 import { MessageWithValue } from "../message/MessageWithValue";
-import { AuthenticatorSimple } from "../security/AuthenticatorSimple";
+import { AuthenticatorJWT } from "../security/AuthenticatorJWT";
+import { AuthenticatorStrategy } from "../security/AuthenticatorStrategy";
 import { UserStatus } from "../security/UserStatus";
 import { Sender } from "../Sender";
 import { WebSocketUserSession } from "../WebSocketUserSession";
@@ -8,9 +10,11 @@ import { WebSocketUserSession } from "../WebSocketUserSession";
 export class AuthenticationHandlerAPI{
 
 	private _userStatus : UserStatus;
+	private _JWTpublicKey : string;
 
-	constructor(_userStatus : UserStatus){
+	constructor(_userStatus : UserStatus, JWTpublicKey : string){
 		this._userStatus = _userStatus;
+		this._JWTpublicKey = JWTpublicKey;
 	}
 
 	public isUserAuthenticated(ws: WebSocketUserSession, messageFromClient: Message | MessageWithValue<any>): boolean {
@@ -24,7 +28,7 @@ export class AuthenticationHandlerAPI{
 				return false;
 			}
 
-			const authenticator = new AuthenticatorSimple();
+			const authenticator = new AuthenticatorStrategy(GameAPISingleton.getTypeOfEnvironment(), this._JWTpublicKey);           //JWT(this._JWTpublicKey);
 
 			if (messageFromClient.getType === 'AUTHENTICATION_LOGIN') {
 

@@ -1,3 +1,5 @@
+import { GameAPISingleton } from "../GameAPISingleton";
+import { TypeOfEnvironment } from "../ParametersVariables";
 import { UserRatingInformation } from "../persistence/UserRatingInformation";
 import { UserRatingInformationStrategy } from "../persistence/UserRatingInformationStrategy";
 import { CalcRating } from "./CalcRating";
@@ -13,7 +15,7 @@ export class SaveRating {
 
 	constructor() {
 		this._calcRating = new CalcRating();
-		this._userRatingInformation = new UserRatingInformationStrategy('test');
+		this._userRatingInformation = new UserRatingInformationStrategy(GameAPISingleton.getTypeOfEnvironment());
 	}
 
 	public saveRating(gameScoreboard: GameScoreboard): void {
