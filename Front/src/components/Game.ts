@@ -46,7 +46,7 @@ import {
 } from './GameUI';
 import { extractAndStoreAuthData } from '../utils/cookieUtils';
 import { ensureAuthDataAvailable } from '../utils/auth';
-import { fetchWithAuth } from '../utils/fetchWithAuth'; 
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 /**
  * Renderiza a página do jogo de Pong e inicializa a lógica.
@@ -54,7 +54,7 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
 
-async function fetchUserName(userId: string) {
+async function fetchUserName(userId: string): Promise<string> {
   if (!userId) {
     console.warn("fetchUserName chamado com ID nulo ou indefinido.");
     return "Jogador";
@@ -311,22 +311,22 @@ export function renderPongGame(container: HTMLElement): () => void {
 
       // Garante que temos os dados de autenticação necessários
       const authReady = await ensureAuthDataAvailable();
-      
+
       if (!authReady) {
         console.error('❌ Não foi possível obter dados de autenticação');
         statusText.textContent = 'Erro de autenticação. Faça login novamente.';
         return;
       }
-      
+
       const userToken = localStorage.getItem('userToken');
       const userId = localStorage.getItem('user_id');
-      
+
       // Exemplo de autenticação
       ws?.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken, userId } }));
       console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async(event) => {
       const data: ServerMessage = JSON.parse(event.data);
       console.log('Mensagem recebida:', data);
       statusText.classList.remove('hidden');
@@ -350,14 +350,27 @@ export function renderPongGame(container: HTMLElement): () => void {
           const { userId1, userId2 } = data.value;
 
           if (userId1 && userId2) {
-           
-            // Atualiza o estado do jogo e a UI
-            gameState.player1Name = fetchUserName(userId1);
-            gameState.player2Name = fetchUserName(userId2);
-            player1NameElement.textContent = fetchUserName(userId1);
-            player2NameElement.textContent = fetchUserName(userId2);
+
+            // 1. Inicia as duas buscas de nome em paralelo.
+            const promises = [
+              fetchUserName(userId1), // Retorna Promise<string>
+              fetchUserName(userId2)  // Retorna Promise<string>
+            ];
+
+            // 2. Usa 'await Promise.all' para esperar que AMBAS as promises terminem.
+            // O resultado será um array com os nomes: [nomeDoJogador1, nomeDoJogador2]
+            const [p1Name, p2Name] = await Promise.all(promises);
+
+            // 3. AGORA, 'p1Name' e 'p2Name' são strings de verdade!
+            // Use essas variáveis para atualizar o estado e a UI.
+            gameState.player1Name = p1Name;
+            gameState.player2Name = p2Name;
+            player1NameElement.textContent = p1Name;
+            player2NameElement.textContent = p2Name;
+
+            console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
           }
-      
+
           // Atualiza o resto do estado do jogo (posições, etc.)
           updateGameState(data.value);
           drawGame();
