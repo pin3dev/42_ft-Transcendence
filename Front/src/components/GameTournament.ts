@@ -291,7 +291,7 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
   /** Conecta ao servidor WebSocket e configura os handlers */
   function connect(): void {
     // ws = new WebSocket(`ws://${window.location.hostname}:3001`); // Use este para produção/desenvolvimento
-    ws = new WebSocket(`ws://${window.location.hostname}:3001`); // Força localhost para testes locais
+    ws = new WebSocket(`wss://${window.location.hostname}:3001`); // Força localhost para testes locais
 
     ws.onopen = () => {
       console.log('Conectado ao servidor WebSocket.');

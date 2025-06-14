@@ -258,13 +258,14 @@ export function renderPongGame(container: HTMLElement): () => void {
   /** Conecta ao servidor WebSocket e configura os handlers */
   function connect(): void {
     // ws = new WebSocket(`ws://${window.location.hostname}:3001`); // Use este para produção/desenvolvimento
-    ws = new WebSocket(`ws://${window.location.hostname}:3001`); // Força localhost para testes locais
+    ws = new WebSocket(`wss://${window.location.hostname}:3001`); // Força localhost para testes locais
 
     ws.onopen = () => {
       console.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
       // Exemplo de autenticação
-      ws?.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken: "123456", userId: "player_ts" } }));
+      ws?.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken: localStorage.getItem('userToken') , userId: localStorage.getItem('userName') } }));
+      console.log('Enviando autenticação:', { type: "AUTHENTICATION_MAKE", value: { userToken: localStorage.getItem('userToken') , userId: localStorage.getItem('userName') } });
     };
 
     ws.onmessage = (event) => {
