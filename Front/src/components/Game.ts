@@ -46,11 +46,48 @@ import {
 } from './GameUI';
 import { extractAndStoreAuthData } from '../utils/cookieUtils';
 import { ensureAuthDataAvailable } from '../utils/auth';
+import { fetchWithAuth } from '../utils/fetchWithAuth'; 
+
 /**
  * Renderiza a página do jogo de Pong e inicializa a lógica.
  * @param container O elemento HTML onde o jogo será renderizado.
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
+
+async function fetchUserName(userId: string) {
+  if (!userId) {
+    console.warn("fetchUserName chamado com ID nulo ou indefinido.");
+    return "Jogador";
+  }
+
+  try {
+    // Usa a função de fetch com autenticação e o endpoint especificado
+    const response = await fetchWithAuth(`/user/search?id=${userId}`);
+
+    if (!response.ok) {
+      console.error(`Erro na API ao buscar usuário ${userId}: Status ${response.status}`);
+      // Retorna um nome padrão que inclui parte do ID para depuração
+      return `Jogador (${userId.slice(0, 5)}...)`;
+    }
+
+    const responseData: any[] = await response.json();
+
+    // Validação crucial: Verifica se a resposta é um array e se não está vazio
+    if (Array.isArray(responseData) && responseData.length > 0) {
+      const user = responseData[0];
+      // Retorna o nome do usuário do primeiro objeto no array
+      return user.name || `Jogador (${userId.slice(0, 5)}...)`;
+    } else {
+      console.warn(`Nenhum usuário encontrado para o ID ${userId} na resposta da API.`);
+      return `Jogador Desconhecido`;
+    }
+
+  } catch (error) {
+    console.error(`Falha de rede ou erro ao buscar o nome do usuário ${userId}:`, error);
+    return 'Jogador (Erro)'; // Indica um erro de conexão
+  }
+}
+
 export function renderPongGame(container: HTMLElement): () => void {
 
   let ui: UIElements | null = null;
@@ -125,6 +162,11 @@ export function renderPongGame(container: HTMLElement): () => void {
   startButton.id = 'accept-match-button';
   startButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
   startButton.textContent = 'Aceitar Partida';
+
+  const AgianButton = document.createElement('button');
+  AgianButton.id = 'accept-match-button-again';
+  AgianButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
+  AgianButton.textContent = 'Aceitar Partida';
 
   const SearchButton = document.createElement('button');
   SearchButton.id = 'accept-match-button';
@@ -265,7 +307,8 @@ export function renderPongGame(container: HTMLElement): () => void {
     ws.onopen = async () => {
       console.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
-      
+      AgianButton.classList.add('hidden');
+
       // Garante que temos os dados de autenticação necessários
       const authReady = await ensureAuthDataAvailable();
       
@@ -298,15 +341,27 @@ export function renderPongGame(container: HTMLElement): () => void {
           statusText.textContent = 'Procurando partida...';
           break;
         case 'GAME_CAN_START':
-          // ui.matchmakingContainer.style.display = 'flex';
-          // ui.matchStatusDisplay.textContent = 'Jogador encontrado! Clique em Aceitar para começar.';
           statusText.textContent = 'Oponente encontrado! Clique para iniciar.';
           startButton.classList.remove('hidden');
           break;
         case 'GAME_FULL':
           statusText.textContent = 'Jogo completo! Preparando para iniciar...';
+
+          const { userId1, userId2 } = data.value;
+
+          if (userId1 && userId2) {
+           
+            // Atualiza o estado do jogo e a UI
+            gameState.player1Name = fetchUserName(userId1);
+            gameState.player2Name = fetchUserName(userId2);
+            player1NameElement.textContent = fetchUserName(userId1);
+            player2NameElement.textContent = fetchUserName(userId2);
+          }
+      
+          // Atualiza o resto do estado do jogo (posições, etc.)
           updateGameState(data.value);
           drawGame();
+          statusText.textContent = 'Tudo pronto! Preparando para iniciar...';
           break;
         case 'GAME_COUNT_DOWN':
           statusText.textContent = `Iniciando em: ${data.value}`;
@@ -326,18 +381,21 @@ export function renderPongGame(container: HTMLElement): () => void {
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Parabéns, você venceu!';
           matchStarted = false;
+          AgianButton.classList.remove('hidden');
 
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Você perdeu! Mais sorte na próxima.';
           matchStarted = false;
+          AgianButton.classList.remove('hidden');
 
           break;
         case 'GAME_ABORTED':
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Partida abortada: o oponente saiu.';
           matchStarted = false;
+          AgianButton.classList.remove('hidden');
 
           break;
         default:
@@ -350,6 +408,7 @@ export function renderPongGame(container: HTMLElement): () => void {
       statusText.textContent = 'Desconectado do servidor. Tente recarregar a página.';
       matchStarted = false;
       startButton.classList.add('hidden');
+      AgianButton.classList.add('hidden');
     };
 
     ws.onerror = (error) => {
@@ -363,6 +422,12 @@ export function renderPongGame(container: HTMLElement): () => void {
   const handleStartClick = () => {
     ws?.send(JSON.stringify({ type: 'GAME_START_MATCH' }));
     startButton.classList.add('hidden');
+    statusText.textContent = 'Aguardando início...';
+  };
+
+  const handleStartAgainClick = () => {
+    ws?.send(JSON.stringify({ type: 'GAME_START_MATCH' }));
+    AgianButton.classList.add('hidden');
     statusText.textContent = 'Aguardando início...';
   };
 
@@ -395,6 +460,7 @@ export function renderPongGame(container: HTMLElement): () => void {
     }
   };
 
+  AgianButton.addEventListener('click', handleStartAgainClick);
   startButton.addEventListener('click', handleStartClick);
   SearchButton.addEventListener('click', handlebuscaClick);
   window.addEventListener('keydown', handleKeyDown);
