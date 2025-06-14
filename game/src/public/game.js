@@ -33,7 +33,7 @@ let gameState = {
 
 // Conecta no WebSocket do servidor
 function connect() {
-	ws = new WebSocket(`ws://${window.location.hostname}:3001`);
+	ws = new WebSocket(`wss://${window.location.hostname}:3001`);
 
 	ws.onopen = () => {
 
