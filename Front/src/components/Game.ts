@@ -53,6 +53,41 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  * @param container O elemento HTML onde o jogo será renderizado.
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
+
+async function fetchUserName(userId: string) {
+  if (!userId) {
+    console.warn("fetchUserName chamado com ID nulo ou indefinido.");
+    return "Jogador";
+  }
+
+  try {
+    // Usa a função de fetch com autenticação e o endpoint especificado
+    const response = await fetchWithAuth(`/user/search?id=${userId}`);
+
+    if (!response.ok) {
+      console.error(`Erro na API ao buscar usuário ${userId}: Status ${response.status}`);
+      // Retorna um nome padrão que inclui parte do ID para depuração
+      return `Jogador (${userId.slice(0, 5)}...)`;
+    }
+
+    const responseData: any[] = await response.json();
+
+    // Validação crucial: Verifica se a resposta é um array e se não está vazio
+    if (Array.isArray(responseData) && responseData.length > 0) {
+      const user = responseData[0];
+      // Retorna o nome do usuário do primeiro objeto no array
+      return user.name || `Jogador (${userId.slice(0, 5)}...)`;
+    } else {
+      console.warn(`Nenhum usuário encontrado para o ID ${userId} na resposta da API.`);
+      return `Jogador Desconhecido`;
+    }
+
+  } catch (error) {
+    console.error(`Falha de rede ou erro ao buscar o nome do usuário ${userId}:`, error);
+    return 'Jogador (Erro)'; // Indica um erro de conexão
+  }
+}
+
 export function renderPongGame(container: HTMLElement): () => void {
 
   let ui: UIElements | null = null;
@@ -315,17 +350,12 @@ export function renderPongGame(container: HTMLElement): () => void {
           const { userId1, userId2 } = data.value;
 
           if (userId1 && userId2) {
-            // Esta chamada agora usa a nova e robusta função fetchUserName
-            const [p1Name, p2Name] = await Promise.all([
-              fetchWithAuth(userId1),
-              fetchWithAuth(userId2)
-            ]);
-            
+           
             // Atualiza o estado do jogo e a UI
-            gameState.player1Name = p1Name;
-            gameState.player2Name = p2Name;
-            player1NameElement.textContent = p1Name;
-            player2NameElement.textContent = p2Name;
+            gameState.player1Name = fetchUserName(userId1);
+            gameState.player2Name = fetchUserName(userId2);
+            player1NameElement.textContent = fetchUserName(userId1);
+            player2NameElement.textContent = fetchUserName(userId2);
           }
       
           // Atualiza o resto do estado do jogo (posições, etc.)
