@@ -156,7 +156,7 @@ async function fetchFriendsList(): Promise<Friend[]> {
     return (data.friends || []).map((friend: any) => ({
       id: friend.user_id,
       name: friend.name,
-      status: 'offline', // ver
+      status: friend.is_online ? 'online' : 'offline',
       avatar: friend.avatar_url
     }));
   } catch (error) {

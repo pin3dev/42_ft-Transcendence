@@ -1,6 +1,6 @@
 const { listAccepted } = require("../infrastructure/db/friends_repository");
 const profileRepo = require("../infrastructure/db/profile_repository");
-const { getCache } = require("../../../../pckg/redis/modules");
+const { getCache } = require("../../pckg/redis/modules");
 
 async function getFriends(userId) {
   try {

@@ -36,6 +36,7 @@ export class FriendsList {
         <div class="relative">
           <img src="${friend.avatar}" alt="${friend.name}" class="w-10 h-10 rounded-full border-2 ${friend.status === 'online' ? 'border-neon-green' : friend.status === 'pending' ? 'border-neon-orange' : 'border-gray-500'}">
           <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full ${
+            friend.status ===  'offline' ? 'bg-gray-300' :
             friend.status === 'online' ? 'bg-neon-green' : 
             friend.status === 'pending' ? 'bg-neon-orange' : 'bg-gray-500'
           } border border-arcade-darker"></div>
@@ -43,6 +44,7 @@ export class FriendsList {
         <div>
           <p class="text-white font-medium">${friend.name}</p>
           <p class="text-xs ${
+            friend.status === 'offline' ? 'text-gray-300' :
             friend.status === 'online' ? 'text-neon-green' : 
             friend.status === 'pending' ? 'text-neon-orange' : 'text-neon-pink/70'
           }">${friend.status === 'pending' ? 'Solicitação pendente' : friend.status}</p>
