@@ -2,7 +2,7 @@
 
 all: keys static-frontend build run
 
-keys: 
+keys:
 	[ -s .env ] || ./env_generator.sh
 
 static-frontend:
@@ -34,10 +34,22 @@ stop:
 iclean: stop
 	sudo docker compose -f docker-compose.yml down --rmi all
 
-vclean: iclean
+vclean_all: iclean
 	sudo docker compose -f docker-compose.yml down --rmi all -v
 
+vclean: iclean
+	sudo docker image rmi transcendence-api-gateway || true
+	sudo docker image rmi transcendence-tournament-service || true
+	sudo docker image rmi transcendence-auth-service || true
+	sudo docker image rmi transcendence-user-mgmt || true
+	sudo docker image rmi transcendence-game-server || true
+	sudo docker image rmi transcendence-frontend-builder || true
+	sudo docker image rmi transcendence-event-bus || true
+
 fclean: vclean
+	sudo docker system prune -af
+
+destroy: vclean_all
 	sudo docker system prune -af
 
 # ============================ INSPEÇÃO DO DOCKER ============================
