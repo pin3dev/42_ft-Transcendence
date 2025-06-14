@@ -74,6 +74,7 @@ async function testProtectedRoute(): Promise<UserStats | null> {
 
     if (!profileResponse.ok) {
       if (profileResponse.status === 401 || profileResponse.status === 403) {
+        console.log('❌ Sessão inválida na rota protegida - redirecionando para home');
         window.location.href = '/';
         return null;
       }
@@ -122,8 +123,18 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     };
   } catch (error) {
     console.error('Erro ao acessar a rota protegida:', error);
+    
+    // Se for erro de sessão expirada, redireciona silenciosamente
+    if (error instanceof Error && error.message === 'Sessão expirada') {
+      console.log('🔄 Sessão expirada detectada - redirecionando para home');
+      window.location.href = '/';
+      return null;
+    }
+    
+    // Para outros erros, também redireciona
+    console.log('🔄 Erro de autenticação - redirecionando para home');
     window.location.href = '/';
-    return null; // Retorna os dados mockados em caso de erro
+    return null;
   }
 }
 

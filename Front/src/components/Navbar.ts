@@ -1,7 +1,7 @@
 // Supondo que navigateTo e createProfileButtonWithDropdown estão corretamente importados ou globalmente disponíveis
 import { navigateTo } from '../router/index'; // Seu import original
 import { fetchWithAuth } from '../utils/fetchWithAuth'; // Importar fetchWithAuth
-import { hasLocalToken, hasJWTCookie } from '../utils/auth'; // Importar verificação de autenticação
+import { hasLocalToken, hasJWTCookie, clearAllAuthData } from '../utils/auth'; // Importar verificação de autenticação
 
 // Função para mostrar modal personalizado de logout
 function showLogoutModal(): void {
@@ -43,10 +43,10 @@ function showLogoutModal(): void {
     } catch (error) {
       console.warn('Erro ao chamar logout no servidor:', error);
     } finally {
-      // Limpar dados locais independentemente do resultado da API
-      localStorage.removeItem('userToken');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('userAvatar');
+      // Limpar dados locais independentemente do resultado da API usando a nova função
+      clearAllAuthData();
+      
+      // Força o reload da página para garantir que tudo seja resetado
       window.location.href = '/';
     }
   });
@@ -257,18 +257,14 @@ export function createNavbar(): HTMLElement {
   mobileNavContent.appendChild(mobileAuthContainer);
 
   // --- Lógica de exibição dos botões baseada na autenticação ---
-  // Debug: vamos ver os resultados das verificações
+  // Verificação mais simples e rápida para a navbar
   const hasLocal = hasLocalToken();
   const hasJWT = hasJWTCookie();
   
-  console.log('🔐 Verificação de autenticação:');
-  console.log('📱 hasLocalToken:', hasLocal);
-  console.log('🍪 hasJWTCookie:', hasJWT);
-  
-  // Verifica tanto localStorage quanto JWT cookie
+  // Para a navbar, usamos uma verificação básica
+  // A validação real será feita quando necessário (ao acessar rotas protegidas)
   const isUserAuthenticated = hasLocal || hasJWT;
-  console.log('✅ isUserAuthenticated:', isUserAuthenticated);
-
+  
   if (!isUserAuthenticated) {
     console.log('👤 Exibindo botões de Login/Registrar');
     // Botões de Login e Registrar (desktop)
