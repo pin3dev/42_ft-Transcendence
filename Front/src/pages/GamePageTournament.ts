@@ -52,7 +52,7 @@ export function GamePageTournament(): void {
 
   // --- CALLBACKS PARA ATUALIZAÇÃO DA UI ---
 
-  const handleRankingUpdate = (rankingsFromSocket: any[]) => {
+  const handleRankingUpdate =  async (rankingsFromSocket: any[]) => {
     console.log("LOG 4a: handleRankingUpdate ACIONADO com:", rankingsFromSocket);
     
     // Verificação de segurança
