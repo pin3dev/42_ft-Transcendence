@@ -1,4 +1,5 @@
 import { navigateTo } from '../router/index';
+import { hasLocalToken, hasJWTCookie, clearAllAuthData } from '../utils/auth'; 
 
 export function createHero(): HTMLElement {
   const heroSection = document.createElement('div');
@@ -49,8 +50,19 @@ export function createHero(): HTMLElement {
   secondaryButton.textContent = 'Como Jogar';
   secondaryButton.addEventListener('click', () => navigateTo('/ComoJogar'));
   
-  buttonContainer.appendChild(primaryButton);
-  buttonContainer.appendChild(secondaryButton);
+    // --- Lógica de exibição dos botões baseada na autenticação ---
+    // Verificação mais simples e rápida para a navbar
+    const hasLocal = hasLocalToken();
+    const hasJWT = hasJWTCookie();
+    
+    // Para a navbar, usamos uma verificação básica
+    // A validação real será feita quando necessário (ao acessar rotas protegidas)
+    const isUserAuthenticated = hasLocal || hasJWT;
+    
+    if (!isUserAuthenticated) {
+      buttonContainer.appendChild(primaryButton);
+      buttonContainer.appendChild(secondaryButton);
+    }
   
   leftColumn.appendChild(heroTitle);
   leftColumn.appendChild(heroDescription);
