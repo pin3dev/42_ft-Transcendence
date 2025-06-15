@@ -1,4 +1,4 @@
-declare module "../../../../pckg/redis/modules.js" {
+declare module "../../../pckg/redis/modules.js" {
   export function deleteCache(key: string): Promise<void>;
   export function setCache(key: string, value: any, ttl: number | null): Promise<void>;
   export function getCache(key: string): Promise<any>;
