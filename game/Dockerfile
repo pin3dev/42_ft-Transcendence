@@ -2,7 +2,7 @@ FROM node:20.18.1
 
 WORKDIR /app
 
-COPY ./src .
+COPY . .
 RUN npm install
 
 # Usa o entrypoint
