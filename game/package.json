@@ -28,5 +28,5 @@
 	"directories": {
 		"test": "tests"
 	},
-	"description": ""
+	"description": "game engine API"
 }

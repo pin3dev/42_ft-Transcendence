@@ -30,11 +30,11 @@ export class TournamentPlayer extends GamePlayer{
 		this._numOfMatch = numOfMatch;
 	}
 
-	public get starts(): number {
+	public get stars(): number {
 		return this._starts;
 	}
 
-	public set starts(starts: number) {
+	public set stars(starts: number) {
 		this._starts = starts;
 	}
 

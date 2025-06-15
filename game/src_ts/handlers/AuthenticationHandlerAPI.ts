@@ -28,7 +28,7 @@ export class AuthenticationHandlerAPI{
 				return false;
 			}
 
-			const authenticator = new AuthenticatorStrategy(GameAPISingleton.getTypeOfEnvironment(), this._JWTpublicKey);           //JWT(this._JWTpublicKey);
+			const authenticator = new AuthenticatorStrategy(GameAPISingleton.getTypeOfEnvironment(), this._JWTpublicKey);
 
 			if (messageFromClient.getType === 'AUTHENTICATION_LOGIN') {
 

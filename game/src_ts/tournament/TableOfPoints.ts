@@ -46,7 +46,7 @@ export class TableOfPoints {
 			const player = sortedTable[i];
 
 			const stats = [
-				player.starts,
+				player.stars,
 				player.numberOfVictories,
 				player.pointsBalance,
 				player.pointsMake
@@ -62,7 +62,7 @@ export class TableOfPoints {
 				position: displayPosition,
 				playerName: player.webSocketUserSession.getUserName,
 				numOfMatch: player.numOfMatch,
-				starts: player.starts,
+				stars: player.stars,
 				numberOfVictories: player.numberOfVictories,
 				pointsBalance: player.pointsBalance,
 				pointsMake: player.pointsMake
@@ -82,14 +82,14 @@ export class TableOfPoints {
 
 	private makeDraw(playerWhoTied: TournamentPlayer, gameScoreboard: GameScoreboard) {
 		playerWhoTied.numOfMatch = playerWhoTied.numOfMatch + 1;
-		playerWhoTied.starts = playerWhoTied.starts + 1;
+		playerWhoTied.stars = playerWhoTied.stars + 1;
 		playerWhoTied.pointsMake = playerWhoTied.pointsMake + gameScoreboard.getPlayerPoints(playerWhoTied)!
 	}
 
 	private makeVictory(playerWinner: TournamentPlayer, playerLoser: TournamentPlayer, gameScoreboard: GameScoreboard) {
 
 		playerWinner.numOfMatch = playerWinner.numOfMatch + 1;
-		playerWinner.starts = playerWinner.starts + 3;
+		playerWinner.stars = playerWinner.stars + 3;
 		playerWinner.numberOfVictories = playerWinner.numberOfVictories + 1;
 		playerWinner.pointsBalance = playerWinner.pointsBalance + (gameScoreboard.getPlayerPoints(playerWinner)! - gameScoreboard.getPlayerPoints(playerLoser)!);
 		playerWinner.pointsMake = playerWinner.pointsMake + gameScoreboard.getPlayerPoints(playerWinner)!

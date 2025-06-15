@@ -5,7 +5,11 @@ export class MakeRounds {
 	private fixPlayers: TournamentPlayer[];
 
 	constructor(tournamentPlayer: TournamentPlayer[]) {
-		this.fixPlayers = [...tournamentPlayer];
+		if (tournamentPlayer !== null){
+			this.fixPlayers = [...tournamentPlayer];
+		}else{
+			this.fixPlayers = [];
+		}
 	}
 
 	public getARound(): [TournamentPlayer, TournamentPlayer][] {

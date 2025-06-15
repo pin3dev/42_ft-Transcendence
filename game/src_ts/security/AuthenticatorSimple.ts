@@ -6,6 +6,7 @@ import { MessageWithValue } from "../message/MessageWithValue";
 export class AuthenticatorSimple implements Authenticator<AuthenticationMessage>{
 
     makeLogin(ws : WebSocketUserSession, message : MessageWithValue<AuthenticationMessage>) : boolean{
+		console.log('Authentication: ');
         if (message.getValue.getUserToken == '123456'){
             ws.setUserId = '123';
 			return true;
