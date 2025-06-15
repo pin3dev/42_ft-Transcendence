@@ -8,14 +8,14 @@ async function getUserProfile(userId, options = {}) {
     error.statusCode = 404;
     throw error;
   }
-
-  const GATEWAY_BASE_URL = process.env.GATEWAY_URL || "https://localhost";
+  
+  const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
   return {
     name: profile.name,
     avatar_url: profile.avatar_path
-      ? `${GATEWAY_BASE_URL}/static${profile.avatar_path}`
-      : `${GATEWAY_BASE_URL}/static/avatars/default.png`
+      ? `https://${GATEWAY}/static${profile.avatar_path}`
+      : `https://${GATEWAY}/static/avatars/default.png`
   };
 }
 

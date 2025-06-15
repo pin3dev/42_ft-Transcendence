@@ -8,12 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@babylonjs/core": "^6.35.0",
-    "@babylonjs/gui": "^6.35.0",
-    "@babylonjs/loaders": "^6.35.0",
-    "@babylonjs/materials": "^6.35.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.32",

@@ -59,12 +59,12 @@ async function searchByName(name) {
   `;
   const rows = await all(sql, [`%${name}%`]);
 
-  const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
+  const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
   return rows.map(p => ({
     user_id: String(p.user_id || p.USER_ID),
     name: p.name || p.NAME,
-    avatar_url: `${GATEWAY}/static${p.avatar_path || p.AVATAR_PATH}`
+    avatar_url: `https://${GATEWAY}/static${p.avatar_path || p.AVATAR_PATH}`
   }));
 }
 

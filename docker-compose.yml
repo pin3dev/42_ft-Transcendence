@@ -17,7 +17,7 @@ services:
       - SSL_KEY_BASE64=${SSL_KEY_BASE64}
     networks:
       - internal_network
-      - external_network
+      # - external_network
     ports:
       - "443:443"
     depends_on:
@@ -63,6 +63,8 @@ services:
     build:
       context: ./user-mgmt
     container_name: user-mgmt
+    environment:
+      - LOCAL_IP_BASE64=${LOCAL_IP_BASE64}
     networks:
       - internal_network
     expose:
@@ -103,7 +105,7 @@ services:
       - "3001"
     networks:
       - internal_network
-      - external_network
+      # - external_network
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
     depends_on:
@@ -114,9 +116,9 @@ networks:
     name: internal_network
     driver: bridge
 
-  external_network:
-    name: external_network
-    driver: bridge
+  # external_network:
+  #   name: external_network
+  #   driver: bridge
 
 volumes:
   user-data:
