@@ -415,17 +415,7 @@ export function renderPongGameTournament(
           break;
         case 'GAME_FULL':
           statusText.textContent = 'Jogo completo! Preparando para iniciar...';
-          updateGameState(data.value);
-          drawGame();
-          break;
-        case 'GAME_COUNT_DOWN':
-          statusText.textContent = `Iniciando em: ${data.value}`;
-          if (data.value === 0) {
-            matchStarted = true;
-            matchmakingUI.classList.add('hidden');
-          }
-          break;
-        case 'GAME_STATUS':
+
           const { userId1, userId2 } = data.value;
 
           if (userId1 && userId2) {
@@ -449,6 +439,17 @@ export function renderPongGameTournament(
 
             console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
           }
+          updateGameState(data.value);
+          drawGame();
+          break;
+        case 'GAME_COUNT_DOWN':
+          statusText.textContent = `Iniciando em: ${data.value}`;
+          if (data.value === 0) {
+            matchStarted = true;
+            matchmakingUI.classList.add('hidden');
+          }
+          break;
+        case 'GAME_STATUS':
           updateGameState(data.value);
           drawGame();
           break;
