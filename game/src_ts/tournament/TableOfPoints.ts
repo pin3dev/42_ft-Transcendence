@@ -61,7 +61,7 @@ export class TableOfPoints {
 
 			table.push({
 				position: displayPosition,
-				playerName: player.webSocketUserSession.getUserName,
+				userId: player.webSocketUserSession.getUserId,
 				numOfMatch: player.numOfMatch,
 				stars: player.stars,
 				numberOfVictories: player.numberOfVictories,

@@ -16,9 +16,9 @@ export class OverallScoreboardOfTheRound {
 
 		const json = Array.from(this.allScoreboardInTheRound.values()).map(scoreboard => {
 			return {
-				player1Name: scoreboard.player1.webSocketUserSession.getUserName,
+				userId1: scoreboard.player1.webSocketUserSession.getUserId,
 				player1Score: scoreboard.player1Points,
-				player2Name: scoreboard.player2.webSocketUserSession.getUserName,
+				userId2: scoreboard.player2.webSocketUserSession.getUserId,
 				player2Score: scoreboard.player2Points,
 			};
 		});
