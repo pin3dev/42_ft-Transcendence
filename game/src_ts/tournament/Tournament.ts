@@ -22,6 +22,7 @@ export enum TournamentStatus {
 
 export enum RoundStatus {
 	COUNT_DOWN,
+	WAITING_COUTDOWN,
 	CREATE_ROUND,
 	ROUND_GOING_ON
 }
@@ -126,8 +127,11 @@ export class Tournament implements GameTournamentListener {
 
 		let tournamentPlayer: TournamentPlayer = new TournamentPlayer(true, webSocketUserSession);
 		this._tournamentPlayers.set(webSocketUserSession, tournamentPlayer);
+		this._tableOfPoints.addPlayer(tournamentPlayer);
 
 		sender.sendMessage(new Message('TOURNAMENT_WAITING_PLAYER'));
+
+		this.sendMessageTableOfPoints();
 
 		this._tournamentStatus = TournamentStatus.READY;
 		return (this._tournamentPlayers.size === this._numberOfPlayer);
@@ -179,6 +183,7 @@ export class Tournament implements GameTournamentListener {
 			switch (this._roundStatus) {
 				case RoundStatus.COUNT_DOWN:
 					this.sendCountDown();
+					this._roundStatus = RoundStatus.WAITING_COUTDOWN;
 					break;
 
 				case RoundStatus.CREATE_ROUND:

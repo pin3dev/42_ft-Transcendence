@@ -1,2 +1,3 @@
 {"type": "AUTHENTICATION_LOGIN", "value": {"userToken": "123456","userId": "123456"}}
 {"type": "TOURNAMENT_CREATE", "value": 2}
+{"type": "TOURNAMENT_TO_PARTICIPATE"}
