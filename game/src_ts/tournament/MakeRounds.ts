@@ -14,7 +14,7 @@ export class MakeRounds {
 
 	public getARound(): [TournamentPlayer, TournamentPlayer][] {
 
-		const middle = this.fixPlayers.length - 1;
+		const middle = this.fixPlayers.length / 2;
 
 		const round: [TournamentPlayer, TournamentPlayer][] = [];
 

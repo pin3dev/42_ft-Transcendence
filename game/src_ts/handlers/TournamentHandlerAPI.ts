@@ -5,6 +5,7 @@ import { Sender } from "../Sender";
 import { Tournament, TournamentStatus } from "../tournament/Tournament";
 import { WebSocketUserSession } from "../WebSocketUserSession";
 import { WebSocketUserSessionListener } from "../WebSocketUserSessionListener";
+import { GameHandlerAPI } from "./GameHandlerAPI";
 
 export class TournamentHandlerAPI implements WebSocketUserSessionListener {
 
@@ -13,10 +14,10 @@ export class TournamentHandlerAPI implements WebSocketUserSessionListener {
 
 	private _tournamentPublic: Tournament | null;
 
-	private _mapGlobal: Map<number, Game>;
+	private _gameHandlerAPI: GameHandlerAPI;
 
-	constructor(mapGlobal: Map<number, Game>) {
-		this._mapGlobal = mapGlobal;
+	constructor(gameHandlerAPI: GameHandlerAPI) {
+		this._gameHandlerAPI = gameHandlerAPI;
 		this._tournamentPublic = null;
 		this.clearPublicTournamentFinished();
 	}
@@ -60,7 +61,7 @@ export class TournamentHandlerAPI implements WebSocketUserSessionListener {
 				return;
 			}
 
-			this._tournamentPublic = new Tournament(messageWithValue.getValue, this._mapGlobal);
+			this._tournamentPublic = new Tournament(messageWithValue.getValue, this._gameHandlerAPI);
 			sender.sendMessage(new Message('TOURNAMENT_CREATED'));
 			this._tournamentPublic?.addPlayer(ws);
 

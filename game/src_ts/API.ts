@@ -23,7 +23,7 @@ export class API {
 
 		this.gameHandlerAPI = new GameHandlerAPI();
 		this.authenticationHandlerAPI = new AuthenticationHandlerAPI(this._userStatus, JWTpublicKey);
-		this.tournamentHandlerAPI = new TournamentHandlerAPI(this.gameHandlerAPI.getMapgamesGlobal());
+		this.tournamentHandlerAPI = new TournamentHandlerAPI(this.gameHandlerAPI);
 	}
 
 	public message(ws: WebSocketUserSession, message: RawData): void {
@@ -61,7 +61,6 @@ export class API {
 		if (Message.tournamentMessageTypeRequest.has(messageFromClient.getType)) {
 			this.tournamentHandlerAPI.message(ws, messageFromClient);
 		}
-
 
 		//se a mensagem for to tipo game mas o torneio id for diferente de 0, logo, o game eh de um torneio, usar o handler de torneios
 

@@ -7,9 +7,21 @@ import WebSocket from 'ws';
 import { GamePlayer } from '../game/GamePlayer';
 import { GameGlobal } from '../game/GameGlobal';
 
+
+/*
+
+let gamePlayer = this.gamePlayers.get(ws);
+if (!gamePlayer){
+	gamePlayer = new GamePlayer(true, ws);
+	this.gamePlayers.set(ws, gamePlayer);
+}
+
+*/
+
+
 export class GameHandlerAPI implements WebSocketUserSessionListener {
 
-	private waitingPlayer: GamePlayer | null = null;
+	private waitingPlayer: WebSocketUserSession | null = null;
 
 	private gamesGlobal = new Map<number, Game>();
 	private gamePlayers = new Map<WebSocketUserSession, GamePlayer>();
@@ -18,34 +30,26 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 		const sender = new Sender(ws.getWebsocket);
 
-		let gamePlayer = this.gamePlayers.get(ws);
-		if (!gamePlayer){
-			gamePlayer = new GamePlayer(true, ws);
-			this.gamePlayers.set(ws, gamePlayer);
-		}
-
 		if (messageFromClient.getType === 'GAME_CREATE_GLOBAL_MATCH') {
 
-			if (this.waitingPlayer === gamePlayer || this.waitingPlayer === null || (this.waitingPlayer.webSocketUserSession.getWebsocket.readyState !== WebSocket.OPEN)) {
-				this.waitingPlayer = gamePlayer;
+			if (this.waitingPlayer === ws || this.waitingPlayer === null || (this.waitingPlayer.getWebsocket.readyState !== WebSocket.OPEN)) {
+				this.waitingPlayer = ws;
 				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER'));
 			} else {
 				let game = new GameGlobal();
 
-				const gameId = game.getId;
+				let gamePlayerLeft: GamePlayer = new GamePlayer(true, this.waitingPlayer);
+				let gamePlayerRight: GamePlayer = new GamePlayer(true, ws);
 
-				this.waitingPlayer.webSocketUserSession.setGameId = gameId;
-				ws.setGameId = gameId;
+				this.addGameToGlobalGameMap(game, gamePlayerLeft, gamePlayerRight);
 
-				this.gamesGlobal.set(gameId, game);
-
-				game.createMatch(this.waitingPlayer, gamePlayer);
+				game.createMatch(gamePlayerLeft, gamePlayerRight);
 				this.waitingPlayer = null;
 			}
 			return;
 		}
 
-		if (messageFromClient.getType === 'GAME_ABORT' && gamePlayer === this.waitingPlayer) {
+		if (messageFromClient.getType === 'GAME_ABORT' && ws === this.waitingPlayer) {
 			this.waitingPlayer = null;
 			sender.sendMessage(new Message('GAME_ABORTED'));
 			return;
@@ -74,16 +78,21 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 			messageFromClient.getType === 'GAME_PADDLE_UP_KEYDOWN' ||
 			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYUP' ||
 			messageFromClient.getType === 'GAME_PADDLE_DOWN_KEYDOWN') {
-			playerGame.movePaddle(gamePlayer, messageFromClient.getType);
+
+			let gamePlayer = this.gamePlayers.get(ws);
+
+			if (gamePlayer) {
+				playerGame.movePaddle(gamePlayer, messageFromClient.getType);
+			}else {
+				console.error('GameHandlerAPI: message: Unable to find player on player map');
+			}
 		}
 
 	}
 
 	close(ws: WebSocketUserSession): void {
 
-		let gamePlayer = this.gamePlayers.get(ws);
-
-		if (gamePlayer === this.waitingPlayer) {
+		if (ws === this.waitingPlayer) {
 			this.waitingPlayer === null;
 			return;
 		}
@@ -93,12 +102,35 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 			return;
 		}
 
-		playerGame.playerExit(gamePlayer!);
+		let gamePlayer = this.gamePlayers.get(ws);
+
+		if (gamePlayer === undefined) {
+			console.error('GameHandlerAPI: close: Unable to find player on player map');
+		}else{
+			playerGame.playerExit(gamePlayer);
+		}
 	}
 
-	public getMapgamesGlobal() : Map<number, Game>{
+	public addGameToGlobalGameMap(game: Game, gamePlayerLeft: GamePlayer, gamePlayerRight: GamePlayer) {
+
+		gamePlayerLeft.webSocketUserSession.setGameId = game.getId;
+		gamePlayerRight.webSocketUserSession.setGameId = game.getId;
+
+		this.gamePlayers.set(gamePlayerLeft.webSocketUserSession, gamePlayerLeft);
+		this.gamePlayers.set(gamePlayerRight.webSocketUserSession, gamePlayerRight);
+
+		this.gamesGlobal.set(game.getId, game);
+	}
+
+	public removeGameToGlobalGameMap(gameId : number){
+		this.gamesGlobal.delete(gameId);
+	}
+
+	/*
+	public getMapgamesGlobal(): Map<number, Game> {
 		return this.gamesGlobal;
 	}
+	*/
 
 	private getPlayerGame(wsSession: WebSocketUserSession): Game | undefined {
 		const gameId = wsSession.getGameId;

@@ -15,6 +15,13 @@ export class TableOfPoints {
 		this._playersOfTournament.push(tournamentPlayer);
 	}
 
+	public removerPlayer(tournamentPlayer: TournamentPlayer) {
+		const index = this._playersOfTournament.indexOf(tournamentPlayer);
+		if (index !== -1) {
+			this._playersOfTournament.splice(index, 1);
+		}
+	}
+
 	public addPlayerScore(gameScoreboard: GameScoreboard): void {
 		if (this.areBothPlayersOffline(gameScoreboard)) return;
 
@@ -29,7 +36,7 @@ export class TableOfPoints {
 		}
 	}
 
-	public areBothPlayersOffline(gameScoreboard: GameScoreboard){
+	public areBothPlayersOffline(gameScoreboard: GameScoreboard) {
 		return (!gameScoreboard.player1.isOnline && !gameScoreboard.player2.isOnline)
 	}
 
@@ -74,7 +81,7 @@ export class TableOfPoints {
 
 	}
 
-	public getTableSorted() : TournamentPlayer[]{
+	public getTableSorted(): TournamentPlayer[] {
 		const sorter = new SortTablePointMemberArray(this._playersOfTournament);
 		return sorter.sort();
 	}
