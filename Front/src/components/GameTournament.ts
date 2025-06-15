@@ -481,6 +481,25 @@ export function renderPongGameTournament(
             callbacks.onTournamentUpdate(data.value);
           }
           break;
+          case 'TOURNAMENT_PLAYER_FINAL_POSITION':
+            matchmakingUI.classList.remove('hidden'); // Garante que a UI de status esteja visível
+            matchStarted = false; // O jogo acabou para este jogador
+  
+            const position = data.value; // Ex: 1, 2, 3...
+            let ordinalPosition;
+  
+            // Converte o número para um texto ordinal (1º, 2º, 3º, etc.)
+            if (position === 1) {
+              ordinalPosition = '1º';
+            } else if (position === 2) {
+              ordinalPosition = '2º';
+            } else if (position === 3) {
+              ordinalPosition = '3º';
+            } else {
+              ordinalPosition = `${position}º`;
+            }
+            statusText.textContent = `Torneio finalizado! Você ficou em ${ordinalPosition} lugar.`;
+            break;
 
         // --- NOVO CASE PARA ATUALIZAR A TABELA DE CLASSIFICAÇÃO ---
         case 'TOURNAMENT_TABLE_OF_POINTS':
