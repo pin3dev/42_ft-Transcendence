@@ -36,34 +36,40 @@ export class TournamentHandlerAPI implements WebSocketUserSessionListener {
 
 		if (this._tournamentPublic === null && message.getType !== 'TOURNAMENT_CREATE') {
 			sender.sendMessage(new Message('ERROR_TOURNAMENT_DOESNT_EXIST'));
+			return ;
 		}
 
 		if (this._tournamentPublic !== null && message.getType === 'TOURNAMENT_CREATE') {
 			sender.sendMessage(new Message('ERROR_TOURNAMENT_ALREADY_EXISTS'));
+			return ;
 		}
 
 		//first things, handler tournament create
 		if (message.getType === 'TOURNAMENT_CREATE') {
 
-			if (this._tournamentPublic !== null){
-				this._tournamentPublic?.addPlayer(ws);
-			}
-
 			const messageWithValue = message as MessageWithValue<number>;
 
 			if (messageWithValue.getValue < TournamentHandlerAPI.MINUMUM_NUMBER_OF_PLAYERS) {
 				sender.sendMessage(new Message('ERROR_TOURNAMENT_CREATING_FEW_PLAYERS'));
+				return;
 			} else if (messageWithValue.getValue > TournamentHandlerAPI.MAXIMUM_NUMBER_OF_PLAYERS) {
 				sender.sendMessage(new Message('ERROR_TOURNAMENT_CREATING_MANY_PLAYERS'));
+				return;
 			} else if ((messageWithValue.getValue % 2) !== 0) {
 				sender.sendMessage(new Message('ERROR_TOURNAMENT_CREATING_ODD_PLAYERS'));
+				return;
 			}
 
 			this._tournamentPublic = new Tournament(messageWithValue.getValue, this._mapGlobal);
 			sender.sendMessage(new Message('TOURNAMENT_CREATED'));
-			return;
-		} else if (message.getType === 'TOURNAMENT_TO_PARTICIPATE') {
 			this._tournamentPublic?.addPlayer(ws);
+
+		} else if (message.getType === 'TOURNAMENT_TO_PARTICIPATE') {
+
+			//if 'true' the tournament is full! So, lets start it!
+			if (this._tournamentPublic?.addPlayer(ws)) {
+				this._tournamentPublic.start();
+			}
 		}
 	}
 
