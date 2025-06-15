@@ -1,8 +1,7 @@
 // Front/src/pages/GamePages.ts
 import { createNavbar } from '../components/Navbar';
 import { createFooter } from '../components/Footer';
-import { renderPongGameTournament } from '../components/GameTournament';
-// --- ALTERADO: Importa de ambos os componentes de UI ---
+import { renderPongGameTournament, fetchUserName } from '../components/GameTournament';
 import { createMatchSchedule, updateMatchSchedule, MatchData } from '../components/MatchSchedule';
 import { createRankingTable, updateRankingTable, RankingData } from '../components/RankingTable';
 
@@ -35,12 +34,7 @@ export function GamePageTournament(): void { // Esta função agora renderiza um
   sideColumn.appendChild(rankingComponent);
 
   const matchScheduleComponent = createMatchSchedule();
-
   const matchListContainer = matchScheduleComponent.querySelector('#match-list-container') as HTMLElement;
-  if (!matchListContainer) {
-    console.error("Container '#match-list-container' não encontrado no componente MatchSchedule.");
-    return;
-  }
   sideColumn.appendChild(matchScheduleComponent);
 
   const handleRankingUpdate = (rankingsFromSocket: any[]) => {
@@ -51,16 +45,40 @@ export function GamePageTournament(): void { // Esta função agora renderiza um
     }
   };
 
-  const handleTournamentUpdate = (matchesFromSocket: any[]) => {
-    console.log("handleTournamentUpdate chamado com:", matchesFromSocket);
-    const formattedMatches: MatchData[] = matchesFromSocket.map((match, index) => ({
-      id: index + 1,
-      player1Name: match.player1Name,
-      score1: match.player1Score,
-      player2Name: match.player2Name,
-      score2: match.player2Score,
-    }));
-    updateMatchSchedule(matchListContainer, formattedMatches);
+  const handleTournamentUpdate = async (matchesFromSocket: any[]) => {
+    console.log("Recebido dados de partidas. Buscando nomes...", matchesFromSocket);
+
+    // Mostra um estado de "carregando" (opcional, mas recomendado)
+    if (matchListContainer) {
+      updateMatchSchedule(matchListContainer, [{ id: 1, player1Name: 'Carregando...', player2Name: 'Carregando...', score1: 0, score2: 0 }]);
+    }
+
+    // Cria um array de Promises. Cada promise resolverá para um objeto MatchData completo.
+    const formattedMatchesPromises = matchesFromSocket.map(async (match, index) => {
+      // Busca os dois nomes da partida em paralelo
+      const [p1Name, p2Name] = await Promise.all([
+        fetchUserName(match.userId1),
+        fetchUserName(match.userId2)
+      ]);
+
+      // Retorna o objeto no formato esperado por `MatchData`
+      return {
+        id: index + 1,
+        player1Name: p1Name,
+        score1: match.player1Score,
+        player2Name: p2Name,
+        score2: match.player2Score,
+      };
+    });
+
+    // Espera TODAS as buscas de nome terminarem
+    const formattedMatches = await Promise.all(formattedMatchesPromises);
+
+    // Agora, atualiza a UI com os dados completos
+    if (matchListContainer) {
+      updateMatchSchedule(matchListContainer, formattedMatches);
+      console.log("Tabela de partidas atualizada com nomes.");
+    }
   };
 
 
@@ -72,7 +90,7 @@ export function GamePageTournament(): void { // Esta função agora renderiza um
   const gameSectionContainer = document.createElement('section');
   gameSectionContainer.id = 'pong-game-section';
   gameSectionContainer.className = 'my-8 p-4 sm:p-6 rounded-lg bgp-arcade-darkPurple flex flex-col items-center';
-  
+
   const cleanupGame = renderPongGameTournament(gameSectionContainer, {
     onTournamentUpdate: handleTournamentUpdate,
     onRankingUpdate: handleRankingUpdate

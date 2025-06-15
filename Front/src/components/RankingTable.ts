@@ -9,7 +9,7 @@
 // Define a estrutura de dados para uma única linha da tabela de classificação.
 export interface RankingData {
   position: number;
-  playerName: string;
+  userId: string;
   numOfMatch: number;
   stars: number;
   numberOfVictories: number;
@@ -43,7 +43,7 @@ function createRankingRow(playerData: RankingData): HTMLElement {
 
     // Células da tabela na ordem desejada
     row.appendChild(createCell(playerData.position.toString(), 'font-bold text-white text-center'));
-    row.appendChild(createCell(playerData.playerName, 'font-semibold'));
+    row.appendChild(createCell(playerData.userId, 'font-semibold'));
     row.appendChild(createCell(playerData.stars.toString(), 'font-mono font-bold text-center')); // PTS
     row.appendChild(createCell(playerData.numOfMatch.toString(), 'font-mono text-center')); // P
     row.appendChild(createCell(playerData.numberOfVictories.toString(), 'font-mono text-center')); // V

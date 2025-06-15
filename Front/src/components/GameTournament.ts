@@ -54,11 +54,51 @@ interface GameCallbacks {
 import { ensureAuthDataAvailable } from '../utils/auth';
 import { fetchWithAuth } from '../utils/fetchWithAuth';
 
+
+/**
+
 /**
  * Renderiza a página do jogo de Pong e inicializa a lógica.
  * @param container O elemento HTML onde o jogo será renderizado.
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
+
+
+async function fetchUserName(userId: string): Promise<string> {
+  if (!userId) {
+    console.warn("fetchUserName chamado com ID nulo ou indefinido.");
+    return "Jogador";
+  }
+
+  try {
+    // Usa a função de fetch com autenticação e o endpoint especificado
+    const response = await fetchWithAuth(`/user/search?id=${userId}`);
+
+    if (!response.ok) {
+      console.error(`Erro na API ao buscar usuário ${userId}: Status ${response.status}`);
+      // Retorna um nome padrão que inclui parte do ID para depuração
+      return `Jogador (${userId.slice(0, 5)}...)`;
+    }
+
+    const responseData: any[] = await response.json();
+
+    // Validação crucial: Verifica se a resposta é um array e se não está vazio
+    if (Array.isArray(responseData) && responseData.length > 0) {
+      const user = responseData[0];
+      // Retorna o nome do usuário do primeiro objeto no array
+      return user.name || `Jogador (${userId.slice(0, 5)}...)`;
+    } else {
+      console.warn(`Nenhum usuário encontrado para o ID ${userId} na resposta da API.`);
+      return `Jogador Desconhecido`;
+    }
+
+  } catch (error) {
+    console.error(`Falha de rede ou erro ao buscar o nome do usuário ${userId}:`, error);
+    return 'Jogador (Erro)'; // Indica um erro de conexão
+  }
+}
+
+
 export function renderPongGameTournament(
   container: HTMLElement,
   callbacks: GameCallbacks = {} // <-- ALTERADO: usa a nova interface e um valor padrão
@@ -327,7 +367,7 @@ export function renderPongGameTournament(
       console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       const data: ServerMessage = JSON.parse(event.data);
       console.log('Mensagem recebida:', data);
       statusText.classList.remove('hidden');
@@ -386,6 +426,29 @@ export function renderPongGameTournament(
           }
           break;
         case 'GAME_STATUS':
+          const { userId1, userId2 } = data.value;
+
+          if (userId1 && userId2) {
+
+            // 1. Inicia as duas buscas de nome em paralelo.
+            const promises = [
+              fetchUserName(userId1), // Retorna Promise<string>
+              fetchUserName(userId2)  // Retorna Promise<string>
+            ];
+
+            // 2. Usa 'await Promise.all' para esperar que AMBAS as promises terminem.
+            // O resultado será um array com os nomes: [nomeDoJogador1, nomeDoJogador2]
+            const [p1Name, p2Name] = await Promise.all(promises);
+
+            // 3. AGORA, 'p1Name' e 'p2Name' são strings de verdade!
+            // Use essas variáveis para atualizar o estado e a UI.
+            gameState.player1Name = p1Name;
+            gameState.player2Name = p2Name;
+            player1NameElement.textContent = p1Name;
+            player2NameElement.textContent = p2Name;
+
+            console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
+          }
           updateGameState(data.value);
           drawGame();
           break;
