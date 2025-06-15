@@ -24,7 +24,8 @@ export enum RoundStatus {
 	COUNT_DOWN,
 	WAITING_COUTDOWN,
 	CREATE_ROUND,
-	ROUND_GOING_ON
+	ROUND_GOING_ON,
+	ROUNDS_ENDED
 }
 
 export class Tournament implements GameTournamentListener {
@@ -36,8 +37,8 @@ export class Tournament implements GameTournamentListener {
 	private _numberOfPlayer: number = 0;
 
 	private _tournamentPlayers: Map<WebSocketUserSession, TournamentPlayer>;
-	private _globalGamesMap : Map<number, Game>;
-	private _idsOfGamesRound : number[];
+	private _globalGamesMap: Map<number, Game>;
+	private _idsOfGamesRound: number[];
 
 	// overall tournament ranking
 	private _tableOfPoints: TableOfPoints;
@@ -65,7 +66,7 @@ export class Tournament implements GameTournamentListener {
 
 	private _makeRound: MakeRounds;
 
-	constructor(numberOfPlayer: number, globalGamesMap : Map<number, Game>) {
+	constructor(numberOfPlayer: number, globalGamesMap: Map<number, Game>) {
 
 		this._numberOfPlayer = numberOfPlayer;
 		this._globalGamesMap = globalGamesMap;
@@ -116,7 +117,7 @@ export class Tournament implements GameTournamentListener {
 			return false;
 		}
 
-		if (webSocketUserSession.getTournamentId === this._id){
+		if (webSocketUserSession.getTournamentId === this._id) {
 			sender.sendMessage(new Message('ERROR_TOURNAMENT_ALREADY_PARTICIPATING'));
 			return false;
 		}
@@ -169,7 +170,6 @@ export class Tournament implements GameTournamentListener {
 		return this._tournamentStatus;
 	}
 
-
 	//--- private methods ---
 
 	private tournamentLoop() {
@@ -181,25 +181,30 @@ export class Tournament implements GameTournamentListener {
 			}
 
 			switch (this._roundStatus) {
+				case RoundStatus.WAITING_COUTDOWN:
+					break;
 				case RoundStatus.COUNT_DOWN:
 					this.sendCountDown();
 					this._roundStatus = RoundStatus.WAITING_COUTDOWN;
 					break;
-
 				case RoundStatus.CREATE_ROUND:
 					this._roundStatus = RoundStatus.ROUND_GOING_ON;
 					this.doRound();
 					break;
 				case RoundStatus.ROUND_GOING_ON:
 					{
-						if (this._numberOfGamesCompletedInTheRound === this._numberOfGamesCompletedInTheRoundMaxPossible &&
-							this._roundCount === this._roundCountMaxRounds) {
-							this.tournamentIsOver();
-							this.stopTournamentLoop();
-						} else if (this._numberOfGamesCompletedInTheRound === this._numberOfGamesCompletedInTheRoundMaxPossible) {
+						if (this._numberOfGamesCompletedInTheRound === this._numberOfGamesCompletedInTheRoundMaxPossible) {
 							this._roundStatus = RoundStatus.COUNT_DOWN;
+							this._roundCount++;
 						}
+						if (this._roundCount === this._roundCountMaxRounds) {
+							this._roundStatus = RoundStatus.ROUNDS_ENDED;
+						}
+						break;
 					}
+				case RoundStatus.ROUNDS_ENDED:
+					this.tournamentIsOver();
+					this.stopTournamentLoop();
 			}
 		}, 10);
 	}
@@ -259,10 +264,10 @@ export class Tournament implements GameTournamentListener {
 
 				//rest values to a new round
 		/* 1 */	this._numberOfGamesCompletedInTheRound = 0;
-		/* 2 */	for (const idOfGamesInTheRound of this._idsOfGamesRound){
-					this._globalGamesMap.delete(idOfGamesInTheRound);
-				}
-				this._idsOfGamesRound = [];
+		/* 2 */	for (const idOfGamesInTheRound of this._idsOfGamesRound) {
+			this._globalGamesMap.delete(idOfGamesInTheRound);
+		}
+		this._idsOfGamesRound = [];
 
 		//get a new pairs of games to this round
 		/* 3 */	let roundPairs: [TournamentPlayer, TournamentPlayer][] = this._makeRound.getARound();
@@ -273,9 +278,9 @@ export class Tournament implements GameTournamentListener {
 		let arrayOfGamescoreboardToThisRound: GameScoreboard[] = [];
 
 		for (const playersOfGame of roundPairs) {
-					const gameScoreboard: GameScoreboard = new GameScoreboard(playersOfGame[0], playersOfGame[1]);
+			const gameScoreboard: GameScoreboard = new GameScoreboard(playersOfGame[0], playersOfGame[1]);
 		/* 4 */		arrayOfGamescoreboardToThisRound.push(gameScoreboard);
-					this._overallScoreboardOfTheRound.addGameScoreboard(gameScoreboard);
+			this._overallScoreboardOfTheRound.addGameScoreboard(gameScoreboard);
 		}
 
 		/* 5 */	this.sendMessageOverallScoreboard();
@@ -324,6 +329,7 @@ export class Tournament implements GameTournamentListener {
 		this._tableOfPoints.addPlayerScore(gameScoreboard);
 		this._numberOfGamesCompletedInTheRound++;
 		this.sendMessageOverallScoreboard();
+		this.sendMessageTableOfPoints();
 	}
 
 	// ------------------- interfaces methods end -------------------
