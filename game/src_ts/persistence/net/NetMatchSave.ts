@@ -1,10 +1,10 @@
 import { Game } from "../../game/Game";
 import { MatchSave } from "../MatchSave";
-import { publishEvent, EventTypes } from "../../../../pckg/redis/modules.js";
+//import { publishEvent, EventTypes } from "../../../../pckg/redis/modules.js";
 
 export class NetMatchSave implements MatchSave{
 	save(match: Game): void {
-
+	 /*
 	  this.id = id;
       this.tournamentId = tournamentId;
       this.player1Id = player1Id;
@@ -13,7 +13,7 @@ export class NetMatchSave implements MatchSave{
       this.score = score;
       this.startedAt = startedAt;
       this.endedAt = endedAt;
-
+	  */
 	}
 }
 

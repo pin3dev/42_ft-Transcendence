@@ -14,6 +14,8 @@ export class UserStatus {
 	}
 
 	public addUserOnline(userId : string): void {
+
+		console.log('UserStatus: addUserOnline');
 		const current = this._usersStatus.get(userId);
 
 		if (current === undefined) {
