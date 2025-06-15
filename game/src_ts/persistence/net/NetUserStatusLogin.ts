@@ -1,7 +1,11 @@
 import { Status, UserStatusLogin } from "../UserStatusLogin";
 
-export class NetUserStatusLogin implements UserStatusLogin{
-	setUserStatus(userId : string, status : Status) : void{
+const { setCache } = require("../../../../pckg/redis/modules.js") as {
+    setCache: (key: string, value: any, ttl?: number | null) => Promise<void>
+};
 
+export class NetUserStatusLogin implements UserStatusLogin{
+	async setUserStatus(userId : string, status : Status) : Promise<void>{
+		 await setCache(`user_status:${userId}`, status, null);
 	}
 }
