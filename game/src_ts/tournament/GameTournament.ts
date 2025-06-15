@@ -20,6 +20,8 @@ export class GameTournament extends Game{
 	}
 
 	public gameEnd(): void {
+		console.warn('GameTournament: gameEnd');
+		console.warn(this._gameScoreboard);
 		this._gameListener.playEnded(this._gameScoreboard);
 	}
 

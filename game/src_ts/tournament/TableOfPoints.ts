@@ -22,8 +22,8 @@ export class TableOfPoints {
 			this.makeDraw(gameScoreboard.player1, gameScoreboard);
 			this.makeDraw(gameScoreboard.player2, gameScoreboard);
 		} else {
-			let playerWinner: TournamentPlayer = gameScoreboard.getWinner()!;
-			let playerLoser: TournamentPlayer = gameScoreboard.getLoser()!;
+			let playerWinner: TournamentPlayer = gameScoreboard.getWinner();
+			let playerLoser: TournamentPlayer = gameScoreboard.getLoser();
 
 			this.makeVictory(playerWinner, playerLoser, gameScoreboard);
 		}

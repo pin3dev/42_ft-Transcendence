@@ -1,5 +1,4 @@
 import { TournamentPlayer } from "../tournament/TournamentPlayer";
-import { Game } from "./Game";
 import { GamePlayer } from "./GamePlayer";
 
 export class GameScoreboard {
@@ -20,7 +19,7 @@ export class GameScoreboard {
 		this._player2Points = 0;
 	}
 
-	public get id(){
+	public get id() {
 		return this._id;
 	}
 
@@ -32,41 +31,39 @@ export class GameScoreboard {
 		}
 	}
 
-	public getWinner(): TournamentPlayer | null {
-		if (this._player1Points >= Game.WINNING_SCORE) {
+	public getWinner(): TournamentPlayer {
+		if (this._player1Points > this._player2Points) {
 			return this._player1;
-		} else if (this._player2Points >= Game.WINNING_SCORE) {
+		} else {
 			return this._player2;
 		}
-		return null;
 	}
 
-	public getLoser() : TournamentPlayer | null {
-		if (this._player1Points < Game.WINNING_SCORE) {
+	public getLoser(): TournamentPlayer {
+		if (this._player1Points < this._player2Points) {
 			return this._player1;
-		} else if (this._player2Points < Game.WINNING_SCORE) {
+		} else {
 			return this._player2;
 		}
-		return null;
 	}
 
 	public isDraw(): boolean {
-		return (this._player1Points + this._player2Points === Game.MAX_POINTS)
+		return (this._player1Points === this._player2Points)
 	}
 
-	public get player1(): TournamentPlayer{
+	public get player1(): TournamentPlayer {
 		return this._player1;
 	}
 
-	public get player2(): TournamentPlayer{
+	public get player2(): TournamentPlayer {
 		return this._player2;
 	}
 
-	public get player1Points() : number{
+	public get player1Points(): number {
 		return this._player1Points;
 	}
 
-	public get player2Points(): number{
+	public get player2Points(): number {
 		return this._player2Points;
 	}
 

@@ -97,7 +97,7 @@ export abstract class Game {
 
 		if (this.gameStatus !== 'RUNNING') return;
 
-		if (player === this.gamePlayers[Game.PLAYER_1]) {
+		if (player.webSocketUserSession.getId === this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getId) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_left_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -109,7 +109,7 @@ export abstract class Game {
 			}
 			this.updatePaddleSpeeds();
 		}
-		else if (player === this.gamePlayers[Game.PLAYER_2]) {
+		else if (player.webSocketUserSession.getId === this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getId) {
 			if (paddleDirection === 'GAME_PADDLE_UP_KEYDOWN') {
 				this.keys.paddle_right_up = true;
 			} else if (paddleDirection === 'GAME_PADDLE_UP_KEYUP') {
@@ -133,20 +133,14 @@ export abstract class Game {
 
 	public playerExit(playerDisconnected: GamePlayer) {
 
-		console.warn('Game: playerExit')
-
 		if (this.gameStatus !== 'RUNNING'){
 			this.abort();
 		}
 
-		if (playerDisconnected === this.gamePlayers[Game.PLAYER_1]) {
-			console.warn('Game: playerExit player1')
+		if (playerDisconnected.webSocketUserSession.getId === this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getId) {
 			this.gamePlayersStatus = 'PLAYER_1_DISCONNECTED';
-		} else if (playerDisconnected === this.gamePlayers[Game.PLAYER_2]) {
-			console.warn('Game: playerExit player2')
+		} else if (playerDisconnected.webSocketUserSession.getId === this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getId) {
 			this.gamePlayersStatus = 'PLAYER_2_DISCONNECTED';
-		}else{
-			console.warn('Game: playerExit nao deu match!!')
 		}
 	}
 
