@@ -1,11 +1,11 @@
 HTTPS_PORT=3000
 WSS_PORT=3001
-IS_ENVIRONMENT_TEST=false
+IS_ENVIRONMENT_TEST=true
 
 install:
-	export JWT_PUBLIC_KEY_BASE64="a"
-	export SSL_KEY_BASE64="b"
-	export SSL_CERT_BASE64="c"
+	JWT_PUBLIC_KEY_BASE64="a"
+	SSL_KEY_BASE64="b"
+	SSL_CERT_BASE64="c"
 	npm init -y
 	npm install --save-dev @types/jest @types/node jest ts-jest
 	npm install --save @types/node @types/ws ts-node typescript ws

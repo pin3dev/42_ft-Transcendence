@@ -3,13 +3,13 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"start": "node src/Main.js",
+		"start": "ts-node src_ts/Main.ts",
 		"test": "jest"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"type": "module",
+	"type": "commonjs",
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"@types/jsonwebtoken": "^9.0.1",

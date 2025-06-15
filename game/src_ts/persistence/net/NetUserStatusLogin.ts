@@ -1,11 +1,10 @@
 import { Status, UserStatusLogin } from "../UserStatusLogin";
 
-const { setCache } = require("../../../../pckg/redis/modules.js") as {
-    setCache: (key: string, value: any, ttl?: number | null) => Promise<void>
-};
+// Evite usar import/export aqui se o módulo for CommonJS
+const redisModules = require("../../../../pckg/redis/modules.js");
 
-export class NetUserStatusLogin implements UserStatusLogin{
-	async setUserStatus(userId : string, status : Status) : Promise<void>{
-		 await setCache(`user_status:${userId}`, status, null);
+export class NetUserStatusLogin implements UserStatusLogin {
+	async setUserStatus(userId: string, status: Status): Promise<void> {
+		await redisModules.setCache(`user_status:${userId}`, status, null);
 	}
 }
