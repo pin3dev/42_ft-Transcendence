@@ -1,5 +1,6 @@
 import { Game } from "../game/Game";
 import { GameScoreboard } from "../game/GameScoreboard";
+import { GameHandlerAPI } from "../handlers/GameHandlerAPI";
 import { Message, MessageType } from "../message/Message";
 import { MessageWithValue } from "../message/MessageWithValue";
 import { Sender } from "../Sender";
@@ -16,13 +17,12 @@ export enum TournamentStatus {
 	WAITING_PLAYERS,
 	READY,
 	RUNNING,
-	WITHOUT_PLAYERS,
 	FINISHED
 }
 
 export enum RoundStatus {
 	COUNT_DOWN,
-	WAITING_COUTDOWN,
+	WAITING_COUNTDOWN,
 	CREATE_ROUND,
 	ROUND_GOING_ON,
 	ROUNDS_ENDED
@@ -37,7 +37,7 @@ export class Tournament implements GameTournamentListener {
 	private _numberOfPlayer: number = 0;
 
 	private _tournamentPlayers: Map<WebSocketUserSession, TournamentPlayer>;
-	private _globalGamesMap: Map<number, Game>;
+	private _gameHandlerAPI: GameHandlerAPI;
 	private _idsOfGamesRound: number[];
 
 	// overall tournament ranking
@@ -66,10 +66,10 @@ export class Tournament implements GameTournamentListener {
 
 	private _makeRound: MakeRounds;
 
-	constructor(numberOfPlayer: number, globalGamesMap: Map<number, Game>) {
+	constructor(numberOfPlayer: number, gameHandlerAPI: GameHandlerAPI) {
 
 		this._numberOfPlayer = numberOfPlayer;
-		this._globalGamesMap = globalGamesMap;
+		this._gameHandlerAPI = gameHandlerAPI;
 
 		this._idsOfGamesRound = [];
 
@@ -198,17 +198,10 @@ export class Tournament implements GameTournamentListener {
 	private tournamentLoop() {
 		this.mainInterval = setInterval(() => {
 
-			if (this._tournamentStatus === TournamentStatus.WITHOUT_PLAYERS) {
-				this.stopTournamentLoop();
-				return;
-			}
-
 			switch (this._roundStatus) {
-				case RoundStatus.WAITING_COUTDOWN:
-					break;
 				case RoundStatus.COUNT_DOWN:
 					this.sendCountDown();
-					this._roundStatus = RoundStatus.WAITING_COUTDOWN;
+					this._roundStatus = RoundStatus.WAITING_COUNTDOWN;
 					break;
 				case RoundStatus.CREATE_ROUND:
 					this._roundStatus = RoundStatus.ROUND_GOING_ON;
@@ -216,12 +209,12 @@ export class Tournament implements GameTournamentListener {
 					break;
 				case RoundStatus.ROUND_GOING_ON:
 					{
-						if (this._numberOfGamesCompletedInTheRound === this._numberOfGamesCompletedInTheRoundMaxPossible) {
-							this._roundStatus = RoundStatus.COUNT_DOWN;
-							this._roundCount++;
-						}
 						if (this._roundCount === this._roundCountMaxRounds) {
 							this._roundStatus = RoundStatus.ROUNDS_ENDED;
+						} else if (this._numberOfGamesCompletedInTheRound === this._numberOfGamesCompletedInTheRoundMaxPossible) {
+							this._roundStatus = RoundStatus.COUNT_DOWN;
+							this._roundCount++;
+
 						}
 						break;
 					}
@@ -273,6 +266,7 @@ export class Tournament implements GameTournamentListener {
 	}
 
 	private doRound(): void {
+
 		// 1) countDeJogosDaRodada = 0;
 		// 2) limpar mapa de jogos da rodada do torneio
 		// 3) pegar uma rodada no mapa de jogos do torneio
@@ -288,7 +282,7 @@ export class Tournament implements GameTournamentListener {
 				//rest values to a new round
 		/* 1 */	this._numberOfGamesCompletedInTheRound = 0;
 		/* 2 */	for (const idOfGamesInTheRound of this._idsOfGamesRound) {
-			this._globalGamesMap.delete(idOfGamesInTheRound);
+			this._gameHandlerAPI.removeGameToGlobalGameMap(idOfGamesInTheRound);
 		}
 		this._idsOfGamesRound = [];
 
@@ -302,16 +296,18 @@ export class Tournament implements GameTournamentListener {
 
 		for (const playersOfGame of roundPairs) {
 			const gameScoreboard: GameScoreboard = new GameScoreboard(playersOfGame[0], playersOfGame[1]);
-		/* 4 */		arrayOfGamescoreboardToThisRound.push(gameScoreboard);
+/* 4 */		arrayOfGamescoreboardToThisRound.push(gameScoreboard);
 			this._overallScoreboardOfTheRound.addGameScoreboard(gameScoreboard);
+
 		}
 
-		/* 5 */	this.sendMessageOverallScoreboard();
-		/* 6 */ this.sendMessageTableOfPoints();
+		/* 5 */		this.sendMessageOverallScoreboard();
+		/* 6 */ 	this.sendMessageTableOfPoints();
 
 		let isTheTournamentWithoutPlayers: boolean = true;
 
 		/* 7 */ for (const gameboard of arrayOfGamescoreboardToThisRound) {
+
 
 			// If both players are offline there is no reason to play,
 			// we will count this match and continue
@@ -330,14 +326,14 @@ export class Tournament implements GameTournamentListener {
 			gameboard.player1.webSocketUserSession.setGameId = gameId;
 			gameboard.player2.webSocketUserSession.setGameId = gameId;
 
-			this._globalGamesMap.set(gameId, newGame);
+			this._gameHandlerAPI.addGameToGlobalGameMap(newGame, gameboard.player1, gameboard.player2);
 			this._idsOfGamesRound.push(gameId);
 
 			newGame.createMatch(gameboard.player1, gameboard.player2);
 		}
 
 		if (isTheTournamentWithoutPlayers) {
-			this._tournamentStatus = TournamentStatus.WAITING_PLAYERS;
+			this._roundStatus = RoundStatus.ROUNDS_ENDED;
 		}
 	}
 
@@ -347,14 +343,12 @@ export class Tournament implements GameTournamentListener {
 		this._overallScoreboardOfTheRound.addGameScoreboard(gameScoreboard);
 		this.sendMessageOverallScoreboard();
 	}
+
 	playEnded(gameScoreboard: GameScoreboard): void {
 
 		//change gameScoreboard status
 		this._tableOfPoints.addPlayerScore(gameScoreboard);
 		this._numberOfGamesCompletedInTheRound++;
-		this.sendMessageOverallScoreboard();
-		this.sendMessageTableOfPoints();
-
 	}
 
 	// ------------------- interfaces methods end -------------------
@@ -390,17 +384,5 @@ export class Tournament implements GameTournamentListener {
 			: new MessageWithValue(messageType, obj);
 
 		sender.sendMessage(messageToSend);
-	}
-
-	private getPlayerGame(wsSession: WebSocketUserSession): Game | undefined {
-
-		const gameId = wsSession.getGameId;
-		const sender = new Sender(wsSession.getWebsocket);
-
-		let playerGame = this._globalGamesMap.get(gameId);
-		if (!playerGame) {
-			sender.sendMessage(new Message('ERROR_MATCH_DOES_NOT_EXIST'));
-		}
-		return playerGame;
 	}
 }
