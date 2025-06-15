@@ -329,41 +329,41 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           statusText.classList.add('hidden');
 
           break;
-          case 'TOURNAMENT_CREATED':
-            statusText.textContent = 'Torneio criado! Clique para participar.';
-            tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
-            joinButton.classList.remove('hidden'); // Mostra o botão para entrar
-            break;
+        case 'TOURNAMENT_CREATED':
+          statusText.textContent = 'Torneio criado! Clique para participar.';
+          tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
+          joinButton.classList.remove('hidden'); // Mostra o botão para entrar
+          break;
 
         case 'TOURNAMENT_WAITING_PLAYER':
-            statusText.textContent = `Aguardando jogadores...`; // Você pode adicionar contagem se a API enviar: (${data.value.current}/${data.value.total})
-            tournamentSetupContainer.classList.add('hidden');
-            joinButton.classList.add('hidden');
-            break;
-            
+          statusText.textContent = `Aguardando jogadores...`; // Você pode adicionar contagem se a API enviar: (${data.value.current}/${data.value.total})
+          tournamentSetupContainer.classList.add('hidden');
+          joinButton.classList.add('hidden');
+          break;
+
         case 'TOURNAMENT_COUNT_DOWN':
-            statusText.textContent = `Torneio começa em: ${data.value}`;
-            break;
-            
+          statusText.textContent = `Torneio começa em: ${data.value}`;
+          break;
+
         case 'ERROR_TOURNAMENT_ALREADY_EXISTS':
-            statusText.textContent = 'Erro: Um torneio já existe.';
-            tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
-            joinButton.textContent = 'Entrar no Torneio Existente';
-            joinButton.classList.remove('hidden'); // Mostra o botão para entrar
-            break;
+          statusText.textContent = 'Erro: Um torneio já existe.';
+          tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
+          joinButton.textContent = 'Entrar no Torneio Existente';
+          joinButton.classList.remove('hidden'); // Mostra o botão para entrar
+          break;
 
         case 'ERROR_TOURNAMENT_CREATING_FEW_PLAYERS':
-            statusText.textContent = `Erro: Mínimo de ${data.value} jogadores.`;
-            break;
+          statusText.textContent = `Erro: Mínimo de ${data.value} jogadores.`;
+          break;
 
         case 'ERROR_TOURNAMENT_CREATING_MANY_PLAYERS':
-            statusText.textContent = `Erro: Máximo de ${data.value} jogadores.`;
-            break;
-        
+          statusText.textContent = `Erro: Máximo de ${data.value} jogadores.`;
+          break;
+
         case 'ERROR_TOURNAMENT_ALREADY_PARTICIPATING':
-            statusText.textContent = 'Você já está no torneio. Aguardando início...';
-            joinButton.classList.add('hidden');
-            break;
+          statusText.textContent = 'Você já está no torneio. Aguardando início...';
+          joinButton.classList.add('hidden');
+          break;
         case 'GAME_FULL':
           statusText.textContent = 'Jogo completo! Preparando para iniciar...';
           updateGameState(data.value);
@@ -391,6 +391,10 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           statusText.textContent = 'Você perdeu! Mais sorte na próxima.';
           matchStarted = false;
 
+          break;
+        case 'GAME_CAN_START':
+          statusText.textContent = 'Oponente encontrado! Clique para iniciar.';
+          startButton.classList.remove('hidden');
           break;
         case 'GAME_ABORTED':
           matchmakingUI.classList.remove('hidden');
@@ -431,7 +435,7 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
     statusText.textContent = `Criando torneio para ${selectedPlayers} jogadores...`;
     statusText.classList.remove('hidden');
   };
-  
+
   // O antigo 'handlebuscaClick' agora é para entrar no torneio
   const handleJoinTournamentClick = () => {
     ws?.send(JSON.stringify({ type: 'TOURNAMENT_TO_PARTICIPATE' }));
