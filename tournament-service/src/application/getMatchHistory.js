@@ -13,13 +13,6 @@ async function getMatchHistory(userId) {
           { player2_id: userId }
         ]
       },
-      include: {
-        tournament: {
-          select: {
-            id: true
-          }
-        }
-      },
       orderBy: {
         started_at: 'desc'
       },
@@ -44,11 +37,19 @@ async function getMatchHistory(userId) {
     const simplifiedMatches = matches.map(match => {
       const isPlayer1 = match.player1_id === userId;
       const adversarioId = isPlayer1 ? match.player2_id : match.player1_id;
-      const won = match.winner_id === userId;
+      
+      let resultado;
+      if (match.winner_id === null) {
+        resultado = 'Empate';
+      } else if (match.winner_id === userId) {
+        resultado = 'Vitoria';
+      } else {
+        resultado = 'Derrota';
+      }
       
       return {
         adversario_id: adversarioId,
-        resultado: won ? 'Vitoria' : 'Derrota',
+        resultado: resultado,
         placar: match.score,
         data: match.started_at,
         tipo: match.tournament_id ? 'Torneio' : '1v1'
