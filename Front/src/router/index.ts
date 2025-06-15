@@ -14,8 +14,8 @@ const routes: Record<string, () => void | Promise<void>> = {
   '*': renderNotFound,
   '/Login': renderLogin,
   '/ComoJogar': renderHowToPlayPage,
-  '/Game': GamePage,
-  '/GameTournament': GamePageTournament,
+  '/Game': () => renderProtectedRoute(GamePage),
+  '/GameTournament': () => renderProtectedRoute(GamePageTournament),
   '/Register': renderRegister,
   '/Profile': () => renderProtectedRoute(renderTestPage)
 };
