@@ -1,0 +1,5 @@
+1. O certificado ta sendo gerado para o IP da maquina que rodar o script
+2. A maquina que rodar o projeto pode acessar o mesmo por localhost, ou por transcendence.local se for configurado em sudo vim /etc/hosts como transcendence.local 127.0.0.1
+3. As demais maquina que tentarem acesso remoto terão que acessar o site pelo ip do servidor do site, ou por transcendence.local se for configurado em sudo vim /etc/hosts como transcendence.local $IP_SERVIDOR_SITE
+4. Além da port os acessos remotos precisarão do certificado disponivel no servidor do site em cp ~/.local/share/mkcert/rootCA.pem ~/Desktop/ 
+5. Na maquina remota no firefox, deve importar o certificado passado por discord ou outra plataforma: settings > security & privacy > certificate > view certificate > authorities > import
