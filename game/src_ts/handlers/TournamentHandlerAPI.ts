@@ -45,6 +45,10 @@ export class TournamentHandlerAPI implements WebSocketUserSessionListener {
 		//first things, handler tournament create
 		if (message.getType === 'TOURNAMENT_CREATE') {
 
+			if (this._tournamentPublic !== null){
+				this._tournamentPublic?.addPlayer(ws);
+			}
+
 			const messageWithValue = message as MessageWithValue<number>;
 
 			if (messageWithValue.getValue < TournamentHandlerAPI.MINUMUM_NUMBER_OF_PLAYERS) {
