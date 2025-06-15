@@ -439,7 +439,7 @@ export function renderPongGame(container: HTMLElement): () => void {
   };
 
   const handleStartAgainClick = () => {
-    ws?.send(JSON.stringify({ type: 'GAME_START_MATCH' }));
+    ws?.send(JSON.stringify({ type: 'GAME_CREATE_GLOBAL_MATCH' }));
     AgainButton.classList.add('hidden');
     statusText.textContent = 'Aguardando início...';
   };
