@@ -75,10 +75,12 @@ generate_ssl_certificates() {
   fi
 
   mkdir -p certs
+  LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null)
 
   if [ ! -f certs/localhost.pem ] || [ ! -f certs/localhost-key.pem ]; then
     echo "🔐 Gerando certificados SSL com mkcert..."
-    mkcert -cert-file certs/localhost.pem -key-file certs/localhost-key.pem localhost 127.0.0.1 ::1
+    mkcert -cert-file certs/localhost.pem -key-file certs/localhost-key.pem localhost 127.0.0.1 ::1 $LOCAL_IP transcendence.local
+    
   else
     echo "ℹ️  Certificados SSL já existem. Pulando geração."
   fi
