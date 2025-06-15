@@ -117,9 +117,18 @@ export class Tournament implements GameTournamentListener {
 			return false;
 		}
 
+		// check if the websocket is not already in the tournament
 		if (webSocketUserSession.getTournamentId === this._id) {
 			sender.sendMessage(new Message('ERROR_TOURNAMENT_ALREADY_PARTICIPATING'));
 			return false;
+		}
+
+		// check if the user is not already in the tournament
+		for (let webSocketUserSessionAlreadyInTheTournament of this._tournamentPlayers.keys()) {
+			if (webSocketUserSession.getUserId === webSocketUserSessionAlreadyInTheTournament.getUserId) {
+				sender.sendMessage(new Message('ERROR_TOURNAMENT_ALREADY_PARTICIPATING'));
+				return false;
+			}
 		}
 
 		// add the id of this tournament in webSocketUserSession to make it easier
@@ -141,6 +150,8 @@ export class Tournament implements GameTournamentListener {
 	}
 
 	public removePlayer(webSocketUserSession: WebSocketUserSession): void {
+
+		webSocketUserSession.setTournamentId = 0;
 
 		if (this._tournamentStatus === TournamentStatus.FINISHED) {
 			return;
