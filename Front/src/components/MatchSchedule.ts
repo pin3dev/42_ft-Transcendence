@@ -18,9 +18,7 @@ export interface MatchData {
 // --- FIX: Added initial data for the component to render on load ---
 // This was missing and would have caused a runtime error.
 const initialScheduleData: MatchData[] = [
-    { id: 1, player1Name: 'Aguardando', player2Name: 'Aguardando', score1: 0, score2: 0 },
-    { id: 2, player1Name: 'Aguardando', player2Name: 'Aguardando', score1: 0, score2: 0 },
-    { id: 3, player1Name: 'Aguardando', player2Name: 'Aguardando', score1: 0, score2: 0 },
+    { id: 1, player1Name: 'Aguardando', player2Name: 'Aguardando', score1: 0, score2: 0 }
 ];
 
 
