@@ -53,7 +53,10 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  * @param container O elemento HTML onde o jogo será renderizado.
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
-export function renderPongGameTournament(container: HTMLElement): () => void {
+export function renderPongGameTournament(
+  container: HTMLElement,
+  onTournamentUpdate?: (matches: any[]) => void // <-- NOVO: Adiciona o parâmetro de callback
+): () => void {
 
   let ui: UIElements | null = null;
   // --- 1. CRIAÇÃO DA ESTRUTURA HTML COM TAILWIND ---
@@ -329,49 +332,40 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           statusText.classList.add('hidden');
 
           break;
-          case 'TOURNAMENT_CREATED':
-            statusText.textContent = 'Torneio criado! Clique para participar.';
-            tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
-            joinButton.classList.remove('hidden'); // Mostra o botão para entrar
-            break;
+        case 'TOURNAMENT_CREATED':
+          statusText.textContent = 'Torneio criado! Clique para participar.';
+          tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
+          joinButton.classList.remove('hidden'); // Mostra o botão para entrar
+          break;
 
         case 'TOURNAMENT_WAITING_PLAYER':
-            statusText.textContent = `Aguardando jogadores...`; // Você pode adicionar contagem se a API enviar: (${data.value.current}/${data.value.total})
-            tournamentSetupContainer.classList.add('hidden');
-            joinButton.classList.add('hidden');
-            break;
-            
+          statusText.textContent = `Aguardando jogadores...`; // Você pode adicionar contagem se a API enviar: (${data.value.current}/${data.value.total})
+          tournamentSetupContainer.classList.add('hidden');
+          joinButton.classList.add('hidden');
+          break;
+
         case 'TOURNAMENT_COUNT_DOWN':
-            statusText.textContent = `Torneio começa em: ${data.value}`;
-            break;
-            
+          statusText.textContent = `Torneio começa em: ${data.value}`;
+          break;
+
         case 'ERROR_TOURNAMENT_ALREADY_EXISTS':
-            statusText.textContent = 'Erro: Um torneio já existe.';
-            tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
-            joinButton.textContent = 'Entrar no Torneio Existente';
-            joinButton.classList.remove('hidden'); // Mostra o botão para entrar
-            break;
+          statusText.textContent = 'Erro: Um torneio já existe.';
+          tournamentSetupContainer.classList.add('hidden'); // Esconde a UI de criação
+          joinButton.textContent = 'Entrar no Torneio Existente';
+          joinButton.classList.remove('hidden'); // Mostra o botão para entrar
+          break;
 
         case 'ERROR_TOURNAMENT_CREATING_FEW_PLAYERS':
-            statusText.textContent = `Erro: Mínimo de ${data.value} jogadores.`;
-            break;
+          statusText.textContent = `Erro: Mínimo de ${data.value} jogadores.`;
+          break;
 
         case 'ERROR_TOURNAMENT_CREATING_MANY_PLAYERS':
-            statusText.textContent = `Erro: Máximo de ${data.value} jogadores.`;
-            break;
-        
-        case 'ERROR_TOURNAMENT_ALREADY_PARTICIPATING':
-            statusText.textContent = 'Você já está no torneio. Aguardando início...';
-            joinButton.classList.add('hidden');
-            break;
-        case 'GAME_WAITING_NEW_PLAYER':
-          statusText.textContent = 'Procurando partida...';
+          statusText.textContent = `Erro: Máximo de ${data.value} jogadores.`;
           break;
-        case 'GAME_CAN_START':
-          // ui.matchmakingContainer.style.display = 'flex';
-          // ui.matchStatusDisplay.textContent = 'Jogador encontrado! Clique em Aceitar para começar.';
-          statusText.textContent = 'Oponente encontrado! Clique para iniciar.';
-          startButton.classList.remove('hidden');
+
+        case 'ERROR_TOURNAMENT_ALREADY_PARTICIPATING':
+          statusText.textContent = 'Você já está no torneio. Aguardando início...';
+          joinButton.classList.add('hidden');
           break;
         case 'GAME_FULL':
           statusText.textContent = 'Jogo completo! Preparando para iniciar...';
@@ -383,10 +377,7 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           if (data.value === 0) {
             matchStarted = true;
             matchmakingUI.classList.add('hidden');
-
-
           }
-
           break;
         case 'GAME_STATUS':
           updateGameState(data.value);
@@ -404,11 +395,22 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           matchStarted = false;
 
           break;
+        case 'GAME_CAN_START':
+          statusText.textContent = 'Oponente encontrado! Clique para iniciar.';
+          startButton.classList.remove('hidden');
+          break;
         case 'GAME_ABORTED':
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Partida abortada: o oponente saiu.';
           matchStarted = false;
-
+          break;
+        case 'TOURNAMENT_OVERALL_SCOREBOARD':
+          console.log('Recebido placar geral do torneio:', data.value);
+          // Se o callback foi fornecido ao renderizar o componente...
+          if (onTournamentUpdate) {
+            // ...chame-o com os dados das partidas.
+            onTournamentUpdate(data.value);
+          }
           break;
         default:
           console.warn('Tipo de mensagem não tratada:', data.type);
@@ -444,7 +446,7 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
     statusText.textContent = `Criando torneio para ${selectedPlayers} jogadores...`;
     statusText.classList.remove('hidden');
   };
-  
+
   // O antigo 'handlebuscaClick' agora é para entrar no torneio
   const handleJoinTournamentClick = () => {
     ws?.send(JSON.stringify({ type: 'TOURNAMENT_TO_PARTICIPATE' }));
@@ -467,8 +469,10 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
 
       if (e.key === 'ArrowUp') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }));
+        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }))
       } else if (e.key === 'ArrowDown') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }));
+        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }))
       }
     }
   };
@@ -477,8 +481,10 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
     if (!matchStarted) return;
     if (e.key === 'ArrowUp') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
+      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }))
     } else if (e.key === 'ArrowDown') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
+      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }))
     }
   };
 
