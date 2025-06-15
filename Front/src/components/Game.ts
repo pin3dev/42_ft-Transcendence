@@ -163,10 +163,10 @@ export function renderPongGame(container: HTMLElement): () => void {
   startButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
   startButton.textContent = 'Aceitar Partida';
 
-  const AgianButton = document.createElement('button');
-  AgianButton.id = 'accept-match-button-again';
-  AgianButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
-  AgianButton.textContent = 'Aceitar Partida';
+  const AgainButton = document.createElement('button');
+  AgainButton.id = 'accept-match-button-again';
+  AgainButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
+  AgainButton.textContent = 'Aceitar Partida';
 
   const SearchButton = document.createElement('button');
   SearchButton.id = 'accept-match-button';
@@ -174,7 +174,7 @@ export function renderPongGame(container: HTMLElement): () => void {
   SearchButton.textContent = 'Procurar Partida';
 
   // Monta a estrutura
-  matchmakingUI.append(statusText, startButton, SearchButton);
+  matchmakingUI.append(statusText, startButton, SearchButton, AgainButton);
   gameArea.append(canvas, matchmakingUI);
   container.append(scoreboardContainer, gameArea); // Adiciona a área do jogo completa ao container principal
 
@@ -307,7 +307,7 @@ export function renderPongGame(container: HTMLElement): () => void {
     ws.onopen = async () => {
       console.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
-      AgianButton.classList.add('hidden');
+      AgainButton.classList.add('hidden');
 
       // Garante que temos os dados de autenticação necessários
       const authReady = await ensureAuthDataAvailable();
@@ -394,21 +394,21 @@ export function renderPongGame(container: HTMLElement): () => void {
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Parabéns, você venceu!';
           matchStarted = false;
-          AgianButton.classList.remove('hidden');
+          AgainButton.classList.remove('hidden');
 
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Você perdeu! Mais sorte na próxima.';
           matchStarted = false;
-          AgianButton.classList.remove('hidden');
+          AgainButton.classList.remove('hidden');
 
           break;
         case 'GAME_ABORTED':
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Partida abortada: o oponente saiu.';
           matchStarted = false;
-          AgianButton.classList.remove('hidden');
+          AgainButton.classList.remove('hidden');
 
           break;
         default:
@@ -421,7 +421,7 @@ export function renderPongGame(container: HTMLElement): () => void {
       statusText.textContent = 'Desconectado do servidor. Tente recarregar a página.';
       matchStarted = false;
       startButton.classList.add('hidden');
-      AgianButton.classList.add('hidden');
+      AgainButton.classList.add('hidden');
     };
 
     ws.onerror = (error) => {
@@ -440,7 +440,7 @@ export function renderPongGame(container: HTMLElement): () => void {
 
   const handleStartAgainClick = () => {
     ws?.send(JSON.stringify({ type: 'GAME_START_MATCH' }));
-    AgianButton.classList.add('hidden');
+    AgainButton.classList.add('hidden');
     statusText.textContent = 'Aguardando início...';
   };
 
@@ -473,7 +473,7 @@ export function renderPongGame(container: HTMLElement): () => void {
     }
   };
 
-  AgianButton.addEventListener('click', handleStartAgainClick);
+  AgainButton.addEventListener('click', handleStartAgainClick);
   startButton.addEventListener('click', handleStartClick);
   SearchButton.addEventListener('click', handlebuscaClick);
   window.addEventListener('keydown', handleKeyDown);
