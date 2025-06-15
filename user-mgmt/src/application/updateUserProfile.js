@@ -77,12 +77,12 @@ async function updateUserProfile(userId, body) {
     avatar_path: avatarPath,
   });
 
-  const gatewayUrl = process.env.GATEWAY_URL || 'https://localhost';
+  const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
   return {
     name: updated.name,
     avatar_url: updated.avatar_path
-      ? `${gatewayUrl}/static${updated.avatar_path}`
+      ? `https://${GATEWAY}/static${updated.avatar_path}`
       : null,
   };
 }

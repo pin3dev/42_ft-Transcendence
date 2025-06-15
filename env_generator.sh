@@ -76,6 +76,7 @@ generate_ssl_certificates() {
 
   mkdir -p certs
   LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null)
+  LOCAL_IP_BASE64=$(echo -n "$LOCAL_IP" | base64)
 
   if [ ! -f certs/localhost.pem ] || [ ! -f certs/localhost-key.pem ]; then
     echo "🔐 Gerando certificados SSL com mkcert..."
@@ -103,6 +104,9 @@ JWT_PUBLIC_KEY_BASE64=$PUBLIC_KEY
 # Certificado e chave privada SSL para HTTPS (base64)
 SSL_CERT_BASE64=$SSL_CERT
 SSL_KEY_BASE64=$SSL_KEY
+
+# ===================== Network Configuration =====================
+LOCAL_IP_BASE64=$LOCAL_IP_BASE64
 EOF
 
   echo "✅ Arquivo .env criado com sucesso."

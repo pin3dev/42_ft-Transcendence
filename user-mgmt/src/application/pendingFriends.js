@@ -12,7 +12,7 @@ async function pendingFriends(userId) {
   const profiles = await profileRepo.findManyByIds(requesterIds);
   console.log("👤 Perfis encontrados:", profiles);
 
-  const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
+  const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
   return requests.map(req => {
     const profile = profiles.find(p => p.user_id === req.user_id);
@@ -20,8 +20,8 @@ async function pendingFriends(userId) {
       user_id: req.user_id,
       name: profile?.name || "Desconhecido",
       avatar_url: profile?.avatar_path
-        ? `${GATEWAY}/static${profile.avatar_path}`
-        : `${GATEWAY}/static/avatars/default.png`,
+        ? `https://${GATEWAY}/static${profile.avatar_path}`
+        : `https://${GATEWAY}/static/avatars/default.png`,
       since: req.created_at
     };
   });

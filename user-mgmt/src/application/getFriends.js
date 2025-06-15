@@ -2,6 +2,7 @@ const { listAccepted } = require("../infrastructure/db/friends_repository");
 const profileRepo = require("../infrastructure/db/profile_repository");
 const { getCache } = require("../../pckg/redis/modules");
 
+
 async function getFriends(userId) {
   try {
     const rows = await listAccepted(userId);
@@ -15,7 +16,7 @@ async function getFriends(userId) {
     console.log("🧠 Perfis retornados:", profiles);
     console.log("📌 Tipo de profiles:", Array.isArray(profiles) ? "array" : typeof profiles);
 
-    const GATEWAY = process.env.GATEWAY_URL || "https://localhost";
+    const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
     // Mapear os amigos com status online/offline
     const friendsWithStatus = await Promise.all(
@@ -30,7 +31,7 @@ async function getFriends(userId) {
         // Verificar status online no cache
         let isOnline = false;
         try {
-          const onlineStatus = await getCache(`user_id:${fid}`);
+          const onlineStatus = await getCache(`user_status:${fid}`);
           isOnline = onlineStatus ? JSON.parse(onlineStatus) === true : false;
         } catch (error) {
           console.warn(`⚠️ Erro ao verificar status online para user ${fid}:`, error);
@@ -42,8 +43,8 @@ async function getFriends(userId) {
           status: row.status || "ACCEPTED",
           name: profile?.name || "Desconhecido",
           avatar_url: profile?.avatar_path
-            ? `${GATEWAY}/static${profile.avatar_path}`
-            : `${GATEWAY}/static/avatars/default.png`,
+            ? `https://${GATEWAY}/static${profile.avatar_path}`
+            : `https://${GATEWAY}/static/avatars/default.png`,
           since: row.updated_at,
           is_online: isOnline,
         };
