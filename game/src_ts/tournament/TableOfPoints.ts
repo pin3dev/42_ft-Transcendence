@@ -16,7 +16,6 @@ export class TableOfPoints {
 	}
 
 	public addPlayerScore(gameScoreboard: GameScoreboard): void {
-
 		if (this.areBothPlayersOffline(gameScoreboard)) return;
 
 		if (gameScoreboard.isDraw()) {
@@ -55,6 +54,8 @@ export class TableOfPoints {
 			if (lastStats && JSON.stringify(stats) !== JSON.stringify(lastStats)) {
 				displayPosition = i + 1;
 			}
+
+			player.position = displayPosition;
 
 			lastStats = stats;
 
