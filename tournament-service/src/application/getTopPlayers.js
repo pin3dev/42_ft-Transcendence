@@ -11,7 +11,7 @@ async function getTopPlayers(limit = 5) {
       const playerId = player.player_id;
       const matchStats = await matchRepo.getStats(playerId);
       
-      // Calcula taxa de aproveitamento (win rate)
+      // Calcula taxa de aproveitamento (win rate) - desconsiderando empates
       const totalGames = matchStats.totalWins + matchStats.totalLosses;
       let win_rate = "N/A";
       
@@ -25,6 +25,7 @@ async function getTopPlayers(limit = 5) {
         score: player.score,
         total_wins: matchStats.totalWins,
         total_losses: matchStats.totalLosses,
+        // total_draws: matchStats.totalDraws,
         win_rate
       };
     })

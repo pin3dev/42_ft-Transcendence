@@ -45,6 +45,14 @@ case $EVENT_TYPE in
         redis_publish "match.finished" "$MATCH_EVENT"
         ;;
     
+    "draw")
+        echo "🤝 Criando partida com empate..."
+        STARTED_TIME=$(get_past_timestamp 2)
+        ENDED_TIME=$(get_timestamp)
+        DRAW_EVENT="{\"event\":\"match.finished\",\"version\":\"1.0\",\"timestamp\":\"$ENDED_TIME\",\"source\":\"quick-test\",\"data\":{\"id\":\"draw-match-$(date +%s)\",\"tournamentId\":null,\"player1Id\":\"user-test\",\"player2Id\":\"user-opponent\",\"winnerId\":null,\"score\":\"10-10\",\"startedAt\":\"$STARTED_TIME\",\"endedAt\":\"$ENDED_TIME\"}}"
+        redis_publish "match.finished" "$DRAW_EVENT"
+        ;;
+    
     "tournament-private")
         echo "🔒 Criando torneio privado..."
         TOURNAMENT_PRIVATE="{\"event\":\"tournament.created\",\"version\":\"1.0\",\"timestamp\":\"$(get_timestamp)\",\"source\":\"quick-test\",\"data\":{\"id\":\"quick-private-$(date +%s)\",\"isPrivate\":true,\"ownerId\":\"user-test\",\"password\":\"secret123\",\"started\":\"$(get_timestamp)\",\"createdAt\":\"$(get_timestamp)\",\"players\":[\"user-test\",\"user-friend\"]}}"
@@ -83,6 +91,8 @@ case $EVENT_TYPE in
         $0 match
         sleep 1
         $0 match1v1
+        sleep 1
+        $0 draw
         sleep 1
         $0 batch
         ;;

@@ -119,6 +119,38 @@ redis_publish "match.finished" "$MATCH_EVENT_2"
 sleep 2
 
 echo "==========================================="
+echo "🤝 TESTE 3.5: MATCH_FINISHED (Empate)"
+echo "==========================================="
+
+# Evento: Match Finished com empate (winnerId = null)
+STARTED_TIME_DRAW=$(get_past_timestamp 4)
+ENDED_TIME_DRAW=$(get_timestamp)
+
+MATCH_EVENT_DRAW=$(cat <<EOF
+{
+  "event": "match.finished",
+  "version": "1.0",
+  "timestamp": "$ENDED_TIME_DRAW",
+  "source": "test-script",
+  "data": {
+    "id": "M-DRAW-$(date +%s)",
+    "tournamentId": null,
+    "player1Id": "2",
+    "player2Id": "3",
+    "winnerId": null,
+    "score": "10-10",
+    "startedAt": "$STARTED_TIME_DRAW",
+    "endedAt": "$ENDED_TIME_DRAW"
+  }
+}
+EOF
+)
+
+redis_publish "match.finished" "$MATCH_EVENT_DRAW"
+
+sleep 2
+
+echo "==========================================="
 echo "🏆 TESTE 4: TOURNAMENT_CREATED (Privado)"
 echo "==========================================="
 
@@ -150,13 +182,25 @@ echo "==========================================="
 echo "🎮 TESTE 5: Múltiplas partidas completas"
 echo "==========================================="
 
-# Várias partidas para popular o histórico - TODOS os campos sempre preenchidos
+# Várias partidas para popular o histórico - incluindo empates
 for i in {3..6}; do
     PLAYER1="$((RANDOM % 4 + 1))"
     PLAYER2="$((RANDOM % 4 + 2))"
-    WINNER=$([[ $((RANDOM % 2)) -eq 0 ]] && echo "$PLAYER1" || echo "$PLAYER2")
-    SCORE1=$((RANDOM % 5 + 10))
-    SCORE2=$((RANDOM % 8 + 5))
+    
+    # 15% de chance de empate, senão escolhe um vencedor aleatório
+    RAND_RESULT=$((RANDOM % 100))
+    if [[ $RAND_RESULT -lt 15 ]]; then
+        WINNER="null"
+        SCORE1="10"
+        SCORE2="10"
+        echo "🤝 Gerando empate $i: $PLAYER1 vs $PLAYER2 - Score: $SCORE1-$SCORE2"
+    else
+        WINNER=$([[ $((RANDOM % 2)) -eq 0 ]] && echo "$PLAYER1" || echo "$PLAYER2")
+        SCORE1=$((RANDOM % 5 + 10))
+        SCORE2=$((RANDOM % 8 + 5))
+        echo "🎯 Gerando partida $i: $PLAYER1 vs $PLAYER2 (Vencedor: $WINNER) - Score: $SCORE1-$SCORE2"
+    fi
+    
     TOURNAMENT_REF=$([[ $((RANDOM % 2)) -eq 0 ]] && echo '"tournament-test-001"' || echo 'null')
     
     # Gerar timestamps válidos
@@ -175,7 +219,7 @@ for i in {3..6}; do
     "tournamentId": $TOURNAMENT_REF,
     "player1Id": "$PLAYER1",
     "player2Id": "$PLAYER2",
-    "winnerId": "$WINNER",
+    "winnerId": $WINNER,
     "score": "$SCORE1-$SCORE2",
     "startedAt": "$STARTED_TIME",
     "endedAt": "$ENDED_TIME"
@@ -184,7 +228,6 @@ for i in {3..6}; do
 EOF
 )
 
-    echo "🎯 Gerando partida $i: $PLAYER1 vs $PLAYER2 (Vencedor: $WINNER) - Score: $SCORE1-$SCORE2"
     redis_publish "match.finished" "$MATCH_EVENT"
     sleep 1
 done
@@ -233,9 +276,20 @@ for i in {7..12}; do
         PLAYER2=${USERS[$((RANDOM % ${#USERS[@]}))]}
     done
     
-    WINNER=$([[ $((RANDOM % 2)) -eq 0 ]] && echo "$PLAYER1" || echo "$PLAYER2")
-    SCORE1=$((RANDOM % 8 + 10))
-    SCORE2=$((RANDOM % 8 + 5))
+    # 20% de chance de empate nas partidas adicionais
+    RAND_RESULT=$((RANDOM % 100))
+    if [[ $RAND_RESULT -lt 20 ]]; then
+        WINNER="null"
+        SCORE1="10"
+        SCORE2="10"
+        echo "🤝 Partida adicional $i: $PLAYER1 vs $PLAYER2 (EMPATE) - Score: $SCORE1-$SCORE2"
+    else
+        WINNER=$([[ $((RANDOM % 2)) -eq 0 ]] && echo "$PLAYER1" || echo "$PLAYER2")
+        SCORE1=$((RANDOM % 8 + 10))
+        SCORE2=$((RANDOM % 8 + 5))
+        echo "🎯 Partida adicional $i: $PLAYER1 vs $PLAYER2 (Vencedor: $WINNER) - Score: $SCORE1-$SCORE2"
+    fi
+    
     TOURNAMENT_REF=$([[ $((RANDOM % 3)) -eq 0 ]] && echo '"T'$((RANDOM % 3 + 1))'"' || echo 'null')
     
     # Gerar timestamps válidos e diferentes
@@ -256,7 +310,7 @@ for i in {7..12}; do
     "tournamentId": $TOURNAMENT_REF,
     "player1Id": "$PLAYER1",
     "player2Id": "$PLAYER2",
-    "winnerId": "$WINNER",
+    "winnerId": $WINNER,
     "score": "$SCORE1-$SCORE2",
     "startedAt": "$STARTED_TIME",
     "endedAt": "$ENDED_TIME"
@@ -265,7 +319,6 @@ for i in {7..12}; do
 EOF
 )
 
-    echo "🎯 Partida adicional $i: $PLAYER1 vs $PLAYER2 (Vencedor: $WINNER) - Score: $SCORE1-$SCORE2"
     redis_publish "match.finished" "$MATCH_EVENT"
     sleep 0.5
 done
@@ -291,6 +344,7 @@ echo "   docker exec event-bus redis-cli MONITOR"
 echo ""
 echo "📈 Dados gerados:"
 echo "   - 3 torneios criados (público, privado, mínimo)"
-echo "   - ~12 partidas geradas"
+echo "   - ~12 partidas geradas (incluindo empates)"
 echo "   - Histórico para múltiplos usuários"
-echo "   - Rankings calculados automaticamente"
+echo "   - Rankings calculados automaticamente (sem alteração em empates)"
+echo "   - Testes específicos para empates com winnerId = null"

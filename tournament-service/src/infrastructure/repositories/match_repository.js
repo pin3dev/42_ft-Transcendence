@@ -23,10 +23,19 @@ async function getStats(userId) {
       AND: [
         { OR: [{ player1_id: userId }, { player2_id: userId }] },
         { NOT: { winner_id: userId } },
+        { NOT: { winner_id: null } } // Exclui empates
       ],
     },
   });
-  return { totalWins, totalLosses };
+  const totalDraws = await prisma.match.count({
+    where: {
+      AND: [
+        { OR: [{ player1_id: userId }, { player2_id: userId }] },
+        { winner_id: null }
+      ],
+    },
+  });
+  return { totalWins, totalLosses, totalDraws };
 }
 
 module.exports = { insertMatch, getStats };

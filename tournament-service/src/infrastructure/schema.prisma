@@ -13,21 +13,17 @@ model Tournament {
   owner_id   String
   password   String?
   started    DateTime
-  ended      DateTime?
-  created_at DateTime  @default(now())
+  created_at DateTime
 
-  players    Player[]
-  matches    Match[]
+  @@map("tournaments")
 }
 
 model Player {
   tournament_id String
   player_id     String
-  joined_at     DateTime @default(now())
-
-  tournament Tournament? @relation(fields: [tournament_id], references: [id])
-
+  
   @@id([tournament_id, player_id])
+  @@map("players")
 }
 
 model Ranking {
@@ -41,10 +37,10 @@ model Match {
   tournament_id String?
   player1_id    String
   player2_id    String
-  winner_id     String
+  winner_id     String?
   score         String
   started_at    DateTime
   ended_at      DateTime
 
-  tournament Tournament? @relation(fields: [tournament_id], references: [id])
+  @@map("matches")
 }
