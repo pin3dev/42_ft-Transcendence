@@ -64,7 +64,7 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  */
 
 
-async function fetchUserName(userId: string): Promise<string> {
+export async function fetchUserName(userId: string): Promise<string> {
   if (!userId) {
     console.warn("fetchUserName chamado com ID nulo ou indefinido.");
     return "Jogador";
