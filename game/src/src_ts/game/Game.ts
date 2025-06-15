@@ -391,6 +391,8 @@ export abstract class Game {
 	private sendMessageGameFull() {
 		this.broadcast('GAME_FULL', {
 			id: this.id,
+			userId1: this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getId,
+			userId2: this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getId,
 			field_width: Field.WIDTH,
 			field_height: Field.HEIGHT,
 			paddle_height: Paddle.HEIGHT,
