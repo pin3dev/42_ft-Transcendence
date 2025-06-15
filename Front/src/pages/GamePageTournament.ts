@@ -143,9 +143,9 @@ export function GamePageTournament(): void {
   });
 
   mainContentArea.appendChild(gameSectionContainer);
-  mainContentArea.appendChild(sideColumn);
-
+  
   GamePageContainer.appendChild(mainContentArea);
+  GamePageContainer.appendChild(sideColumn);
   GamePageContainer.appendChild(createFooter());
   root.appendChild(GamePageContainer);
 
