@@ -134,7 +134,9 @@ export class Tournament implements GameTournamentListener {
 
 		this.sendMessageTableOfPoints();
 
-		this._tournamentStatus = TournamentStatus.READY;
+		if (this._tournamentPlayers.size === this._numberOfPlayer) {
+			this._tournamentStatus = TournamentStatus.READY;
+		}
 		return (this._tournamentPlayers.size === this._numberOfPlayer);
 	}
 
@@ -145,7 +147,17 @@ export class Tournament implements GameTournamentListener {
 		}
 
 		if (this._tournamentStatus === TournamentStatus.WAITING_PLAYERS) {
+
+			let tournamentPlayer: TournamentPlayer | undefined = this._tournamentPlayers.get(webSocketUserSession);
+
+			if (tournamentPlayer !== undefined) {
+				this._tableOfPoints.removerPlayer(tournamentPlayer);
+			}
 			this._tournamentPlayers.delete(webSocketUserSession);
+
+			if (this._tournamentPlayers.size === 0) {
+				this._tournamentStatus = TournamentStatus.FINISHED;
+			}
 			return;
 		}
 
