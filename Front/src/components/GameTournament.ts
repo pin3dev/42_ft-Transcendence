@@ -53,7 +53,10 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  * @param container O elemento HTML onde o jogo será renderizado.
  * @returns Uma função de cleanup para ser chamada quando a página for "desmontada".
  */
-export function renderPongGameTournament(container: HTMLElement): () => void {
+export function renderPongGameTournament(
+  container: HTMLElement,
+  onTournamentUpdate?: (matches: any[]) => void // <-- NOVO: Adiciona o parâmetro de callback
+): () => void {
 
   let ui: UIElements | null = null;
   // --- 1. CRIAÇÃO DA ESTRUTURA HTML COM TAILWIND ---
@@ -400,6 +403,14 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Partida abortada: o oponente saiu.';
           matchStarted = false;
+          break;
+        case 'TOURNAMENT_OVERALL_SCOREBOARD':
+          console.log('Recebido placar geral do torneio:', data.value);
+          // Se o callback foi fornecido ao renderizar o componente...
+          if (onTournamentUpdate) {
+            // ...chame-o com os dados das partidas.
+            onTournamentUpdate(data.value);
+          }
           break;
         default:
           console.warn('Tipo de mensagem não tratada:', data.type);
