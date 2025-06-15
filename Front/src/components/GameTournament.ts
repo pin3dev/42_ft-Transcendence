@@ -45,6 +45,12 @@ import {
   UIElements
 } from './GameUI';
 
+interface GameCallbacks {
+  onTournamentUpdate?: (matches: any[]) => void;
+  onRankingUpdate?: (rankings: any[]) => void;
+}
+
+
 import { ensureAuthDataAvailable } from '../utils/auth';
 import { fetchWithAuth } from '../utils/fetchWithAuth';
 
@@ -55,7 +61,7 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
  */
 export function renderPongGameTournament(
   container: HTMLElement,
-  onTournamentUpdate?: (matches: any[]) => void // <-- NOVO: Adiciona o parâmetro de callback
+  callbacks: GameCallbacks = {} // <-- ALTERADO: usa a nova interface e um valor padrão
 ): () => void {
 
   let ui: UIElements | null = null;
@@ -406,10 +412,18 @@ export function renderPongGameTournament(
           break;
         case 'TOURNAMENT_OVERALL_SCOREBOARD':
           console.log('Recebido placar geral do torneio:', data.value);
-          // Se o callback foi fornecido ao renderizar o componente...
-          if (onTournamentUpdate) {
-            // ...chame-o com os dados das partidas.
-            onTournamentUpdate(data.value);
+          // Chama o callback se ele foi fornecido no objeto
+          if (callbacks.onTournamentUpdate) {
+            callbacks.onTournamentUpdate(data.value);
+          }
+          break;
+
+        // --- NOVO CASE PARA ATUALIZAR A TABELA DE CLASSIFICAÇÃO ---
+        case 'TOURNAMENT_TABLE_OF_POINTS':
+          console.log('Recebida tabela de pontos do torneio:', data.value);
+          // Chama o novo callback se ele foi fornecido
+          if (callbacks.onRankingUpdate) {
+            callbacks.onRankingUpdate(data.value);
           }
           break;
         default:
