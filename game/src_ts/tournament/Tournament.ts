@@ -330,6 +330,8 @@ export class Tournament implements GameTournamentListener {
 		this._numberOfGamesCompletedInTheRound++;
 		this.sendMessageOverallScoreboard();
 		this.sendMessageTableOfPoints();
+
+		console.warn('Tournament: playEnded')
 	}
 
 	// ------------------- interfaces methods end -------------------

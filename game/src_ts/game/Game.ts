@@ -133,14 +133,20 @@ export abstract class Game {
 
 	public playerExit(playerDisconnected: GamePlayer) {
 
+		console.warn('Game: playerExit')
+
 		if (this.gameStatus !== 'RUNNING'){
 			this.abort();
 		}
 
 		if (playerDisconnected === this.gamePlayers[Game.PLAYER_1]) {
+			console.warn('Game: playerExit player1')
 			this.gamePlayersStatus = 'PLAYER_1_DISCONNECTED';
 		} else if (playerDisconnected === this.gamePlayers[Game.PLAYER_2]) {
+			console.warn('Game: playerExit player2')
 			this.gamePlayersStatus = 'PLAYER_2_DISCONNECTED';
+		}else{
+			console.warn('Game: playerExit nao deu match!!')
 		}
 	}
 
@@ -391,8 +397,8 @@ export abstract class Game {
 	private sendMessageGameFull() {
 		this.broadcast('GAME_FULL', {
 			id: this.id,
-			userId1: this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getId,
-			userId2: this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getId,
+			userId1: this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId,
+			userId2: this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getUserId,
 			field_width: Field.WIDTH,
 			field_height: Field.HEIGHT,
 			paddle_height: Paddle.HEIGHT,
