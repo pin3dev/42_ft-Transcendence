@@ -44,6 +44,10 @@ import {
   createFullGameUI,
   UIElements
 } from './GameUI';
+
+import { ensureAuthDataAvailable } from '../utils/auth';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
+
 /**
  * Renderiza a página do jogo de Pong e inicializa a lógica.
  * @param container O elemento HTML onde o jogo será renderizado.
@@ -293,11 +297,25 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
     // ws = new WebSocket(`ws://${window.location.hostname}:3001`); // Use este para produção/desenvolvimento
     ws = new WebSocket(`wss://${window.location.hostname}:3001`); // Força localhost para testes locais
 
-    ws.onopen = () => {
+    ws.onopen = async () => {
       console.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
+
+      // Garante que temos os dados de autenticação necessários
+      const authReady = await ensureAuthDataAvailable();
+
+      if (!authReady) {
+        console.error('❌ Não foi possível obter dados de autenticação');
+        statusText.textContent = 'Erro de autenticação. Faça login novamente.';
+        return;
+      }
+
+      const userToken = localStorage.getItem('userToken');
+      const userId = localStorage.getItem('user_id');
+
       // Exemplo de autenticação
-      ws?.send(JSON.stringify({ type: "AUTHENTICATION_MAKE", value: { userToken: "123456", userId: "player_ts" } }));
+      ws?.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken, userId } }));
+      console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
     ws.onmessage = (event) => {
