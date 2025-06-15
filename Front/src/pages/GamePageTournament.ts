@@ -60,9 +60,37 @@ export function GamePageTournament(): void {
         console.error("ERRO: Tentando atualizar tabela de ranking, mas o container não foi encontrado.");
         return;
     }
-    const formattedRankings: RankingData[] = rankingsFromSocket.map(r => ({ ...r }));
-    updateRankingTable(rankingTableBody, formattedRankings);
-    console.log("LOG 5a: Tabela de Ranking ATUALIZADA.");
+    try {
+        // Opcional: Mostra um estado de carregamento na tabela
+        updateRankingTable(rankingTableBody, [{ 
+            position: 1, 
+            playerName: 'Buscando...', 
+            numOfMatch: 0, stars: 0, numberOfVictories: 0, pointsBalance: 0, pointsMake: 0 
+        }]);
+
+        // Mapeia cada entrada do ranking para uma Promise que busca o nome do jogador
+        const formattedRankingsPromises = rankingsFromSocket.map(async (ranking) => {
+            // Busca o nome do jogador usando o userId
+            const playerName = await fetchUserName(ranking.userId);
+
+            // Retorna o objeto completo com o nome resolvido, mantendo os outros dados
+            return {
+                ...ranking, // Copia todas as outras propriedades (position, stars, etc.)
+                playerName: playerName // Substitui pelo nome que acabamos de buscar
+            };
+        });
+
+        // Espera todas as buscas de nome terminarem
+        const formattedRankings = await Promise.all(formattedRankingsPromises);
+        console.log("LOG 5a: Nomes do ranking buscados. Dados formatados:", formattedRankings);
+
+        // Atualiza a tabela com os dados completos
+        updateRankingTable(rankingTableBody, formattedRankings);
+        console.log("LOG 6a: Tabela de Ranking ATUALIZADA.");
+
+    } catch (error) {
+        console.error("ERRO CRÍTICO dentro de handleRankingUpdate:", error);
+    }
   };
 
   const handleTournamentUpdate = async (matchesFromSocket: any[]) => {
