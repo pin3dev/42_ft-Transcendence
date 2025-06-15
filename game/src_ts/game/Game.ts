@@ -296,7 +296,8 @@ export abstract class Game {
 	// Reset the ball in the center
 	private resetBall() {
 		this.ball.x = Field.WIDTH / 2;
-		this.ball.y = Math.floor(Math.random() * ((Field.HEIGHT - 10) - 10 + 1)) + 10;
+		this.ball.y = Math.floor(Math.random() * ((Field.HEIGHT - 20) - 20 + 1)) + 20;
+
 
 		// Random direction (but always towards the player who lost the point)
 		this.ball.speedX = this.ball.speedX > 0 ? Ball.INITIAL_BALL_SPEED : -Ball.INITIAL_BALL_SPEED;
@@ -367,26 +368,6 @@ export abstract class Game {
 
 	private sendMessageGameCountdown(second: number) {
 		this.broadcast('GAME_COUNT_DOWN', second);
-	}
-
-	private remover(){
-
-	let a = {
-			id: this.id,
-			field_width: Field.WIDTH,
-			field_height: Field.HEIGHT,
-			paddle_height: Paddle.HEIGHT,
-			paddle_width: Paddle.WIDTH,
-			paddle_player_1_height_position: this.players[0].y,
-			paddle_player_1_width_position: this.players[0].x,
-			paddle_player_2_height_position: this.players[1].y,
-			paddle_player_2_width_position: this.players[1].x,
-			ball_size: Ball.BALL_SIZE,
-			ball_height_position: this.ball.y,
-			ball_width_position: this.ball.x,
-			scoreboard_player_1: this.scoreboard[Game.PLAYER_1],
-			scoreboard_player_2: this.scoreboard[Game.PLAYER_2]
-		}
 	}
 
 	private sendMessageGameFull() {
