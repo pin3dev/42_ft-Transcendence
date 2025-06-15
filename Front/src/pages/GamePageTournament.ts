@@ -22,11 +22,11 @@ export function GamePageTournament(): void {
   root.innerHTML = '';
 
   const GamePageContainer = document.createElement('div');
-  GamePageContainer.className = 'flex flex-col min-h-screen bg-arcade-darkPurple';
+  GamePageContainer.className = 'flex flex-col min-h-screen bgp-arcade-darkPurple';
   GamePageContainer.appendChild(createNavbar());
   
   const mainContentArea = document.createElement('main');
-  mainContentArea.className = 'flex flex-col lg:flex-row justify-center items-start gap-8 p-4 w-full max-w-7xl mx-auto';
+  mainContentArea.className = 'flex flex-col lg:flex-row justify-center items-start gap-8 p-4 w-full max-w-7xl mx-auto bgp-arcade-darkPurple';
 
   const sideColumn = document.createElement('div');
   sideColumn.className = 'flex flex-col gap-6 w-full lg:w-auto lg:min-w-[400px] mt-8';
@@ -134,7 +134,7 @@ export function GamePageTournament(): void {
 
   const gameSectionContainer = document.createElement('section');
   gameSectionContainer.id = 'pong-game-section';
-  gameSectionContainer.className = 'my-8 flex-grow flex flex-col items-center';
+  gameSectionContainer.className = 'my-8 flex-grow flex flex-col items-center ';
   
   console.log("LOG 3: Chamando renderPongGameTournament com os callbacks.");
   const cleanupGame = renderPongGameTournament(gameSectionContainer, { 
@@ -143,9 +143,9 @@ export function GamePageTournament(): void {
   });
 
   mainContentArea.appendChild(gameSectionContainer);
+  mainContentArea.appendChild(sideColumn);
   
   GamePageContainer.appendChild(mainContentArea);
-  GamePageContainer.appendChild(sideColumn);
   GamePageContainer.appendChild(createFooter());
   root.appendChild(GamePageContainer);
 
