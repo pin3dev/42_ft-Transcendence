@@ -61,8 +61,8 @@ export function createHero(): HTMLElement {
     
     if (!isUserAuthenticated) {
       buttonContainer.appendChild(primaryButton);
-      buttonContainer.appendChild(secondaryButton);
     }
+    buttonContainer.appendChild(secondaryButton);
   
   leftColumn.appendChild(heroTitle);
   leftColumn.appendChild(heroDescription);
