@@ -364,15 +364,6 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
             statusText.textContent = 'Você já está no torneio. Aguardando início...';
             joinButton.classList.add('hidden');
             break;
-        case 'GAME_WAITING_NEW_PLAYER':
-          statusText.textContent = 'Procurando partida...';
-          break;
-        case 'GAME_CAN_START':
-          // ui.matchmakingContainer.style.display = 'flex';
-          // ui.matchStatusDisplay.textContent = 'Jogador encontrado! Clique em Aceitar para começar.';
-          statusText.textContent = 'Oponente encontrado! Clique para iniciar.';
-          startButton.classList.remove('hidden');
-          break;
         case 'GAME_FULL':
           statusText.textContent = 'Jogo completo! Preparando para iniciar...';
           updateGameState(data.value);
@@ -383,10 +374,7 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           if (data.value === 0) {
             matchStarted = true;
             matchmakingUI.classList.add('hidden');
-
-
           }
-
           break;
         case 'GAME_STATUS':
           updateGameState(data.value);
@@ -408,7 +396,6 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Partida abortada: o oponente saiu.';
           matchStarted = false;
-
           break;
         default:
           console.warn('Tipo de mensagem não tratada:', data.type);
@@ -467,8 +454,10 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
 
       if (e.key === 'ArrowUp') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }));
+        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }))
       } else if (e.key === 'ArrowDown') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }));
+        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }))
       }
     }
   };
@@ -477,8 +466,10 @@ export function renderPongGameTournament(container: HTMLElement): () => void {
     if (!matchStarted) return;
     if (e.key === 'ArrowUp') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
+      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }))
     } else if (e.key === 'ArrowDown') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
+      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }))
     }
   };
 
