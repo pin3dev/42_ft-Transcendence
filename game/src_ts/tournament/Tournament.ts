@@ -326,9 +326,6 @@ export class Tournament implements GameTournamentListener {
 	}
 	playEnded(gameScoreboard: GameScoreboard): void {
 
-		console.warn('Tournament: playEnded')
-		console.warn(gameScoreboard);
-
 		//change gameScoreboard status
 		this._tableOfPoints.addPlayerScore(gameScoreboard);
 		this._numberOfGamesCompletedInTheRound++;

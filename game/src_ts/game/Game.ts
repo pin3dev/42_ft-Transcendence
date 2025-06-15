@@ -128,6 +128,7 @@ export abstract class Game {
 	public abort() {
 		if (this.gameStatus === 'FINISHED') return ;
 		this.broadcast('GAME_ABORTED');
+		this.gameEnd();
 		this.stop();
 	}
 
