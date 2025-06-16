@@ -215,8 +215,14 @@ export function renderPongGameTournament(
   joinButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
   joinButton.textContent = 'Entrar no Torneio';
 
+  const homeButton = document.createElement('button');
+  homeButton.id = 'home-button'; // ID mais genérico
+  homeButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
+  homeButton.textContent = 'Voltar para o perfil';
+
+
   // Monta a estrutura
-  matchmakingUI.append(tournamentSetupContainer, statusText, startButton, joinButton);
+  matchmakingUI.append(tournamentSetupContainer, statusText, startButton, joinButton, homeButton);
   gameArea.append(canvas, matchmakingUI);
   container.append(scoreboardContainer, gameArea); // Adiciona a área do jogo completa ao container principal
 
@@ -487,8 +493,8 @@ export function renderPongGameTournament(
           }
           break;
         case 'TOURNAMENT_PLAYER_FINAL_POSITION':
-          matchmakingUI.classList.remove('hidden'); // Garante que a UI de status esteja visível
           matchStarted = false; // O jogo acabou para este jogador
+          homeButton.classList.remove('hidden')
 
           const position = data.value; // Ex: 1, 2, 3...
           let ordinalPosition;
@@ -556,7 +562,7 @@ export function renderPongGameTournament(
     statusText.textContent = 'Entrando no torneio...';
   };
 
-  const handleStartClick = () => {
+    const handleStartClick = () => {
     ws?.send(JSON.stringify({ type: 'GAME_START_MATCH' }));
     startButton.classList.add('hidden');
     statusText.textContent = 'Aguardando início...';
@@ -593,6 +599,7 @@ export function renderPongGameTournament(
   createTournamentButton.addEventListener('click', handleCreateTournamentClick);
   startButton.addEventListener('click', handleStartClick);
   joinButton.addEventListener('click', handleJoinTournamentClick);
+  homeButton.addEventListener('click', () => {window.location.href = '/Profile';});
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
 
