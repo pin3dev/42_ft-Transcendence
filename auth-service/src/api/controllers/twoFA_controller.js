@@ -37,7 +37,7 @@ async function twoFA_controller(request, reply) {
     .setCookie('jwt', jwtToken, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: false, // em produção, mude para true com HTTPS
+      secure: true, // ✅ HTTPS obrigatório para produção
       path: '/',
       maxAge: 3600 // 1 hora
     })
