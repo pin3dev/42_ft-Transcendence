@@ -10,9 +10,9 @@ export class NetUserStatusLogin implements UserStatusLogin {
 
 		console.log('NetUserStatusLogin: setUserStatus, the userId('+theMessage+'');
 
-		if (Status.ONLINE){
+		if (status == Status.ONLINE){
 			redisModules.setCache(theMessage, true, null);
-		}else if (Status.OFFLINE){
+		}else if (status == Status.OFFLINE){
 			redisModules.setCache(theMessage, false, null);
 		}
 	}
