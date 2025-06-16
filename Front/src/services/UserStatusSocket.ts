@@ -2,136 +2,194 @@
 
 /**
  * Helper para obter o token de autenticação do localStorage.
- * Assumindo que seu 'fetchWithAuth' o armazena lá.
  */
 function getAuthToken(): string | null {
-    // ATENÇÃO: Ajuste 'accessToken' para o nome da chave que você realmente usa.
-    return localStorage.getItem('accessToken');
-  }
-  
+  // Usa os mesmos nomes de chave que o resto da aplicação
+  return localStorage.getItem('userToken') || localStorage.getItem('accessToken');
+}
+
+/**
+ * Helper para obter o user_id do localStorage.
+ */
+function getUserId(): string | null {
+  return localStorage.getItem('user_id');
+}
+
+/**
+ * Classe para gerenciar a conexão WebSocket de status do usuário.
+ * Implementada como um singleton para garantir uma única conexão por sessão.
+ */
+class UserStatusSocketManager {
+  private ws: WebSocket | null = null;
+  private isConnected: boolean = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectTimer: number | null = null;
+  private isManualDisconnect = false;
+
   /**
-   * Classe para gerenciar a conexão WebSocket de status do usuário.
-   * Implementada como um singleton para garantir uma única conexão por sessão.
+   * Inicia a conexão com o servidor WebSocket de status.
    */
-  class UserStatusSocketManager {
-    private ws: WebSocket | null = null;
-    private isConnected: boolean = false;
-    private reconnectAttempts = 0;
-    private maxReconnectAttempts = 5;
-  
-    /**
-     * Inicia a conexão com o servidor WebSocket.
-     */
-    public connect(): void {
-      // Evita múltiplas conexões
-      if (this.isConnected || this.ws) {
-        console.log('Socket de status já está conectado ou em processo de conexão.');
-        return;
-      }
-  
-      const token = getAuthToken();
-      if (!token) {
-        console.error('Token de autenticação não encontrado. Não é possível conectar o socket de status.');
-        return;
-      }
-  
-      // Usa o mesmo hostname e porta do jogo, mas poderia ser um serviço diferente.
-      // Usa wss:// para conexões seguras (https)
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.hostname}:3001`;
-  
-      console.log(`Tentando conectar ao socket de status em: ${wsUrl}`);
-      this.ws = new WebSocket(wsUrl);
-  
-      this.ws.onopen = () => {
-        this.isConnected = true;
-        this.reconnectAttempts = 0; // Reseta tentativas de reconexão
-        console.log('✅ Socket de status de usuário conectado.');
-  
-        // Envia a mensagem de autenticação, similar ao jogo
-        this.sendMessage({
-          type: 'AUTHENTICATION_MAKE',
-          value: { userToken: token },
-        });
-      };
-  
-      this.ws.onmessage = (event) => {
+  public connect(): void {
+    // Evita múltiplas conexões
+    if (this.isConnected || this.ws) {
+      console.log('Socket de status já está conectado ou em processo de conexão.');
+      return;
+    }
+
+    const token = getAuthToken();
+    const userId = getUserId();
+    
+    if (!token || !userId) {
+      console.error('Token de autenticação ou user_id não encontrado. Não é possível conectar o socket de status.');
+      return;
+    }
+
+    // Usa o mesmo endpoint do jogo existente (mesmo servidor)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.hostname}:3001`;
+
+    console.log(`🔌 Conectando ao socket de status em: ${wsUrl}`);
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.onopen = () => {
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
+      this.isManualDisconnect = false;
+      console.log('✅ Socket de status de usuário conectado.');
+
+      // Usa a mesma mensagem de autenticação do jogo existente
+      this.sendMessage({
+        type: 'AUTHENTICATION_LOGIN',
+        value: { userToken: token, userId: userId }
+      });
+    };
+
+    this.ws.onmessage = (event) => {
+      try {
         const message = JSON.parse(event.data);
         console.log('📬 Mensagem de status recebida:', message);
-  
-        // Aqui você tratará as atualizações em tempo real
         this.handleServerMessage(message);
-      };
-  
-      this.ws.onclose = () => {
-        console.log('❌ Socket de status de usuário desconectado.');
-        this.isConnected = false;
-        this.ws = null;
-  
-        // Lógica de reconexão automática (opcional, mas recomendado)
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
-          this.reconnectAttempts++;
-          const delay = Math.pow(2, this.reconnectAttempts) * 1000;
-          console.log(`Tentando reconectar em ${delay / 1000}s...`);
-          setTimeout(() => this.connect(), delay);
-        } else {
-          console.error('Máximo de tentativas de reconexão atingido.');
-        }
-      };
-  
-      this.ws.onerror = (error) => {
-        console.error('🚨 Erro no socket de status de usuário:', error);
-        // O onclose será chamado logo em seguida, tratando a reconexão.
-      };
-    }
-  
-    /**
-     * Desconecta o WebSocket de forma limpa.
-     */
-    public disconnect(): void {
-      if (this.ws) {
-        this.maxReconnectAttempts = 0; // Impede a reconexão ao desconectar manualmente
-        this.ws.close();
-        console.log('Socket de status desconectado manualmente.');
+      } catch (error) {
+        console.error('Erro ao processar mensagem do socket de status:', error);
       }
-    }
-  
-    /**
-     * Roteia as mensagens recebidas para as funções apropriadas.
-     */
-    private handleServerMessage(message: { type: string; value: any }): void {
-      switch (message.type) {
-        case 'OK_USER_AUTHENTICATED':
-          console.log('Autenticação no socket de status bem-sucedida.');
-          break;
-  
-        case 'FRIEND_STATUS_UPDATE':
-          console.log(`Amigo ${message.value.userId} agora está ${message.value.status}`);
-          // TODO: Disparar um evento customizado ou chamar um callback para atualizar a UI da lista de amigos.
-          // Ex: document.dispatchEvent(new CustomEvent('friendStatusUpdate', { detail: message.value }));
-          break;
-  
-        case 'INCOMING_GAME_INVITE':
-          console.log(`Você recebeu um convite para jogar de ${message.value.from}`);
-          // TODO: Mostrar um modal/notificação para o usuário aceitar ou recusar o convite.
-          break;
-  
-        default:
-          console.warn('Tipo de mensagem de status não tratada:', message.type);
+    };
+
+    this.ws.onclose = (event) => {
+      console.log('❌ Socket de status de usuário desconectado.', event.code, event.reason);
+      this.cleanup();
+
+      // Dispara evento customizado
+      document.dispatchEvent(new CustomEvent('userStatusDisconnected'));
+
+      // Reconexão automática apenas se não foi desconexão manual
+      if (!this.isManualDisconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        const delay = Math.pow(2, this.reconnectAttempts) * 1000;
+        console.log(`🔄 Tentando reconectar em ${delay / 1000}s... (Tentativa ${this.reconnectAttempts})`);
+        
+        this.reconnectTimer = window.setTimeout(() => this.connect(), delay);
+      } else if (!this.isManualDisconnect) {
+        console.error('❌ Máximo de tentativas de reconexão atingido.');
       }
-    }
-  
-    /**
-     * Envia uma mensagem para o servidor no formato JSON.
-     */
-    public sendMessage(data: object): void {
-      if (this.ws && this.isConnected) {
-        this.ws.send(JSON.stringify(data));
-      } else {
-        console.warn('Tentativa de enviar mensagem com socket de status não conectado.');
-      }
+    };
+
+    this.ws.onerror = (error) => {
+      console.error('🚨 Erro no socket de status de usuário:', error);
+    };
+  }
+
+  /**
+   * Desconecta o WebSocket de forma limpa.
+   */
+  public disconnect(): void {
+    console.log('🔌 Desconectando socket de status...');
+    this.isManualDisconnect = true;
+    this.cleanup();
+    
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      // Envia logout antes de fechar (usando o mesmo formato do jogo)
+      this.sendMessage({ type: 'AUTHENTICATION_LOGOUT' });
+      this.ws.close(1000, 'Manual disconnect');
     }
   }
-  
-  // Exporta uma única instância (padrão Singleton) para ser usada em toda a aplicação.
-  export const userStatusSocket = new UserStatusSocketManager();
+
+  /**
+   * Limpa timers e estados internos
+   */
+  private cleanup(): void {
+    this.isConnected = false;
+    this.ws = null;
+    
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+  }
+
+  /**
+   * Roteia as mensagens recebidas para as funções apropriadas.
+   */
+  private handleServerMessage(message: { type: string; value?: any }): void {
+    switch (message.type) {
+      case 'OK_USER_AUTHENTICATED':
+        console.log('✅ Autenticação no socket de status bem-sucedida.');
+        // Dispara evento para informar que está online
+        document.dispatchEvent(new CustomEvent('userStatusConnected'));
+        break;
+
+      case 'FRIEND_STATUS_UPDATE':
+        console.log(`👥 Amigo ${message.value?.userId} agora está ${message.value?.status}`);
+        // Dispara evento para atualizar UI da lista de amigos
+        document.dispatchEvent(new CustomEvent('friendStatusUpdate', { 
+          detail: message.value 
+        }));
+        break;
+
+      case 'INCOMING_GAME_INVITE':
+        console.log(`🎮 Convite para jogar de ${message.value?.from}`);
+        // Dispara evento para mostrar notificação de convite
+        document.dispatchEvent(new CustomEvent('gameInviteReceived', { 
+          detail: message.value 
+        }));
+        break;
+
+      case 'ERROR_INVALID_CREDENTIALS':
+        console.error('❌ Credenciais inválidas no socket de status');
+        this.disconnect();
+        break;
+
+      default:
+        console.warn('⚠️ Tipo de mensagem de status não tratada:', message.type);
+    }
+  }
+
+  /**
+   * Envia uma mensagem para o servidor no formato JSON.
+   */
+  public sendMessage(data: object): void {
+    if (this.ws && this.isConnected && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(data));
+    } else {
+      console.warn('⚠️ Tentativa de enviar mensagem com socket de status não conectado.');
+    }
+  }
+
+  /**
+   * Verifica se o socket está conectado
+   */
+  public isSocketConnected(): boolean {
+    return this.isConnected && this.ws?.readyState === WebSocket.OPEN;
+  }
+
+  /**
+   * Força uma nova tentativa de conexão
+   */
+  public forceReconnect(): void {
+    this.disconnect();
+    setTimeout(() => this.connect(), 1000);
+  }
+}
+
+// Exporta uma única instância (padrão Singleton)
+export const userStatusSocket = new UserStatusSocketManager();
