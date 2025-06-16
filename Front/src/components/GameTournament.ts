@@ -467,11 +467,13 @@ export function renderPongGameTournament(
           break;
         case 'GAME_PLAYER_DRAW':
           matchmakingUI.classList.remove('hidden');
+          startButton.classList.add('hidden');
           statusText.textContent = 'Você empatou! Mais uma partida!?';
           matchStarted = false;
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
+          startButton.classList.add('hidden');
           statusText.textContent = 'Você perdeu! Revanche!?';
           matchStarted = false;
 
@@ -493,6 +495,7 @@ export function renderPongGameTournament(
           }
           break;
         case 'TOURNAMENT_PLAYER_FINAL_POSITION':
+          matchmakingUI.classList.remove('hidden');
           matchStarted = false; // O jogo acabou para este jogador
           homeButton.classList.remove('hidden');
           startButton.classList.add('hidden');
