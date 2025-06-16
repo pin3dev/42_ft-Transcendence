@@ -369,14 +369,14 @@ export abstract class Game {
 		// check by player disconnect
 		if (this.gamePlayersStatus === 'PLAYER_1_DISCONNECTED') {
 			if (this.scoreboard[Game.PLAYER_2] < this.scoreboard[Game.PLAYER_1]) {
-				this.gameEndedInADraw();
+				this.sendMessageDraw();
 			} else {
 				this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_2], this.gamePlayers[Game.PLAYER_1]);
 			}
 			return true;
 		} else if (this.gamePlayersStatus === 'PLAYER_2_DISCONNECTED') {
 			if (this.scoreboard[Game.PLAYER_1] < this.scoreboard[Game.PLAYER_2]) {
-				this.gameEndedInADraw();
+				this.sendMessageDraw();
 			} else {
 				this.gameEndedWithVictory(this.gamePlayers[Game.PLAYER_1], this.gamePlayers[Game.PLAYER_2]);
 			}
@@ -419,10 +419,6 @@ export abstract class Game {
 		this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN')
 		this.sendMessageToPlayer(loser, 'GAME_PLAYER_LOSE')
 
-	}
-
-	private gameEndedInADraw() {
-		this.broadcast('GAME_PLAYER_DRAW');
 	}
 
 	private sendMessageDraw() {

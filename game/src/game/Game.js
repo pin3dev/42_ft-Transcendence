@@ -272,7 +272,7 @@ class Game {
     checkIfAPlayerHasDisconnected() {
         if (this.gamePlayersStatus === 'PLAYER_1_DISCONNECTED') {
             if (this.scoreboard[_a.PLAYER_2] < this.scoreboard[_a.PLAYER_1]) {
-                this.gameEndedInADraw();
+                this.sendMessageDraw();
             }
             else {
                 this.gameEndedWithVictory(this.gamePlayers[_a.PLAYER_2], this.gamePlayers[_a.PLAYER_1]);
@@ -281,7 +281,7 @@ class Game {
         }
         else if (this.gamePlayersStatus === 'PLAYER_2_DISCONNECTED') {
             if (this.scoreboard[_a.PLAYER_1] < this.scoreboard[_a.PLAYER_2]) {
-                this.gameEndedInADraw();
+                this.sendMessageDraw();
             }
             else {
                 this.gameEndedWithVictory(this.gamePlayers[_a.PLAYER_1], this.gamePlayers[_a.PLAYER_2]);
@@ -316,9 +316,6 @@ class Game {
     gameEndedWithVictory(winner, loser) {
         this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN');
         this.sendMessageToPlayer(loser, 'GAME_PLAYER_LOSE');
-    }
-    gameEndedInADraw() {
-        this.broadcast('GAME_PLAYER_DRAW');
     }
     sendMessageDraw() {
         this.broadcast('GAME_PLAYER_DRAW');
