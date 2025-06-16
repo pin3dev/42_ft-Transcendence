@@ -391,7 +391,7 @@ export function renderPongGameTournament(
           break;
 
         case 'TOURNAMENT_COUNT_DOWN':
-          statusText.textContent = `Torneio começa em: ${data.value}`;
+          statusText.textContent = `A Rodada começa em: ${data.value}`;
           break;
 
         case 'ERROR_TOURNAMENT_ALREADY_EXISTS':
@@ -457,11 +457,15 @@ export function renderPongGameTournament(
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Parabéns, você venceu!';
           matchStarted = false;
-
+          break;
+        case 'GAME_PLAYER_DRAW':
+          matchmakingUI.classList.remove('hidden');
+          statusText.textContent = 'Você empatou! Mais uma partida!?';
+          matchStarted = false;
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
-          statusText.textContent = 'Você perdeu! Mais sorte na próxima.';
+          statusText.textContent = 'Você perdeu! Revanche!?';
           matchStarted = false;
 
           break;
@@ -481,25 +485,25 @@ export function renderPongGameTournament(
             callbacks.onTournamentUpdate(data.value);
           }
           break;
-          case 'TOURNAMENT_PLAYER_FINAL_POSITION':
-            matchmakingUI.classList.remove('hidden'); // Garante que a UI de status esteja visível
-            matchStarted = false; // O jogo acabou para este jogador
-  
-            const position = data.value; // Ex: 1, 2, 3...
-            let ordinalPosition;
-  
-            // Converte o número para um texto ordinal (1º, 2º, 3º, etc.)
-            if (position === 1) {
-              ordinalPosition = '1º';
-            } else if (position === 2) {
-              ordinalPosition = '2º';
-            } else if (position === 3) {
-              ordinalPosition = '3º';
-            } else {
-              ordinalPosition = `${position}º`;
-            }
-            statusText.textContent = `Torneio finalizado! Você ficou em ${ordinalPosition} lugar.`;
-            break;
+        case 'TOURNAMENT_PLAYER_FINAL_POSITION':
+          matchmakingUI.classList.remove('hidden'); // Garante que a UI de status esteja visível
+          matchStarted = false; // O jogo acabou para este jogador
+
+          const position = data.value; // Ex: 1, 2, 3...
+          let ordinalPosition;
+
+          // Converte o número para um texto ordinal (1º, 2º, 3º, etc.)
+          if (position === 1) {
+            ordinalPosition = '1º';
+          } else if (position === 2) {
+            ordinalPosition = '2º';
+          } else if (position === 3) {
+            ordinalPosition = '3º';
+          } else {
+            ordinalPosition = `${position}º`;
+          }
+          statusText.textContent = `Torneio finalizado! Você ficou em ${ordinalPosition} lugar.`;
+          break;
 
         // --- NOVO CASE PARA ATUALIZAR A TABELA DE CLASSIFICAÇÃO ---
         case 'TOURNAMENT_TABLE_OF_POINTS':

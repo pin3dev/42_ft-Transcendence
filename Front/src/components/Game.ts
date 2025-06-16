@@ -166,7 +166,7 @@ export function renderPongGame(container: HTMLElement): () => void {
   const AgainButton = document.createElement('button');
   AgainButton.id = 'accept-match-button-again';
   AgainButton.className = 'hidden mt-6 px-8 py-3 bg-neon-green text-arcade-darker font-bold rounded-lg hover:bg-opacity-80 transform hover:scale-105 transition-all duration-200';
-  AgainButton.textContent = 'Aceitar Partida';
+  AgainButton.textContent = 'Nova Partida?';
 
   const SearchButton = document.createElement('button');
   SearchButton.id = 'accept-match-button';
@@ -326,7 +326,7 @@ export function renderPongGame(container: HTMLElement): () => void {
       console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
-    ws.onmessage = async(event) => {
+    ws.onmessage = async (event) => {
       const data: ServerMessage = JSON.parse(event.data);
       console.log('Mensagem recebida:', data);
       statusText.classList.remove('hidden');
@@ -357,12 +357,8 @@ export function renderPongGame(container: HTMLElement): () => void {
               fetchUserName(userId2)  // Retorna Promise<string>
             ];
 
-            // 2. Usa 'await Promise.all' para esperar que AMBAS as promises terminem.
-            // O resultado será um array com os nomes: [nomeDoJogador1, nomeDoJogador2]
             const [p1Name, p2Name] = await Promise.all(promises);
 
-            // 3. AGORA, 'p1Name' e 'p2Name' são strings de verdade!
-            // Use essas variáveis para atualizar o estado e a UI.
             gameState.player1Name = p1Name;
             gameState.player2Name = p2Name;
             player1NameElement.textContent = p1Name;
@@ -396,6 +392,11 @@ export function renderPongGame(container: HTMLElement): () => void {
           matchStarted = false;
           AgainButton.classList.remove('hidden');
 
+          break;
+        case 'GAME_PLAYER_DRAW':
+          matchmakingUI.classList.remove('hidden');
+          statusText.textContent = 'Você empatou! Mais uma partida!?';
+          matchStarted = false;
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
