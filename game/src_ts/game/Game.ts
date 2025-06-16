@@ -49,6 +49,8 @@ export abstract class Game {
 
 	private matchSaveStrategy: MatchSaveStrategy;
 
+	private _tournamentId: string | null;
+
 	private keys = {
 		paddle_left_up: false,
 		paddle_left_down: false,
@@ -56,7 +58,8 @@ export abstract class Game {
 		paddle_right_down: false
 	};
 
-	constructor() {
+	constructor(tournamentId: string | null) {
+
 		this.gamePlayers = [];
 		this.players[0] = new Paddle(Paddle.SPACE_FROM_SIDE, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0);
 		this.players[1] = new Paddle(Field.WIDTH - Paddle.SPACE_FROM_SIDE - Paddle.WIDTH, Field.HEIGHT / 2 - Paddle.HEIGHT / 2, 0);
@@ -74,6 +77,8 @@ export abstract class Game {
 		this.saveRating = new SaveRating();
 
 		this.matchSaveStrategy = new MatchSaveStrategy(GameAPISingleton.getTypeOfEnvironment());
+
+		this._tournamentId = tournamentId;
 	}
 
 	public createMatch(player1: GamePlayer, player2: GamePlayer) {
@@ -127,6 +132,10 @@ export abstract class Game {
 		this.gameStatus = 'READY';
 		this.sendMessageGameFull();
 		this.makeCountDownRoutine();
+	}
+
+	public getTournamentId() : string | null {
+		return this._tournamentId;
 	}
 
 	public movePaddle(player: GamePlayer, paddleDirection: MessageType) {

@@ -8,8 +8,8 @@ export class GameTournament extends Game{
 	private _gameScoreboard : GameScoreboard;
 	private _gameListener: GameTournamentListener;
 
-	constructor(gameScoreboard : GameScoreboard, gameListener : GameTournamentListener){
-		super();
+	constructor(gameScoreboard : GameScoreboard, gameListener : GameTournamentListener, tournamentId: string){
+		super(tournamentId);
 		this._gameScoreboard = gameScoreboard;
 		this._gameListener = gameListener;
 	}

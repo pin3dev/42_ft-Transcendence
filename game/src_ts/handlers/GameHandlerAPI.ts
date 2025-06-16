@@ -7,18 +7,6 @@ import WebSocket from 'ws';
 import { GamePlayer } from '../game/GamePlayer';
 import { GameGlobal } from '../game/GameGlobal';
 
-
-/*
-
-let gamePlayer = this.gamePlayers.get(ws);
-if (!gamePlayer){
-	gamePlayer = new GamePlayer(true, ws);
-	this.gamePlayers.set(ws, gamePlayer);
-}
-
-*/
-
-
 export class GameHandlerAPI implements WebSocketUserSessionListener {
 
 	private waitingPlayer: WebSocketUserSession | null = null;
@@ -36,7 +24,7 @@ export class GameHandlerAPI implements WebSocketUserSessionListener {
 				this.waitingPlayer = ws;
 				sender.sendMessage(new Message('GAME_WAITING_NEW_PLAYER'));
 			} else {
-				let game = new GameGlobal();
+				let game = new GameGlobal(null);
 
 				let gamePlayerLeft: GamePlayer = new GamePlayer(true, this.waitingPlayer);
 				let gamePlayerRight: GamePlayer = new GamePlayer(true, ws);

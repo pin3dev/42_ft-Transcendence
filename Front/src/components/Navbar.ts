@@ -2,6 +2,7 @@
 import { navigateTo } from '../router/index'; // Seu import original
 import { fetchWithAuth } from '../utils/fetchWithAuth'; // Importar fetchWithAuth
 import { hasLocalToken, hasJWTCookie, clearAllAuthData } from '../utils/auth'; // Importar verificação de autenticação
+import { userStatusSocket } from '../services/UserStatusSocket'; // Importa o socket de status
 
 // Função para mostrar modal personalizado de logout
 function showLogoutModal(): void {
@@ -43,8 +44,15 @@ function showLogoutModal(): void {
     } catch (error) {
       console.warn('Erro ao chamar logout no servidor:', error);
     } finally {
+      // Desconecta o socket de status ANTES de limpar dados
+      console.log('🔌 Desconectando socket de status durante logout');
+      userStatusSocket.disconnect();
+      
       // Limpar dados locais independentemente do resultado da API usando a nova função
       clearAllAuthData();
+      
+      // Dispara evento de logout para outros componentes
+      document.dispatchEvent(new CustomEvent('userLoggedOut'));
       
       // Força o reload da página para garantir que tudo seja resetado
       window.location.href = '/';

@@ -3,6 +3,7 @@ import { createNavbar } from '../components/Navbar';
 import { showToast } from '../utils/toast';
 import { extractAndStoreAuthData } from '../utils/cookieUtils';
 import { ensureAuthDataAvailable } from '../utils/auth';
+import { userStatusSocket } from '../services/UserStatusSocket'; // Importa o socket de status
 
 export function render2FAPage(qrCode?: string | null): void {
   const root = document.getElementById('root');
@@ -93,6 +94,10 @@ function render2FAInput(container?: HTMLElement): void {
 
       // Garante que todos os dados de autenticação estejam disponíveis
       await ensureAuthDataAvailable();
+
+      // Conecta o socket de status após autenticação completa
+      console.log('✅ 2FA concluído - conectando socket de status');
+      userStatusSocket.connect();
 
       showToast('Autenticação concluída com sucesso!', 'success');
       // Não remove o user_id pois é necessário para outras funcionalidades
