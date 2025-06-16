@@ -22,8 +22,8 @@ function matchFinished_listener() {
 			const player2Id = match.player2Id;
 			const whoWin = match.whoWin;
 
-			const player1Rating = await ranking.getOrCreateRanking(player1Id);
-			const player2Rating = await ranking.getOrCreateRanking(player2Id);
+			const player1Rating = await ranking.getOrCreateRanking(String(player1Id));
+			const player2Rating = await ranking.getOrCreateRanking(String(player2Id));
 
 			const [player1RatingNew, player2RatingNew] = ranking.calculateRating(player1Rating, player2Rating, whoWin);
 
