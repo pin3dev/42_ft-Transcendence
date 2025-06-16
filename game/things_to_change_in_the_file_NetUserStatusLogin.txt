@@ -4,3 +4,6 @@
 
 //after:
 	import * as redisModules from "../../../../pckg/redis/modules.js";
+
+Nao esquecer de que o caminho é: "../../../pckg/redis/modules.js";
+para a imagem do container
