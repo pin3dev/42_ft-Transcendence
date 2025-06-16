@@ -10,7 +10,7 @@ install:
 	npm install --save-dev @types/jest @types/node jest ts-jest
 	npm install --save @types/node @types/ws ts-node typescript ws
 
-all: install
+all: 
 	npm run start -- HTTPS_PORT $(HTTPS_PORT) WSS_PORT $(WSS_PORT) IS_ENVIRONMENT_TEST $(IS_ENVIRONMENT_TEST)
 
 all_http:

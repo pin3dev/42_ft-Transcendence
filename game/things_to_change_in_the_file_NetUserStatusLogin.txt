@@ -1,0 +1,6 @@
+
+//before:
+	const redisModules = require("../../../../pckg/redis/modules.js");
+
+//after:
+	import * as redisModules from "../../../../pckg/redis/modules.js";

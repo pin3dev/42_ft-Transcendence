@@ -1,4 +1,5 @@
 import { GameAPISingleton } from "../GameAPISingleton";
+import { AuthenticationMessage } from "../message/AuthenticationMessage";
 import { Message } from "../message/Message";
 import { MessageWithValue } from "../message/MessageWithValue";
 import { AuthenticatorJWT } from "../security/AuthenticatorJWT";
@@ -32,11 +33,11 @@ export class AuthenticationHandlerAPI{
 
 			if (messageFromClient.getType === 'AUTHENTICATION_LOGIN') {
 
-				const authLogin = messageFromClient as MessageWithValue<any>;
+				const authLogin = messageFromClient as MessageWithValue<AuthenticationMessage>;
 				const isAuthenticated: boolean = authenticator.makeLogin(ws, authLogin);
 				if (isAuthenticated) {
 					console.log('AuthenticationHandlerAPI: isUserAuthenticated');
-					this._userStatus.addUserOnline(authLogin.getValue);
+					this._userStatus.addUserOnline(authLogin.getValue.getUserId);
 					sender.sendMessage(new Message('OK_USER_AUTHENTICATED'));
 				} else {
 					sender.sendMessage(new Message('ERROR_INVALID_CREDENTIALS'));

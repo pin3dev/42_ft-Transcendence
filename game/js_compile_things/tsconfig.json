@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",               // Mantém o alvo para ES2024
+    "module": "ESNext",               // Usa ESNext para compatibilidade com ES Modules
+    "moduleResolution": "node",       // Módulos no estilo Node.js
+    "lib": ["ES2024", "DOM"],
+    "removeComments": false,
+    "declaration": false,
+    "sourceMap": false,
+    "outDir": "./src",               // Gera os arquivos transpilados em 'dist'
+    "strict": true,
+    "esModuleInterop": true,          // Garante compatibilidade com módulos comuns (CommonJS)
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
+    "noImplicitAny": true,
+    "useDefineForClassFields": true,
+    "baseUrl": "./",                  // Base para resolução de caminhos
+    "paths": {
+      "redis/modules.js": ["../../../../pckg/redis/modules.js"]
+    }
+  },
+  "include": ["src_ts"],             // Inclui os arquivos da pasta 'src_ts'
+  "exclude": ["node_modules", "tests"] // Exclui 'node_modules' e 'tests'
+}
