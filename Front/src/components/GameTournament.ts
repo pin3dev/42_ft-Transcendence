@@ -391,7 +391,7 @@ export function renderPongGameTournament(
           break;
 
         case 'TOURNAMENT_COUNT_DOWN':
-          statusText.textContent = `A Rodada começa em: ${data.value}`;
+          statusText.textContent = `A Rodada ${data.value.round} começa em: ${data.value.count}`;
           break;
 
         case 'ERROR_TOURNAMENT_ALREADY_EXISTS':
@@ -443,6 +443,7 @@ export function renderPongGameTournament(
           drawGame();
           break;
         case 'GAME_COUNT_DOWN':
+
           statusText.textContent = `Iniciando em: ${data.value}`;
           if (data.value === 0) {
             matchStarted = true;
