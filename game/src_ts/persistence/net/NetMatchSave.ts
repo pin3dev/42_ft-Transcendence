@@ -2,18 +2,34 @@ import { Game } from "../../game/Game";
 import { MatchSave } from "../MatchSave";
 //import { publishEvent, EventTypes } from "../../../../pckg/redis/modules.js";
 
-export class NetMatchSave implements MatchSave{
+const redisModules = require("../../../pckg/redis/modules.js");
+
+export class NetMatchSave implements MatchSave {
 	save(match: Game): void {
-	 /*
-	  this.id = id;
-      this.tournamentId = tournamentId;
-      this.player1Id = player1Id;
-      this.player2Id = player2Id;
-      this.winnerId = winnerId;
-      this.score = score;
-      this.startedAt = startedAt;
-      this.endedAt = endedAt;
-	  */
+
+		redisModules.publishEvent(redisModules.EventTypes.MATCH_FINISHED, {
+			data: {
+				id: match.getId,
+				tournamentId: 1,
+				player1Id: match.getPlayer1Id(),
+				player2Id: match.getPlayer2Id(),
+				winnerId: match.getWinnerId(),
+				score: match.getScore(),
+				startedAt: match.getStartedAt(),
+				endedAt: match.getEndedAt()
+			}
+		});
+
+		/*
+		 this.id = id;
+		 this.tournamentId = tournamentId;
+		 this.player1Id = player1Id;
+		 this.player2Id = player2Id;
+		 this.winnerId = winnerId;
+		 this.score = score;
+		 this.startedAt = startedAt;
+		 this.endedAt = endedAt;
+		 */
 	}
 }
 

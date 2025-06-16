@@ -8,9 +8,9 @@ import { Sender } from "../Sender";
 import { GamePlayer } from "./GamePlayer";
 import { SaveRating } from "./SaveRating";
 import { GameScoreboard } from "./GameScoreboard";
-import { Tournament } from "../tournament/Tournament";
 import { TournamentPlayer } from "../tournament/TournamentPlayer";
-import { TypeOfEnvironment } from "../ParametersVariables";
+import { MatchSaveStrategy } from "../persistence/MatchSaveStrategy";
+import { GameAPISingleton } from "../GameAPISingleton";
 
 export type GameStatus2 = 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 export type GamePlayersStatus = 'ON_LINE' | 'PLAYER_1_DISCONNECTED' | 'PLAYER_2_DISCONNECTED';
@@ -42,7 +42,12 @@ export abstract class Game {
 
 	private countDown = Game.START_COUNT_DOWN_VALUE;
 
-	private saveRating : SaveRating;
+	private saveRating: SaveRating;
+
+	private startedAt: Date = new Date();
+	private endedAt: Date = new Date();
+
+	private matchSaveStrategy: MatchSaveStrategy;
 
 	private keys = {
 		paddle_left_up: false,
@@ -67,11 +72,15 @@ export abstract class Game {
 		this.countDownInterval = undefined;
 
 		this.saveRating = new SaveRating();
+
+		this.matchSaveStrategy = new MatchSaveStrategy(GameAPISingleton.getTypeOfEnvironment());
 	}
 
 	public createMatch(player1: GamePlayer, player2: GamePlayer) {
 		this.gamePlayers[Game.PLAYER_1] = player1;
 		this.gamePlayers[Game.PLAYER_2] = player2;
+
+		this.startedAt = new Date();
 
 		if (!player1.isOnline) {
 			this.gameEndedWithWO(player2);
@@ -80,6 +89,33 @@ export abstract class Game {
 		} else {
 			this.sendMessageGameCanStart();
 		}
+	}
+
+	public getPlayer1Id() {
+		return this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId;
+	}
+
+	public getPlayer2Id() {
+		return this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getUserId;
+	}
+
+	public getWinnerId() {
+		if (this.scoreboard[Game.PLAYER_2] > this.scoreboard[Game.PLAYER_1]) {
+			return this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getUserId;
+		}
+		return this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId;
+	}
+
+	public getScore(): string {
+		return this.scoreboard[Game.PLAYER_1] + '-' + this.scoreboard[Game.PLAYER_2];
+	}
+
+	public getStartedAt() {
+		return this.startedAt;
+	}
+
+	public getEndedAt() {
+		return this.endedAt;
 	}
 
 	public addConfirmation(wsSession: WebSocketUserSession): number {
@@ -126,15 +162,14 @@ export abstract class Game {
 	// 'NOT_READY' | 'READY' | 'RUNNING' | 'FINISHED';
 
 	public abort() {
-		if (this.gameStatus === 'FINISHED') return ;
+		if (this.gameStatus === 'FINISHED') return;
 		this.broadcast('GAME_ABORTED');
-		this.gameEnd();
 		this.stop();
 	}
 
 	public playerExit(playerDisconnected: GamePlayer) {
 
-		if (this.gameStatus !== 'RUNNING'){
+		if (this.gameStatus !== 'RUNNING') {
 			this.abort();
 		}
 
@@ -177,10 +212,13 @@ export abstract class Game {
 
 	private stop() {
 
-		this.gameStatus = 'FINISHED';
+		this.endedAt = new Date();
 
 		this.stopCountDownRoutine();
 		this.stopGameLoopRoutine();
+
+		this.gameStatus = 'FINISHED';
+		this.gameEnd();
 	}
 
 	// Updates the paddles speeds
@@ -248,8 +286,8 @@ export abstract class Game {
 
 		if (this.checkIfAnyPlayerWon() || this.checkIfAPlayerHasDisconnected()) {
 
-			let player1 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_1].webSocketUserSession);
-			let player2 : TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_2].webSocketUserSession);
+			let player1: TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_1].webSocketUserSession);
+			let player2: TournamentPlayer = new TournamentPlayer(true, this.gamePlayers[Game.PLAYER_2].webSocketUserSession);
 
 			let gameScoreboard = new GameScoreboard(player1, player2);
 			gameScoreboard.playerMakePoint(player1, this.scoreboard[Game.PLAYER_1]);
@@ -257,7 +295,9 @@ export abstract class Game {
 
 			this.saveRating.saveRating(gameScoreboard);
 
-			this.gameEnd();
+			//apply the date here, because the stop come after the save match
+			this.endedAt = new Date();
+			this.matchSaveStrategy.save(this);
 			this.stop();
 		}
 
@@ -342,23 +382,26 @@ export abstract class Game {
 		return false;
 	}
 
-	private gameEndedWithWO(winner: GamePlayer){
+	private gameEndedWithWO(winner: GamePlayer) {
+
 		this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN');
 
-		winner == this.gamePlayers[Game.PLAYER_1] ? this.scoreboard[Game.PLAYER_1] = 3 : this.scoreboard[Game.PLAYER_2] = 3;
+		let theWinner: GamePlayer = winner.webSocketUserSession.getUserId === this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId ? this.gamePlayers[Game.PLAYER_1] : this.gamePlayers[Game.PLAYER_2];
 
-		this.gameEnd();
+		this.playerMakePoint(theWinner);
+		this.playerMakePoint(theWinner);
+		this.playerMakePoint(theWinner);
+
+		this.stop();
 	}
 
 	private gameEndedWithVictory(winner: GamePlayer, loser: GamePlayer) {
-
 		this.sendMessageToPlayer(winner, 'GAME_PLAYER_WIN')
 		this.sendMessageToPlayer(loser, 'GAME_PLAYER_LOSE')
 
 	}
 
 	private gameEndedInADraw() {
-
 		this.broadcast('GAME_PLAYER_DRAW');
 	}
 
