@@ -9,9 +9,8 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"type": "module",
+	"type": "commonjs",
 	"devDependencies": {
-		"@types/ioredis": "^4.28.10",
 		"@types/jest": "^29.5.14",
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/node": "^22.15.31",
