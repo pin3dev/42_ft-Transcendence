@@ -155,7 +155,10 @@ class Tournament {
     sendCountDown() {
         this._countDown = 3;
         this.countDownInterval = setInterval(() => {
-            this.broadcast('TOURNAMENT_COUNT_DOWN', this._countDown);
+            this.broadcast('TOURNAMENT_COUNT_DOWN', {
+                round: this._roundCount + 1,
+                count: this._countDown
+            });
             this._countDown--;
             if (this._countDown < 0) {
                 this.stopCountDownRoutine();
