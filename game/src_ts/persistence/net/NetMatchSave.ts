@@ -7,18 +7,16 @@ const redisModules = require("../../../pckg/redis/modules.js");
 export class NetMatchSave implements MatchSave {
 	save(match: Game): void {
 
-		redisModules.publishEvent(redisModules.EventTypes.MATCH_FINISHED, {
-			data: {
-				id: match.getId,
-				tournamentId: 1,
-				player1Id: match.getPlayer1Id(),
-				player2Id: match.getPlayer2Id(),
-				winnerId: match.getWinnerId(),
-				score: match.getScore(),
-				startedAt: match.getStartedAt(),
-				endedAt: match.getEndedAt()
-			}
-		});
+		redisModules.publishEvent(redisModules.EventTypes.MATCH_FINISHED, { //REMOVI O DATA
+			id: String(match.getId), //PRECISA SER STRING
+			tournamentId: "1", // PRECISA SER STRING OU NULL
+			player1Id: match.getPlayer1Id(),
+			player2Id: match.getPlayer2Id(),
+			winnerId: match.getWinnerId(),
+			score: match.getScore(),
+			startedAt: match.getStartedAt(),
+			endedAt: match.getEndedAt()
+		}, "game-server"); //PRECISA TER O NOME DO SERVIÇO QUE GERA O EVENTO
 
 		/*
 		 this.id = id;

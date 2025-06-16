@@ -25,6 +25,7 @@ install_mkcert_mac() {
   fi
   brew install mkcert
   mkcert -install
+  LOCAL_IP=$(ipconfig getifaddr en0)
 }
 
 # ==============================
@@ -38,6 +39,7 @@ install_mkcert_linux() {
   chmod +x mkcert-*-linux-amd64
   sudo mv mkcert-*-linux-amd64 /usr/local/bin/mkcert
   mkcert -install
+  LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null)
 }
 
 # ==============================
@@ -75,7 +77,6 @@ generate_ssl_certificates() {
   fi
 
   mkdir -p certs
-  LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null)
   LOCAL_IP_BASE64=$(echo -n "$LOCAL_IP" | base64)
 
   if [ ! -f certs/localhost.pem ] || [ ! -f certs/localhost-key.pem ]; then
