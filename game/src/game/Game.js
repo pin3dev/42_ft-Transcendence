@@ -62,10 +62,13 @@ class Game {
         return this.gamePlayers[_a.PLAYER_2].webSocketUserSession.getUserId;
     }
     getWinnerId() {
-        if (this.scoreboard[_a.PLAYER_2] > this.scoreboard[_a.PLAYER_1]) {
+        if (this.scoreboard[_a.PLAYER_1] > this.scoreboard[_a.PLAYER_2]) {
+            return this.gamePlayers[_a.PLAYER_1].webSocketUserSession.getUserId;
+        }
+        else if (this.scoreboard[_a.PLAYER_2] > this.scoreboard[_a.PLAYER_1]) {
             return this.gamePlayers[_a.PLAYER_2].webSocketUserSession.getUserId;
         }
-        return this.gamePlayers[_a.PLAYER_1].webSocketUserSession.getUserId;
+        return null;
     }
     getScore() {
         return this.scoreboard[_a.PLAYER_1] + '-' + this.scoreboard[_a.PLAYER_2];
