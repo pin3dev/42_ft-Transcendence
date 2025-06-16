@@ -397,6 +397,7 @@ export function renderPongGame(container: HTMLElement): () => void {
           matchmakingUI.classList.remove('hidden');
           statusText.textContent = 'Você empatou! Mais uma partida!?';
           matchStarted = false;
+          AgainButton.classList.remove('hidden');
           break;
         case 'GAME_PLAYER_LOSE':
           matchmakingUI.classList.remove('hidden');
