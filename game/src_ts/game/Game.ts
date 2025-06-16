@@ -105,10 +105,12 @@ export abstract class Game {
 	}
 
 	public getWinnerId() {
-		if (this.scoreboard[Game.PLAYER_2] > this.scoreboard[Game.PLAYER_1]) {
+		if (this.scoreboard[Game.PLAYER_1] > this.scoreboard[Game.PLAYER_2]) {
+			return this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId;
+		} else if (this.scoreboard[Game.PLAYER_2] > this.scoreboard[Game.PLAYER_1]) {
 			return this.gamePlayers[Game.PLAYER_2].webSocketUserSession.getUserId;
 		}
-		return this.gamePlayers[Game.PLAYER_1].webSocketUserSession.getUserId;
+		return null;
 	}
 
 	public getScore(): string {
@@ -143,7 +145,7 @@ export abstract class Game {
 		this.makeCountDownRoutine();
 	}
 
-	public getTournamentId() : string | null {
+	public getTournamentId(): string | null {
 		return this._tournamentId;
 	}
 
