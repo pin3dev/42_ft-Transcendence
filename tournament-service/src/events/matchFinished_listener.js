@@ -27,8 +27,8 @@ function matchFinished_listener() {
 
 			const [player1RatingNew, player2RatingNew] = ranking.calculateRating(player1Rating, player2Rating, whoWin);
 
-			await ranking.updateRanking(player1Id, String(player1RatingNew));
-			await ranking.updateRanking(player2Id, String(player2RatingNew));
+			await ranking.updateRanking(String(player1Id), String(player1RatingNew));
+			await ranking.updateRanking(String(player2Id), String(player2RatingNew));
 
 			console.log(`🏅 Ranking atualizado: ${player1Id} → ${player1RatingNew}, ${player2Id} → ${player2RatingNew}`);
 
