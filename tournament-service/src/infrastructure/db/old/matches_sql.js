@@ -7,7 +7,7 @@ const dbPath = path.join(dbFolder, "tournament.sqlite");
 
 if (!fs.existsSync(dbFolder)) {
   fs.mkdirSync(dbFolder, { recursive: true });
-  console.log("📁 Pasta 'data/' criada.");
+  //console.log("📁 Pasta 'data/' criada.");
 }
 
 const db = new sqlite3.Database(dbPath);

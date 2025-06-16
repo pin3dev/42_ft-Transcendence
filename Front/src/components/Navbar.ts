@@ -37,7 +37,7 @@ function showLogoutModal(): void {
       });
 
       if (response.ok) {
-        console.log('Logout realizado com sucesso no servidor');
+        //console.log('Logout realizado com sucesso no servidor');
       } else {
         console.warn('Erro no logout do servidor, mas continuando com logout local');
       }
@@ -45,7 +45,7 @@ function showLogoutModal(): void {
       console.warn('Erro ao chamar logout no servidor:', error);
     } finally {
       // Desconecta o socket de status ANTES de limpar dados
-      console.log('🔌 Desconectando socket de status durante logout');
+      //console.log('🔌 Desconectando socket de status durante logout');
       userStatusSocket.disconnect();
       
       // Limpar dados locais independentemente do resultado da API usando a nova função
@@ -175,7 +175,7 @@ function createProfileButtonWithDropdown(container: HTMLElement): void {
         
         link.addEventListener('click', async (e) => {
           e.preventDefault(); 
-          console.log(`Ação do menu: ${item.action}`);
+          //console.log(`Ação do menu: ${item.action}`);
           
           if (item.action === 'logout') {
             // Mostrar modal personalizado de logout
@@ -274,7 +274,7 @@ export function createNavbar(): HTMLElement {
   const isUserAuthenticated = hasLocal || hasJWT;
   
   if (!isUserAuthenticated) {
-    console.log('👤 Exibindo botões de Login/Registrar');
+    //console.log('👤 Exibindo botões de Login/Registrar');
     // Botões de Login e Registrar (desktop)
     const loginBtn = document.createElement('button');
     loginBtn.className = 'border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-arcade-darker px-4 py-2 rounded border';
@@ -305,7 +305,7 @@ export function createNavbar(): HTMLElement {
     mobileAuthContainer.appendChild(mobileBtnsFlex);
 
   } else {
-    console.log('⚙️ Exibindo menu de configurações');
+    //console.log('⚙️ Exibindo menu de configurações');
     // Botão de perfil com dropdown (desktop)
     createProfileButtonWithDropdown(authArea);
 

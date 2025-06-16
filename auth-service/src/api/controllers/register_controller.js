@@ -1,8 +1,8 @@
 const { registerUser } = require("../../application/registerUser");
 
 async function register_controller(request, reply) {
-  console.log("[Auth-Service] Requisição recebida no /auth/register");
-  console.log("[Auth-Service] Body:", request.body);
+  //console.log("[Auth-Service] Requisição recebida no /auth/register");
+  //console.log("[Auth-Service] Body:", request.body);
   const { email, password } = request.body;
 
   try {
@@ -11,7 +11,7 @@ async function register_controller(request, reply) {
       hasher: request.server.hasher
     });
 
-    console.log("[Auth-Service] Registro bem-sucedido:", result);
+    //console.log("[Auth-Service] Registro bem-sucedido:", result);
 
     return reply.code(201).send({
       user_id: result.user_id,

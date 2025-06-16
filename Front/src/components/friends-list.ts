@@ -35,7 +35,7 @@ export class FriendsList {
     this.statusUpdateListener = (event: Event) => {
       const customEvent = event as CustomEvent;
       const { userId, status } = customEvent.detail;
-      console.log(`🔄 Atualizando status do amigo ${userId} para ${status}`);
+      // //console.log(`🔄 Atualizando status do amigo ${userId} para ${status}`);
       
       // Atualiza o status do amigo na lista local
       const updatedFriends = this.props.friends.map(friend => {

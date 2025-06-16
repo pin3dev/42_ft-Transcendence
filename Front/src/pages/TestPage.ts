@@ -74,7 +74,7 @@ async function testProtectedRoute(): Promise<UserStats | null> {
 
     if (!profileResponse.ok) {
       if (profileResponse.status === 401 || profileResponse.status === 403) {
-        console.log('❌ Sessão inválida na rota protegida - redirecionando para home');
+        //console.log('❌ Sessão inválida na rota protegida - redirecionando para home');
         window.location.href = '/';
         return null;
       }
@@ -82,7 +82,7 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     }
 
     const profileData = await profileResponse.json();
-    console.log("Dados do perfil:", profileData);
+    //console.log("Dados do perfil:", profileData);
 
 // Busca dados de ranking (wins, losses, score)
     let wins = mockUserStats.wins;
@@ -90,7 +90,7 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     let score = mockUserStats.score;
 
     try {
-      console.log("ID do usuário que será enviado:", profileData.id);
+      //console.log("ID do usuário que será enviado:", profileData.id);
       
       const rankingResponse = await fetchWithAuth('/tournament/ranking/me', {
         method: 'GET',
@@ -99,11 +99,11 @@ async function testProtectedRoute(): Promise<UserStats | null> {
         }
       });
       
-      console.log("Status da resposta ranking:", rankingResponse.status);
+      //console.log("Status da resposta ranking:", rankingResponse.status);
       
       if (rankingResponse.ok) {
         const rankingData = await rankingResponse.json();
-        console.log("Dados de ranking recebidos:", rankingData);
+        //console.log("Dados de ranking recebidos:", rankingData);
         wins = rankingData.total_wins;
         losses = rankingData.total_losses;
         score = rankingData.score;
@@ -126,13 +126,13 @@ async function testProtectedRoute(): Promise<UserStats | null> {
     
     // Se for erro de sessão expirada, redireciona silenciosamente
     if (error instanceof Error && error.message === 'Sessão expirada') {
-      console.log('🔄 Sessão expirada detectada - redirecionando para home');
+      //console.log('🔄 Sessão expirada detectada - redirecionando para home');
       window.location.href = '/';
       return null;
     }
     
     // Para outros erros, também redireciona
-    console.log('🔄 Erro de autenticação - redirecionando para home');
+    //console.log('🔄 Erro de autenticação - redirecionando para home');
     window.location.href = '/';
     return null;
   }
@@ -359,7 +359,7 @@ export async function renderTestPage(): Promise<void> {
         const response = await fetchWithAuth(`/user/search?name=${encodeURIComponent(value)}`);
         if (response.ok) {
           const users = await response.json();
-          console.log('Usuários encontrados:', users);
+          //console.log('Usuários encontrados:', users);
           if (Array.isArray(users) && users.length > 0) {
             users.forEach((user: any) => {
               const resultItem = document.createElement('div');

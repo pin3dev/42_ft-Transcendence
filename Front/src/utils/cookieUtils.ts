@@ -102,7 +102,7 @@ export function setCookie(name: string, value: string, options: { expires?: numb
         localStorage.setItem('user_id', payload.user_id.toString());
       }
   
-      console.log('✅ Dados de autenticação extraídos e armazenados:', {
+      //console.log('✅ Dados de autenticação extraídos e armazenados:', {
         user_id: payload.user_id,
         email: payload.email,
         hasToken: !!jwtToken

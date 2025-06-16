@@ -65,10 +65,10 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
         rank: index + 1,
       }));
     } else {
-      console.error("Erro ao carregar dados do ranking");
+      // console.error("Erro ao carregar dados do ranking");
     }
   } catch (err) {
-    console.error("Erro ao buscar ranking:", err);
+    // console.error("Erro ao buscar ranking:", err);
   }
 
   // Helper function to get player name
@@ -82,11 +82,11 @@ export async function createLeaderboardPreview(): Promise<HTMLElement> {
         }
         return 'Desconhecido';
       } else {
-        console.error("Erro ao buscar nome do jogador.");
+        // console.error("Erro ao buscar nome do jogador.");
         return 'Desconhecido';
       }
     } catch (err) {
-      console.error("Erro ao buscar nome do jogador:", err);
+      // console.error("Erro ao buscar nome do jogador:", err);
       return 'Desconhecido';
     }
   };

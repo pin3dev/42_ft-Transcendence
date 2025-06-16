@@ -89,7 +89,7 @@ class Server {
             });
         });
         server.listen(this._parametersVariables.httpsPort, () => {
-            console.log(`Server listening on http://localhost:${this._parametersVariables.httpsPort}`);
+            //console.log(`Server listening on http://localhost:${this._parametersVariables.httpsPort}`);
         });
     }
 }

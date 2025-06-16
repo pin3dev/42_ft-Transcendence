@@ -66,7 +66,7 @@ import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 export async function fetchUserName(userId: string): Promise<string> {
   if (!userId) {
-    console.warn("fetchUserName chamado com ID nulo ou indefinido.");
+    // console.warn("fetchUserName chamado com ID nulo ou indefinido.");
     return "Jogador";
   }
 
@@ -75,7 +75,7 @@ export async function fetchUserName(userId: string): Promise<string> {
     const response = await fetchWithAuth(`/user/search?id=${userId}`);
 
     if (!response.ok) {
-      console.error(`Erro na API ao buscar usuário ${userId}: Status ${response.status}`);
+      // console.error(`Erro na API ao buscar usuário ${userId}: Status ${response.status}`);
       // Retorna um nome padrão que inclui parte do ID para depuração
       return `Jogador (${userId.slice(0, 5)}...)`;
     }
@@ -88,12 +88,12 @@ export async function fetchUserName(userId: string): Promise<string> {
       // Retorna o nome do usuário do primeiro objeto no array
       return user.name || `Jogador (${userId.slice(0, 5)}...)`;
     } else {
-      console.warn(`Nenhum usuário encontrado para o ID ${userId} na resposta da API.`);
+      // console.warn(`Nenhum usuário encontrado para o ID ${userId} na resposta da API.`);
       return `Jogador Desconhecido`;
     }
 
   } catch (error) {
-    console.error(`Falha de rede ou erro ao buscar o nome do usuário ${userId}:`, error);
+    // console.error(`Falha de rede ou erro ao buscar o nome do usuário ${userId}:`, error);
     return 'Jogador (Erro)'; // Indica um erro de conexão
   }
 }
@@ -233,7 +233,7 @@ export function renderPongGameTournament(
 
   // Validação para garantir que o contexto do canvas foi obtido
   if (!ctx) {
-    console.error("Não foi possível obter o contexto 2D do canvas.");
+    // console.error("Não foi possível obter o contexto 2D do canvas.");
     statusText.textContent = "Erro: Seu navegador não suporta canvas.";
     return () => { };
   }
@@ -353,14 +353,14 @@ export function renderPongGameTournament(
     ws = new WebSocket(`wss://${window.location.hostname}:3001`); // Força localhost para testes locais
 
     ws.onopen = async () => {
-      console.log('Conectado ao servidor WebSocket.');
+      // //console.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
 
       // Garante que temos os dados de autenticação necessários
       const authReady = await ensureAuthDataAvailable();
 
       if (!authReady) {
-        console.error('❌ Não foi possível obter dados de autenticação');
+        // console.error('❌ Não foi possível obter dados de autenticação');
         statusText.textContent = 'Erro de autenticação. Faça login novamente.';
         return;
       }
@@ -370,15 +370,15 @@ export function renderPongGameTournament(
 
       // Exemplo de autenticação
       ws?.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken, userId } }));
-      console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
+      // //console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
     ws.onmessage = async (event) => {
       const data: ServerMessage = JSON.parse(event.data);
-      console.log('Mensagem recebida:', data);
+      // //console.log('Mensagem recebida:', data);
       statusText.classList.remove('hidden');
 
-      console.log(data.type);
+      // //console.log(data.type);
       switch (data.type) {
         case 'OK_USER_AUTHENTICATED':
           statusText.classList.add('hidden');
@@ -443,7 +443,7 @@ export function renderPongGameTournament(
             player1NameElement.textContent = p1Name;
             player2NameElement.textContent = p2Name;
 
-            console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
+            // //console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
           }
           updateGameState(data.value);
           drawGame();
@@ -488,7 +488,7 @@ export function renderPongGameTournament(
           matchStarted = false;
           break;
         case 'TOURNAMENT_OVERALL_SCOREBOARD':
-          console.log('Recebido placar geral do torneio:', data.value);
+          // //console.log('Recebido placar geral do torneio:', data.value);
           // Chama o callback se ele foi fornecido no objeto
           if (callbacks.onTournamentUpdate) {
             callbacks.onTournamentUpdate(data.value);
@@ -518,26 +518,26 @@ export function renderPongGameTournament(
 
         // --- NOVO CASE PARA ATUALIZAR A TABELA DE CLASSIFICAÇÃO ---
         case 'TOURNAMENT_TABLE_OF_POINTS':
-          console.log('Recebida tabela de pontos do torneio:', data.value);
+          // //console.log('Recebida tabela de pontos do torneio:', data.value);
           // Chama o novo callback se ele foi fornecido
           if (callbacks.onRankingUpdate) {
             callbacks.onRankingUpdate(data.value);
           }
           break;
         default:
-          console.warn('Tipo de mensagem não tratada:', data.type);
+          // console.warn('Tipo de mensagem não tratada:', data.type);
       }
     };
 
     ws.onclose = () => {
-      console.log('Conexão com o servidor perdida.');
+      // //console.log('Conexão com o servidor perdida.');
       statusText.textContent = 'Desconectado do servidor. Tente recarregar a página.';
       matchStarted = false;
       startButton.classList.add('hidden');
     };
 
     ws.onerror = (error) => {
-      console.error('Erro no WebSocket:', error);
+      // console.error('Erro no WebSocket:', error);
       statusText.textContent = 'Erro de conexão. O servidor está offline?';
     };
   }
@@ -581,10 +581,10 @@ export function renderPongGameTournament(
 
       if (e.key === 'ArrowUp') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }));
-        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }))
+        // //console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYDOWN' }))
       } else if (e.key === 'ArrowDown') {
         ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }));
-        console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }))
+        // //console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYDOWN' }))
       }
     }
   };
@@ -593,10 +593,10 @@ export function renderPongGameTournament(
     if (!matchStarted) return;
     if (e.key === 'ArrowUp') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
-      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }))
+      // //console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }))
     } else if (e.key === 'ArrowDown') {
       ws?.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
-      console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }))
+      // //console.log('Enviando:', JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }))
     }
   };
 
@@ -617,7 +617,7 @@ export function renderPongGameTournament(
   // Retorna uma função que desfaz tudo o que foi feito,
   // essencial para SPAs para evitar memory leaks.
   return () => {
-    console.log("Limpando a página do jogo...");
+    // //console.log("Limpando a página do jogo...");
     // Remove event listeners
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);

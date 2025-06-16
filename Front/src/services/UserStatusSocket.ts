@@ -33,7 +33,7 @@ class UserStatusSocketManager {
   public connect(): void {
     // Evita múltiplas conexões
     if (this.isConnected || this.ws) {
-      console.log('Socket de status já está conectado ou em processo de conexão.');
+      //console.log('Socket de status já está conectado ou em processo de conexão.');
       return;
     }
 
@@ -49,14 +49,14 @@ class UserStatusSocketManager {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.hostname}:3001`;
 
-    console.log(`🔌 Conectando ao socket de status em: ${wsUrl}`);
+    //console.log(`🔌 Conectando ao socket de status em: ${wsUrl}`);
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {
       this.isConnected = true;
       this.reconnectAttempts = 0;
       this.isManualDisconnect = false;
-      console.log('✅ Socket de status de usuário conectado.');
+      //console.log('✅ Socket de status de usuário conectado.');
 
       // Usa a mesma mensagem de autenticação do jogo existente
       this.sendMessage({
@@ -68,7 +68,7 @@ class UserStatusSocketManager {
     this.ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        console.log('📬 Mensagem de status recebida:', message);
+        //console.log('📬 Mensagem de status recebida:', message);
         this.handleServerMessage(message);
       } catch (error) {
         console.error('Erro ao processar mensagem do socket de status:', error);
@@ -76,7 +76,7 @@ class UserStatusSocketManager {
     };
 
     this.ws.onclose = (event) => {
-      console.log('❌ Socket de status de usuário desconectado.', event.code, event.reason);
+      //console.log('❌ Socket de status de usuário desconectado.', event.code, event.reason);
       this.cleanup();
 
       // Dispara evento customizado
@@ -86,7 +86,7 @@ class UserStatusSocketManager {
       if (!this.isManualDisconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++;
         const delay = Math.pow(2, this.reconnectAttempts) * 1000;
-        console.log(`🔄 Tentando reconectar em ${delay / 1000}s... (Tentativa ${this.reconnectAttempts})`);
+        //console.log(`🔄 Tentando reconectar em ${delay / 1000}s... (Tentativa ${this.reconnectAttempts})`);
         
         this.reconnectTimer = window.setTimeout(() => this.connect(), delay);
       } else if (!this.isManualDisconnect) {
@@ -103,7 +103,7 @@ class UserStatusSocketManager {
    * Desconecta o WebSocket de forma limpa.
    */
   public disconnect(): void {
-    console.log('🔌 Desconectando socket de status...');
+    //console.log('🔌 Desconectando socket de status...');
     this.isManualDisconnect = true;
     this.cleanup();
     
@@ -133,13 +133,13 @@ class UserStatusSocketManager {
   private handleServerMessage(message: { type: string; value?: any }): void {
     switch (message.type) {
       case 'OK_USER_AUTHENTICATED':
-        console.log('✅ Autenticação no socket de status bem-sucedida.');
+        //console.log('✅ Autenticação no socket de status bem-sucedida.');
         // Dispara evento para informar que está online
         document.dispatchEvent(new CustomEvent('userStatusConnected'));
         break;
 
       case 'FRIEND_STATUS_UPDATE':
-        console.log(`👥 Amigo ${message.value?.userId} agora está ${message.value?.status}`);
+        //console.log(`👥 Amigo ${message.value?.userId} agora está ${message.value?.status}`);
         // Dispara evento para atualizar UI da lista de amigos
         document.dispatchEvent(new CustomEvent('friendStatusUpdate', { 
           detail: message.value 
@@ -147,7 +147,7 @@ class UserStatusSocketManager {
         break;
 
       case 'INCOMING_GAME_INVITE':
-        console.log(`🎮 Convite para jogar de ${message.value?.from}`);
+        //console.log(`🎮 Convite para jogar de ${message.value?.from}`);
         // Dispara evento para mostrar notificação de convite
         document.dispatchEvent(new CustomEvent('gameInviteReceived', { 
           detail: message.value 

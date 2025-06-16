@@ -9,7 +9,7 @@ async function login_controller(request, reply) {
       hasher: request.server.hasher
     });
 
-    console.log("Resultado do loginUser:", result);
+    //console.log("Resultado do loginUser:", result);
 
     if (result.status === "2FA_REQUIRED") {
       return reply.code(200).send({

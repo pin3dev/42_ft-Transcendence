@@ -49,7 +49,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
   };
 
   if (!userStats.user_id) {
-    console.error("user_id do amigo é indefinido!");
+    // console.error("user_id do amigo é indefinido!");
     return;
   }
 
@@ -67,10 +67,10 @@ export async function renderUserProfilePage(user: any): Promise<void> {
       userStats.losses = stats.total_losses;
       userStats.score = stats.score;
     } else {
-      console.warn("Não foi possível buscar estatísticas do amigo.");
+      // console.warn("Não foi possível buscar estatísticas do amigo.");
     }
   } catch (err) {
-    console.error("Erro ao buscar estatísticas do amigo:", err);
+    // console.error("Erro ao buscar estatísticas do amigo:", err);
   }
 
 
@@ -186,7 +186,7 @@ export async function renderUserProfilePage(user: any): Promise<void> {
           }
         }
       } catch (error) {
-        console.error('Erro ao enviar solicitação de amizade:', error);
+        // console.error('Erro ao enviar solicitação de amizade:', error);
         
         // Reativa o botão em caso de erro
         addFriendBtn.disabled = false;

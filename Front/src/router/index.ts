@@ -27,19 +27,19 @@ const protectedRoutes = ['/Profile', '/Game'];
  * Renderiza uma rota protegida após verificar autenticação
  */
 async function renderProtectedRoute(renderFunction: () => void | Promise<void>) {
-  console.log('🔐 Verificando autenticação para rota protegida...');
+  //console.log('🔐 Verificando autenticação para rota protegida...');
   
   const isAuthenticated = await validateAndCleanAuthState();
   
   if (!isAuthenticated) {
-    console.log('❌ Usuário não autenticado - redirecionando para login');
+    //console.log('❌ Usuário não autenticado - redirecionando para login');
     // Redireciona para login se não estiver autenticado
     window.history.replaceState(null, '', '/Login');
     renderLogin();
     return;
   }
   
-  console.log('✅ Usuário autenticado - renderizando rota protegida');
+  //console.log('✅ Usuário autenticado - renderizando rota protegida');
   await renderFunction();
 }
 

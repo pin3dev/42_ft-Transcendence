@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function getMatchHistory(userId) {
   try {
-    console.log(`🔍 Buscando histórico para userId: ${userId}`);
+    //console.log(`🔍 Buscando histórico para userId: ${userId}`);
     
     // Buscar as últimas 5 partidas onde o usuário participou
     const matches = await prisma.match.findMany({
@@ -19,7 +19,7 @@ async function getMatchHistory(userId) {
       take: 5
     });
 
-    // console.log(`📊 Encontradas ${matches.length} partidas para o usuário ${userId}`);
+    // //console.log(`📊 Encontradas ${matches.length} partidas para o usuário ${userId}`);
     
     // // Log de todas as partidas no banco para debug
     // const allMatches = await prisma.match.findMany({
@@ -30,8 +30,8 @@ async function getMatchHistory(userId) {
     //     winner_id: true
     //   }
     // });
-    // console.log(`🗃️ Total de partidas no banco: ${allMatches.length}`);
-    // console.log('📋 IDs de jogadores nas partidas:', allMatches.map(m => `${m.player1_id} vs ${m.player2_id}`));
+    // //console.log(`🗃️ Total de partidas no banco: ${allMatches.length}`);
+    // //console.log('📋 IDs de jogadores nas partidas:', allMatches.map(m => `${m.player1_id} vs ${m.player2_id}`));
 
     // Transformar os dados para o formato simplificado
     const simplifiedMatches = matches.map(match => {
@@ -56,7 +56,7 @@ async function getMatchHistory(userId) {
       };
     });
 
-    console.log(`✅ Retornando ${simplifiedMatches.length} partidas processadas`);
+    //console.log(`✅ Retornando ${simplifiedMatches.length} partidas processadas`);
     return simplifiedMatches;
 
   } catch (error) {
