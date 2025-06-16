@@ -319,7 +319,7 @@ export class Tournament implements GameTournamentListener {
 			// variable to check if no players are online. If all players have left, no games will be created, so the tournament should stop
 			isTheTournamentWithoutPlayers = false;
 
-			let newGame: GameTournament = new GameTournament(gameboard, this);
+			let newGame: GameTournament = new GameTournament(gameboard, this, String(this._id));
 			let gameId: number = newGame.getId;
 
 			//add the new gameId for the players so that when they send the messages it doesn't give an invalid match
