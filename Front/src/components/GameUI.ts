@@ -59,7 +59,7 @@ export function createFullGameUI(): UIElements {
   canvas.width = 800; 
   canvas.height = 600; 
   const context = canvas.getContext('2d');
-  if (!context) console.error('Failed to get 2D context for game canvas');
+  // if (!context) console.error('Failed to get 2D context for game canvas');
 
   const mainContent = document.createElement('main');
   mainContent.className = 'flex-grow flex flex-col items-center justify-center container mx-auto px-2 py-4 sm:px-4 sm:py-8 z-10 relative';

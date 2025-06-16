@@ -34,7 +34,7 @@ class UserProfile {
   static validateAvatar(file) {
     if (!file) return null;
 
-    console.log("Validando avatar:", {
+    //console.log("Validando avatar:", {
       filename: file.filename,
       mimetype: file.mimetype,
       temFilePath: !!file.filepath

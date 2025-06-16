@@ -28,7 +28,7 @@ async function loginUser(email, password, { userRepo, hasher }) {
     let qrCodeImage = null;
     
     if (!userData.first2FALoginDone) {
-      console.log("Primeira vez com 2FA, gerando QR para:", user.email);
+      //console.log("Primeira vez com 2FA, gerando QR para:", user.email);
       otpauthUrl = speakeasy.otpauthURL({
         secret: user.twoFASecret,
         label: `Transcendence:${user.email}`,
@@ -44,7 +44,7 @@ async function loginUser(email, password, { userRepo, hasher }) {
       ...(qrCodeImage && { qr_code: qrCodeImage }),
     };
 
-    console.log("Resposta final do loginUser:", response);
+    //console.log("Resposta final do loginUser:", response);
     return response;
   }
 

@@ -19,11 +19,11 @@ const getAdversarioName = async (adversarioId: string): Promise<string> => {
       }
       return 'Desconhecido';
     } else {
-      console.error("Erro ao buscar nome do adversário.");
+      // console.error("Erro ao buscar nome do adversário.");
       return 'Desconhecido'; // Caso haja erro na requisição
     }
   } catch (err) {
-    console.error("Erro ao buscar nome do adversário:", err);
+    // console.error("Erro ao buscar nome do adversário:", err);
     return 'Desconhecido'; // Caso haja erro na requisição
   }
 };
@@ -85,10 +85,10 @@ export async function createMatchHistory(targetUserId?: string): Promise<HTMLEle
       const data = await response.json();
       matchHistory = data.data || [];  // Assumindo que a chave de dados é `data`
     } else {
-      console.error("Erro ao carregar dados do histórico de partidas");
+      // console.error("Erro ao carregar dados do histórico de partidas");
     }
   } catch (err) {
-    console.error("Erro ao buscar histórico de partidas:", err);
+    // console.error("Erro ao buscar histórico de partidas:", err);
   }
 
   // Renderiza os jogos na tabela

@@ -96,14 +96,14 @@ function render2FAInput(container?: HTMLElement): void {
       await ensureAuthDataAvailable();
 
       // Conecta o socket de status após autenticação completa
-      console.log('✅ 2FA concluído - conectando socket de status');
+      // //console.log('✅ 2FA concluído - conectando socket de status');
       userStatusSocket.connect();
 
       showToast('Autenticação concluída com sucesso!', 'success');
       // Não remove o user_id pois é necessário para outras funcionalidades
       window.location.href = '/Profile';
     } catch (error) {
-      console.error('Erro ao verificar o código 2FA:', error);
+      // console.error('Erro ao verificar o código 2FA:', error);
       showToast(error instanceof Error ? error.message : 'Erro desconhecido.', 'error');
     }
   });

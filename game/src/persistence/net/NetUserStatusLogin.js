@@ -5,9 +5,9 @@ const UserStatusLogin_1 = require("../UserStatusLogin");
 const redisModules = require("../../../pckg/redis/modules.js");
 class NetUserStatusLogin {
     setUserStatus(userId, status) {
-        console.log('NetUserStatusLogin: setUserStatus');
+        //console.log('NetUserStatusLogin: setUserStatus');
         let theMessage = `user_status:${userId}`;
-        console.log('NetUserStatusLogin: setUserStatus, the userId(' + theMessage + '');
+        //console.log('NetUserStatusLogin: setUserStatus, the userId(' + theMessage + '');
         if (status == UserStatusLogin_1.Status.ONLINE) {
             redisModules.setCache(theMessage, true, null);
         }

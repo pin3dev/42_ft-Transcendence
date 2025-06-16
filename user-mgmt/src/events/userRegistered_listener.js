@@ -9,7 +9,7 @@ function userRegistered_listener() {
     try {
       const profile = await UserProfile.create({ user_id, email }, profileRepo.nameExists);
       await profileRepo.save(profile);
-      console.log(`[user-mgmt] Perfil criado para ${profile.name}`);
+      //console.log(`[user-mgmt] Perfil criado para ${profile.name}`);
     } catch (err) {
       console.error("[user-mgmt] Erro ao criar perfil:", err);
     }
