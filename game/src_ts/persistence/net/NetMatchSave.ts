@@ -15,7 +15,8 @@ export class NetMatchSave implements MatchSave {
 			winnerId: match.getWinnerId(),
 			score: match.getScore(),
 			startedAt: match.getStartedAt(),
-			endedAt: match.getEndedAt()
+			endedAt: match.getEndedAt(),
+			whoWin: match.getWhoWin()
 		}, "game-server"); //PRECISA TER O NOME DO SERVIÇO QUE GERA O EVENTO
 
 		/*

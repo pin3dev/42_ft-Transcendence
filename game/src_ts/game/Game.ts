@@ -118,6 +118,15 @@ export abstract class Game {
 		return this.endedAt;
 	}
 
+	public getWhoWin(): number {
+		if (this.scoreboard[Game.PLAYER_1] > this.scoreboard[Game.PLAYER_2]) {
+			return -1;
+		} else if (this.scoreboard[Game.PLAYER_2] > this.scoreboard[Game.PLAYER_1]) {
+			return 1;
+		}
+		return 0;
+	}
+
 	public addConfirmation(wsSession: WebSocketUserSession): number {
 		this.confirmed.add(wsSession);
 		return this.confirmed.size;
