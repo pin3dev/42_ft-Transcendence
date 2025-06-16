@@ -494,7 +494,8 @@ export function renderPongGameTournament(
           break;
         case 'TOURNAMENT_PLAYER_FINAL_POSITION':
           matchStarted = false; // O jogo acabou para este jogador
-          homeButton.classList.remove('hidden')
+          homeButton.classList.remove('hidden');
+          startButton.classList.add('hidden');
 
           const position = data.value; // Ex: 1, 2, 3...
           let ordinalPosition;
