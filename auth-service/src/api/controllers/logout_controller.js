@@ -4,7 +4,7 @@ async function logout_controller(request, reply) {
       path: '/', 
       httpOnly: true,
       sameSite: 'lax',
-      secure: false // true se usar HTTPS
+      secure: true // ✅ HTTPS obrigatório para produção
     })
     .code(200)
     .send({ message: 'Logout realizado com sucesso.' });
