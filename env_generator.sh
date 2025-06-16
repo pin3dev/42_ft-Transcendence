@@ -15,6 +15,24 @@ detect_base64_cmd() {
 }
 
 # ==============================
+# Função: Detecta o IP local baseado no sistema operacional
+# ==============================
+detect_local_ip() {
+  case "$(uname -s)" in
+    Darwin) 
+      LOCAL_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "127.0.0.1")
+      ;;
+    Linux) 
+      LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null || echo "127.0.0.1")
+      ;;
+    *) 
+      LOCAL_IP="127.0.0.1"
+      ;;
+  esac
+  echo "🌐 IP local detectado: $LOCAL_IP"
+}
+
+# ==============================
 # Função: Instala mkcert no macOS
 # ==============================
 install_mkcert_mac() {
@@ -25,7 +43,6 @@ install_mkcert_mac() {
   fi
   brew install mkcert
   mkcert -install
-  LOCAL_IP=$(ipconfig getifaddr en0)
 }
 
 # ==============================
@@ -39,7 +56,6 @@ install_mkcert_linux() {
   chmod +x mkcert-*-linux-amd64
   sudo mv mkcert-*-linux-amd64 /usr/local/bin/mkcert
   mkcert -install
-  LOCAL_IP=$(ip route get 8.8.8.8 | grep -oP 'src \K\S+' 2>/dev/null)
 }
 
 # ==============================
@@ -76,6 +92,8 @@ generate_ssl_certificates() {
     esac
   fi
 
+  detect_local_ip
+  
   mkdir -p certs
   LOCAL_IP_BASE64=$(echo -n "$LOCAL_IP" | base64)
 

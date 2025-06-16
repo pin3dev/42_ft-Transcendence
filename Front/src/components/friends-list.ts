@@ -19,11 +19,53 @@ export class FriendsList {
   private element: HTMLElement;
   private props: FriendsListProps;
   private searchTerm: string = '';
+  private statusUpdateListener: EventListener | null = null;
 
   constructor(props: FriendsListProps) {
     this.props = props;
     this.element = document.createElement('div');
     this.render();
+    this.setupStatusListener();
+  }
+
+  /**
+   * Configura listener para atualizações de status dos amigos
+   */
+  private setupStatusListener(): void {
+    this.statusUpdateListener = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { userId, status } = customEvent.detail;
+      console.log(`🔄 Atualizando status do amigo ${userId} para ${status}`);
+      
+      // Atualiza o status do amigo na lista local
+      const updatedFriends = this.props.friends.map(friend => {
+        if (friend.id.toString() === userId.toString()) {
+          return {
+            ...friend,
+            status: status === true || status === 'online' ? 'online' as const : 'offline' as const
+          };
+        }
+        return friend;
+      });
+
+      // Re-renderiza se houve mudanças
+      if (JSON.stringify(updatedFriends) !== JSON.stringify(this.props.friends)) {
+        this.update({ friends: updatedFriends });
+      }
+    };
+
+    // Escuta eventos de atualização de status dos amigos
+    document.addEventListener('friendStatusUpdate', this.statusUpdateListener);
+  }
+
+  /**
+   * Remove o listener quando o componente for destruído
+   */
+  public destroy(): void {
+    if (this.statusUpdateListener) {
+      document.removeEventListener('friendStatusUpdate', this.statusUpdateListener);
+      this.statusUpdateListener = null;
+    }
   }
 
   private renderFriendsList(friends: Friend[]): string {
