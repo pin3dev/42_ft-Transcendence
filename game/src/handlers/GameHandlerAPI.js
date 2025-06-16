@@ -23,7 +23,7 @@ class GameHandlerAPI {
                 sender.sendMessage(new Message_1.Message('GAME_WAITING_NEW_PLAYER'));
             }
             else {
-                let game = new GameGlobal_1.GameGlobal();
+                let game = new GameGlobal_1.GameGlobal(null);
                 let gamePlayerLeft = new GamePlayer_1.GamePlayer(true, this.waitingPlayer);
                 let gamePlayerRight = new GamePlayer_1.GamePlayer(true, ws);
                 this.addGameToGlobalGameMap(game, gamePlayerLeft, gamePlayerRight);

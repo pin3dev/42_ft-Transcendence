@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameTournament = void 0;
 const Game_1 = require("../game/Game");
 class GameTournament extends Game_1.Game {
-    constructor(gameScoreboard, gameListener) {
-        super();
+    constructor(gameScoreboard, gameListener, tournamentId) {
+        super(tournamentId);
         this._gameScoreboard = gameScoreboard;
         this._gameListener = gameListener;
     }

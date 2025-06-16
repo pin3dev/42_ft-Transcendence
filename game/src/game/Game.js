@@ -14,7 +14,7 @@ const TournamentPlayer_1 = require("../tournament/TournamentPlayer");
 const MatchSaveStrategy_1 = require("../persistence/MatchSaveStrategy");
 const GameAPISingleton_1 = require("../GameAPISingleton");
 class Game {
-    constructor() {
+    constructor(tournamentId) {
         this.players = [];
         this.scoreboard = [0, 0];
         this.id = 0;
@@ -39,6 +39,7 @@ class Game {
         this.countDownInterval = undefined;
         this.saveRating = new SaveRating_1.SaveRating();
         this.matchSaveStrategy = new MatchSaveStrategy_1.MatchSaveStrategy(GameAPISingleton_1.GameAPISingleton.getTypeOfEnvironment());
+        this._tournamentId = tournamentId;
     }
     createMatch(player1, player2) {
         this.gamePlayers[_a.PLAYER_1] = player1;
@@ -75,6 +76,15 @@ class Game {
     getEndedAt() {
         return this.endedAt;
     }
+    getWhoWin() {
+        if (this.scoreboard[_a.PLAYER_1] > this.scoreboard[_a.PLAYER_2]) {
+            return -1;
+        }
+        else if (this.scoreboard[_a.PLAYER_2] > this.scoreboard[_a.PLAYER_1]) {
+            return 1;
+        }
+        return 0;
+    }
     addConfirmation(wsSession) {
         this.confirmed.add(wsSession);
         return this.confirmed.size;
@@ -83,6 +93,9 @@ class Game {
         this.gameStatus = 'READY';
         this.sendMessageGameFull();
         this.makeCountDownRoutine();
+    }
+    getTournamentId() {
+        return this._tournamentId;
     }
     movePaddle(player, paddleDirection) {
         if (this.gameStatus !== 'RUNNING')

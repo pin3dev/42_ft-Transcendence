@@ -194,7 +194,7 @@ class Tournament {
                 continue;
             }
             isTheTournamentWithoutPlayers = false;
-            let newGame = new GameTournament_1.GameTournament(gameboard, this);
+            let newGame = new GameTournament_1.GameTournament(gameboard, this, String(this._id));
             let gameId = newGame.getId;
             gameboard.player1.webSocketUserSession.setGameId = gameId;
             gameboard.player2.webSocketUserSession.setGameId = gameId;
