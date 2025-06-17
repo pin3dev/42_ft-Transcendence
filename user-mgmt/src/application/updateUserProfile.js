@@ -5,9 +5,9 @@ const UserProfile = require("../domain/UserProfile");
 const { saveAvatar } = require("../plugins/avatarUtils");
 
 async function updateUserProfile(userId, body) {
-  console.log("Atualizando perfil:", userId);
+  //console.log("Atualizando perfil:", userId);
 
-  console.log("🚨 Dados recebidos no body:", body);
+  //console.log("🚨 Dados recebidos no body:", body);
 
   const existing = await profileRepo.findById(userId);
   if (!existing) {
@@ -47,7 +47,7 @@ async function updateUserProfile(userId, body) {
     };
 
     UserProfile.validateAvatar(avatar); //passar função para avatarUtils.js
-    console.log("Avatar validado");
+    //console.log("Avatar validado");
 
     const buffer = await body.avatar.toBuffer();
 
@@ -65,7 +65,7 @@ async function updateUserProfile(userId, body) {
     // Limpa arquivo temporário
     try {
       await fs.unlink(tempFilePath);
-      console.log("Temp removido:", tempFilePath);
+      //console.log("Temp removido:", tempFilePath);
     } catch (err) {
       console.warn("Erro limpando temp:", err.message);
     }

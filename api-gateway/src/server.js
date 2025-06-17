@@ -22,7 +22,7 @@ async function buildServer() {
       cert: SSLcert,
     }
   });
-  console.log("🚀 Iniciando API Gateway...");
+  //console.log("🚀 Iniciando API Gateway...");
 
   // Plugins essenciais
   await app.register(corsPlugin);
@@ -52,8 +52,8 @@ async function buildServer() {
     if (jwtCookie && !request.headers.authorization) {
       request.headers.authorization = `Bearer ${jwtCookie}`;
     }
-    console.log(`[API Gateway] Requisição recebida: ${request.method} ${request.url}`);
-    console.log(`[API Gateway] Headers:`, request.headers);
+    //console.log(`[API Gateway] Requisição recebida: ${request.method} ${request.url}`);
+    //console.log(`[API Gateway] Headers:`, request.headers);
   });
 
   // Headers CORS para todas as respostas

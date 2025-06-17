@@ -71,7 +71,7 @@ class ServerSSL {
             });
         });
         wssServer.listen(this._parametersVariables.wssPort, () => {
-            console.log(`WSS server listening on https://localhost:${this._parametersVariables.wssPort}`);
+            //console.log(`WSS server listening on https://localhost:${this._parametersVariables.wssPort}`);
         });
     }
 }

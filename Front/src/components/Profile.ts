@@ -53,7 +53,7 @@ export class ProfileSection {
         },
       });
     } catch (error) {
-      console.error('Erro ao buscar estatísticas do usuário:', error);
+      // console.error('Erro ao buscar estatísticas do usuário:', error);
     }
   }
 
@@ -201,7 +201,7 @@ export class ProfileSection {
 
         modal.classList.add('hidden');
       } catch (err) {
-        console.error('Erro ao atualizar perfil:', err);
+        // console.error('Erro ao atualizar perfil:', err);
 
         // Mostrar mensagem de erro para o usuário
         const errorDiv = document.createElement('div');

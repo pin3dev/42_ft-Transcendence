@@ -10,7 +10,7 @@ import { createRankingTable, updateRankingTable, RankingData } from '../componen
 let cleanupCurrentPage: () => void = () => {};
 
 export function GamePageTournament(): void {
-  console.log("Iniciando renderização da GamePageTournament..."); // LOG 1
+  //console.log("Iniciando renderização da GamePageTournament..."); // LOG 1
 
   const root = document.getElementById('root');
   if (!root) {
@@ -48,12 +48,12 @@ export function GamePageTournament(): void {
   if (!matchListContainer) {
       console.error("ERRO: Container '#match-list-container' não foi encontrado!");
   }
-  console.log("LOG 2: Containers das tabelas encontrados:", { rankingTableBody, matchListContainer });
+  //console.log("LOG 2: Containers das tabelas encontrados:", { rankingTableBody, matchListContainer });
 
   // --- CALLBACKS PARA ATUALIZAÇÃO DA UI ---
 
   const handleRankingUpdate =  async (rankingsFromSocket: any[]) => {
-    console.log("LOG 4a: handleRankingUpdate ACIONADO com:", rankingsFromSocket);
+    //console.log("LOG 4a: handleRankingUpdate ACIONADO com:", rankingsFromSocket);
     
     // Verificação de segurança
     if (!rankingTableBody) {
@@ -82,11 +82,11 @@ export function GamePageTournament(): void {
 
         // Espera todas as buscas de nome terminarem
         const formattedRankings = await Promise.all(formattedRankingsPromises);
-        console.log("LOG 5a: Nomes do ranking buscados. Dados formatados:", formattedRankings);
+        //console.log("LOG 5a: Nomes do ranking buscados. Dados formatados:", formattedRankings);
 
         // Atualiza a tabela com os dados completos
         updateRankingTable(rankingTableBody, formattedRankings);
-        console.log("LOG 6a: Tabela de Ranking ATUALIZADA.");
+        //console.log("LOG 6a: Tabela de Ranking ATUALIZADA.");
 
     } catch (error) {
         console.error("ERRO CRÍTICO dentro de handleRankingUpdate:", error);
@@ -94,7 +94,7 @@ export function GamePageTournament(): void {
   };
 
   const handleTournamentUpdate = async (matchesFromSocket: any[]) => {
-    console.log("LOG 4b: handleTournamentUpdate ACIONADO com:", matchesFromSocket);
+    //console.log("LOG 4b: handleTournamentUpdate ACIONADO com:", matchesFromSocket);
 
     // Verificação de segurança
     if (!matchListContainer) {
@@ -120,10 +120,10 @@ export function GamePageTournament(): void {
         });
 
         const formattedMatches = await Promise.all(formattedMatchesPromises);
-        console.log("LOG 5b: Nomes buscados com sucesso. Dados formatados:", formattedMatches);
+        //console.log("LOG 5b: Nomes buscados com sucesso. Dados formatados:", formattedMatches);
 
         updateMatchSchedule(matchListContainer, formattedMatches);
-        console.log("LOG 6b: Tabela de Partidas ATUALIZADA.");
+        //console.log("LOG 6b: Tabela de Partidas ATUALIZADA.");
 
     } catch (error) {
         console.error("ERRO CRÍTICO dentro de handleTournamentUpdate:", error);
@@ -136,7 +136,7 @@ export function GamePageTournament(): void {
   gameSectionContainer.id = 'pong-game-section';
   gameSectionContainer.className = 'my-8 flex-grow flex flex-col items-center ';
   
-  console.log("LOG 3: Chamando renderPongGameTournament com os callbacks.");
+  //console.log("LOG 3: Chamando renderPongGameTournament com os callbacks.");
   const cleanupGame = renderPongGameTournament(gameSectionContainer, { 
     onTournamentUpdate: handleTournamentUpdate,
     onRankingUpdate: handleRankingUpdate 
@@ -150,7 +150,7 @@ export function GamePageTournament(): void {
   root.appendChild(GamePageContainer);
 
   cleanupCurrentPage = () => {
-    console.log("Limpando GamePageTournament...");
+    //console.log("Limpando GamePageTournament...");
     cleanupGame();
   };
 }

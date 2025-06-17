@@ -8,7 +8,7 @@ export class UserStatusLoginStrategy implements UserStatusLogin {
 	private _userStatusLogin: UserStatusLogin;
 
 	constructor(typeOfEnvironment: TypeOfEnvironment) {
-		console.log('UserStatusLoginStrategy: constructor');
+		//console.log('UserStatusLoginStrategy: constructor');
 			if (typeOfEnvironment === TypeOfEnvironment.TEST) {
 			this._userStatusLogin = new TestUserStatusLogin();
 		} else {

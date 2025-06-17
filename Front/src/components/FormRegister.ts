@@ -214,7 +214,7 @@ export class FormRegister {
         showToast('Não foi possível realizar o registro', 'error');
       }
     } catch (error) {
-      console.error('Erro no registro:', error);
+      // console.error('Erro no registro:', error);
       showToast(error instanceof Error ? error.message : 'Erro desconhecido', 'error');
     } finally {
       // Restaura o botão
@@ -224,7 +224,7 @@ export class FormRegister {
   }
 
   private async sendRegisterRequest(email: string, password: string) {
-    console.log('Enviando dados para registro:', { email, password });
+    // //console.log('Enviando dados para registro:', { email, password });
     const response = await fetch('/auth/register', {
       method: 'POST',
       headers: {
@@ -235,7 +235,7 @@ export class FormRegister {
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('Erro recebido do backend:', error);
+      // console.error('Erro recebido do backend:', error);
       if (error.error && error.error.includes("Email já cadastrado")) {
         throw new Error('Este e-mail já está registrado. Por favor, use outro.');
       }
@@ -244,9 +244,9 @@ export class FormRegister {
 
     const data = await response.json();
 
-    console.log('User ID:', data.user_id);
-    console.log('Message:', data.message);
-    console.log('QR Code:', data.qr_code);
+    // //console.log('User ID:', data.user_id);
+    // //console.log('Message:', data.message);
+    // //console.log('QR Code:', data.qr_code);
 
     return data;
   }

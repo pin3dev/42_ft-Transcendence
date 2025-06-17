@@ -6,7 +6,7 @@ const NetUserStatusLogin_1 = require("./net/NetUserStatusLogin");
 const TestUserStatusLogin_1 = require("./test/TestUserStatusLogin");
 class UserStatusLoginStrategy {
     constructor(typeOfEnvironment) {
-        console.log('UserStatusLoginStrategy: constructor');
+        //console.log('UserStatusLoginStrategy: constructor');
         if (typeOfEnvironment === ParametersVariables_1.TypeOfEnvironment.TEST) {
             this._userStatusLogin = new TestUserStatusLogin_1.TestUserStatusLogin();
         }
