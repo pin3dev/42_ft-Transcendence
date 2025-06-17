@@ -71,7 +71,7 @@ export class GameService {
 
   connect(): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      //console.log('WebSocket already connected.');
+      //console.logog('WebSocket already connected.');
       return;
     }
     
@@ -79,7 +79,7 @@ export class GameService {
     this.socket = new WebSocket(this.gameUrl);
 
     this.socket.onopen = () => {
-      //console.log('WebSocket connection established.');
+      //console.logog('WebSocket connection established.');
       this.reconnectAttempts = 0; // Reset on successful connection
       this.callbacks.onOpen?.();
       this.callbacks.onStatusUpdate?.('Connection successful! Waiting for game...');
@@ -117,7 +117,7 @@ export class GameService {
     };
 
     this.socket.onclose = (event) => {
-      //console.log('WebSocket connection closed:', event.code, event.reason);
+      //console.logog('WebSocket connection closed:', event.code, event.reason);
       this.callbacks.onClose?.(event);
       if (event.wasClean) {
         this.callbacks.onStatusUpdate?.('Disconnected from server.');
@@ -153,7 +153,7 @@ export class GameService {
     if (this.socket) {
       this.socket.close(1000, "Client initiated disconnect"); // 1000 is normal closure
       this.socket = null;
-      //console.log('WebSocket connection closed by client.');
+      //console.logog('WebSocket connection closed by client.');
     }
   }
 } */
@@ -235,7 +235,7 @@ export class GameService {
   private readonly MAX_SCORE = 5; // Pontuação para vencer
 
   constructor(gameUrl: string, callbacks: GameServiceCallbacks) {
-    //console.log("MOCK GameService: Constructor called. Game URL (ignored):", gameUrl);
+    //console.logog("MOCK GameService: Constructor called. Game URL (ignored):", gameUrl);
     this.callbacks = callbacks;
     this.mockGameState = this.getInitialGameState();
   }
@@ -262,10 +262,10 @@ export class GameService {
 
   // Conexão simulada do WebSocket
   connect(): void {
-    //console.log("MOCK GameService: connect() - Simulating WebSocket connection...");
+    //console.logog("MOCK GameService: connect() - Simulating WebSocket connection...");
     this.callbacks.onStatusUpdate?.('Mock Service: Connecting to server...');
     setTimeout(() => {
-      //console.log("MOCK GameService: connect() - Simulated OPEN.");
+      //console.logog("MOCK GameService: connect() - Simulated OPEN.");
       this.callbacks.onOpen?.();
       this.callbacks.onStatusUpdate?.('Mock Service: Connection established.');
     }, 300); // Pequeno delay para simular conexão
@@ -273,12 +273,12 @@ export class GameService {
 
   // Lógica de Matchmaking
   findMatch(): void {
-    //console.log("MOCK GameService: findMatch() - Starting matchmaking simulation.");
+    //console.logog("MOCK GameService: findMatch() - Starting matchmaking simulation.");
     this.clearAllTimeoutsAndIntervals(); // Limpa timers anteriores
     this.callbacks.onMatchmakingEvent?.({ event: "SEARCHING", message: "Buscando partida..." });
     
     this.matchmakingTimeoutId = window.setTimeout(() => {
-      //console.log("MOCK GameService: findMatch() - Match found (simulated).");
+      //console.logog("MOCK GameService: findMatch() - Match found (simulated).");
       this.callbacks.onMatchmakingEvent?.({ 
         event: "MATCH_FOUND", 
         message: "Partida encontrada! Aceite para jogar." 
@@ -287,12 +287,12 @@ export class GameService {
   }
 
   acceptMatch(): void {
-    //console.log("MOCK GameService: acceptMatch() - Player accepted match.");
+    //console.logog("MOCK GameService: acceptMatch() - Player accepted match.");
     this.clearAllTimeoutsAndIntervals();
     this.callbacks.onMatchmakingEvent?.({ event: "WAITING_FOR_OPPONENT_ACCEPT", message: "Aguardando oponente aceitar..." });
 
     this.matchmakingTimeoutId = window.setTimeout(() => {
-      //console.log("MOCK GameService: acceptMatch() - Opponent accepted (simulated). Starting countdown.");
+      //console.logog("MOCK GameService: acceptMatch() - Opponent accepted (simulated). Starting countdown.");
       this.callbacks.onMatchmakingEvent?.({
           event: "MATCH_ACCEPTED_STARTING",
           message: "Ambos aceitaram! Iniciando jogo..."
@@ -300,14 +300,14 @@ export class GameService {
       // Atribuir o jogador (poderia ser aleatório ou fixo para teste)
       this.assignedPlayer = Math.random() > 0.5 ? "player1" : "player2";
       this.callbacks.onAssignPlayer?.({ player: this.assignedPlayer }); 
-      //console.log(`MOCK GameService: Assigned player as ${this.assignedPlayer}`);
+      //console.logog(`MOCK GameService: Assigned player as ${this.assignedPlayer}`);
 
       this.startCountdown();
     }, 1500); // Simula oponente aceitando
   }
 
   declineMatch(): void { // Se você adicionar um botão de recusar
-    //console.log("MOCK GameService: declineMatch() - Player declined.");
+    //console.logog("MOCK GameService: declineMatch() - Player declined.");
     this.clearAllTimeoutsAndIntervals();
     this.callbacks.onMatchmakingEvent?.({ event: "SEARCHING", message: "Você recusou. Buscando nova partida..." });
     this.findMatch(); // Reinicia a busca
@@ -316,13 +316,13 @@ export class GameService {
   private startCountdown(): void {
     let countdown = 3;
     this.countdownIntervalId = window.setInterval(() => {
-      //console.log(`MOCK GameService: Countdown: ${countdown}`);
+      //console.logog(`MOCK GameService: Countdown: ${countdown}`);
       this.callbacks.onGameEvent?.({ event: "COUNTDOWN", countdownValue: countdown, message: `Jogo começando em ${countdown}...`});
       countdown--;
       if (countdown < 0) {
         if (this.countdownIntervalId) clearInterval(this.countdownIntervalId);
         this.countdownIntervalId = null;
-        //console.log("MOCK GameService: Countdown finished. Emitting GAME_START and starting game loop.");
+        //console.logog("MOCK GameService: Countdown finished. Emitting GAME_START and starting game loop.");
         this.callbacks.onGameEvent?.({ event: "GAME_START", message: "GO!" });
         this.startGameLoop();
       }
@@ -331,7 +331,7 @@ export class GameService {
 
   // Loop principal do jogo mockado
   private startGameLoop(): void {
-    //console.log("MOCK GameService: startGameLoop() - Initializing game state for new game.");
+    //console.logog("MOCK GameService: startGameLoop() - Initializing game state for new game.");
     this.mockGameState = this.getInitialGameState(); // Reseta estado para novo jogo
     this.resetBall(); // Define velocidades iniciais da bola
 
@@ -385,17 +385,17 @@ export class GameService {
       let scored = false;
       if (this.mockGameState.ball.x - ballRadius < 0) { // Ponto para P2
         this.mockGameState.score2++;
-        //console.log(`MOCK GameService: P2 Scored! Score: ${this.mockGameState.score1}-${this.mockGameState.score2}`);
+        //console.logog(`MOCK GameService: P2 Scored! Score: ${this.mockGameState.score1}-${this.mockGameState.score2}`);
         scored = true;
       } else if (this.mockGameState.ball.x + ballRadius > 1) { // Ponto para P1
         this.mockGameState.score1++;
-        //console.log(`MOCK GameService: P1 Scored! Score: ${this.mockGameState.score1}-${this.mockGameState.score2}`);
+        //console.logog(`MOCK GameService: P1 Scored! Score: ${this.mockGameState.score1}-${this.mockGameState.score2}`);
         scored = true;
       }
 
       if (scored) {
         if (this.mockGameState.score1 >= this.MAX_SCORE || this.mockGameState.score2 >= this.MAX_SCORE) {
-          //console.log("MOCK GameService: Game Over.");
+          //console.logog("MOCK GameService: Game Over.");
           this.callbacks.onGameEvent?.({
               event: "GAME_OVER",
               message: "Fim de Jogo!",
@@ -409,14 +409,14 @@ export class GameService {
       }
       
       // 5. Enviar atualização de estado
-      // //console.log("MOCK GameService: Tick - Updating state:", JSON.parse(JSON.stringify(this.mockGameState)));
+      // //console.logog("MOCK GameService: Tick - Updating state:", JSON.parse(JSON.stringify(this.mockGameState)));
       this.callbacks.onGameStateUpdate?.({ ...this.mockGameState });
     }, 16); // Aproximadamente 60 FPS (1000ms / 60fps ~= 16.6ms)
   }
 
   // Manipulação de input do jogador
   sendInput(action: PlayerInputMessage['payload']['action']): void {
-    // //console.log(`MOCK GameService: Received input: ${action} for player ${this.assignedPlayer}`);
+    // //console.logog(`MOCK GameService: Received input: ${action} for player ${this.assignedPlayer}`);
     const paddleToMove = this.assignedPlayer === "player1" ? this.mockGameState.paddle1 : this.mockGameState.paddle2;
     
     // Para input contínuo, precisaríamos de keydown/keyup e um loop de input
@@ -447,13 +447,13 @@ export class GameService {
       if (this.gameLoopIntervalId) {
           clearInterval(this.gameLoopIntervalId);
           this.gameLoopIntervalId = null;
-          //console.log("MOCK GameService: Game loop stopped.");
+          //console.logog("MOCK GameService: Game loop stopped.");
       }
   }
 
   // Desconexão simulada
   disconnect(): void { // Chamado pela UI ou ao final do jogo
-    //console.log("MOCK GameService: disconnect() - Simulating WebSocket close.");
+    //console.logog("MOCK GameService: disconnect() - Simulating WebSocket close.");
     this.clearAllTimeoutsAndIntervals();
     this.disconnectGameLoop();
 

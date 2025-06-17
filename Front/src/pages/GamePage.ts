@@ -43,7 +43,7 @@ export function GamePage(): void { // Esta função agora renderiza uma página 
 
   // Armazena a função de cleanup do jogo para ser chamada quando a página mudar
   cleanupCurrentPage = () => {
-    //console.log("Limpando GamePage...");
+    //console.logog("Limpando GamePage...");
     cleanupGame(); // Chama a limpeza específica do componente do jogo
   };
 }

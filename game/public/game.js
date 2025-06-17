@@ -159,8 +159,8 @@ function updateInformation(game) {
 	if (game.paddle_player_2_width_position !== undefined)
 		gameState.paddle2.x = game.paddle_player_2_width_position;
 
-	//console.log(game);
-	//console.log('atualizado');
+	//console.logog(game);
+	//console.logog('atualizado');
 
 }
 
@@ -217,10 +217,10 @@ window.addEventListener('keyup', (e) => {
 
 	if (e.key === 'ArrowUp') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_UP_KEYUP' }));
-		//console.log('soltando a seta')
+		//console.logog('soltando a seta')
 	} else if (e.key === 'ArrowDown') {
 		ws.send(JSON.stringify({ type: 'GAME_PADDLE_DOWN_KEYUP' }));
-		//console.log('soltando a seta')
+		//console.logog('soltando a seta')
 	}
 
 });

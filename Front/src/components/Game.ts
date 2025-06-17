@@ -305,7 +305,7 @@ export function renderPongGame(container: HTMLElement): () => void {
     ws = new WebSocket(`wss://${window.location.hostname}:3001`); // Força localhost para testes locais
 
     ws.onopen = async () => {
-      // //console.log('Conectado ao servidor WebSocket.');
+      //console.loge.log('Conectado ao servidor WebSocket.');
       statusText.textContent = 'Conectado! Autenticando...';
       AgainButton.classList.add('hidden');
 
@@ -323,15 +323,15 @@ export function renderPongGame(container: HTMLElement): () => void {
 
       // Exemplo de autenticação
       ws?.send(JSON.stringify({ type: "AUTHENTICATION_LOGIN", value: { userToken, userId } }));
-      // //console.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
+      //console.loge.log('Enviando autenticação:', { type: "AUTHENTICATION_LOGIN", value: { userToken, userId } });
     };
 
     ws.onmessage = async (event) => {
       const data: ServerMessage = JSON.parse(event.data);
-      // //console.log('Mensagem recebida:', data);
+      //console.loge.log('Mensagem recebida:', data);
       statusText.classList.remove('hidden');
 
-      // //console.log(data.type);
+      //console.loge.log(data.type);
       switch (data.type) {
         case 'OK_USER_AUTHENTICATED':
           statusText.textContent = 'Pronto para jogar?';
@@ -364,7 +364,7 @@ export function renderPongGame(container: HTMLElement): () => void {
             player1NameElement.textContent = p1Name;
             player2NameElement.textContent = p2Name;
 
-            // //console.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
+            //console.loge.log(`Nomes atualizados: ${p1Name} vs ${p2Name}`);
           }
 
           // Atualiza o resto do estado do jogo (posições, etc.)
@@ -419,7 +419,7 @@ export function renderPongGame(container: HTMLElement): () => void {
     };
 
     ws.onclose = () => {
-      // //console.log('Conexão com o servidor perdida.');
+      //console.loge.log('Conexão com o servidor perdida.');
       statusText.textContent = 'Desconectado do servidor. Tente recarregar a página.';
       matchStarted = false;
       startButton.classList.add('hidden');
@@ -491,7 +491,7 @@ export function renderPongGame(container: HTMLElement): () => void {
   // Retorna uma função que desfaz tudo o que foi feito,
   // essencial para SPAs para evitar memory leaks.
   return () => {
-    // //console.log("Limpando a página do jogo...");
+    //console.loge.log("Limpando a página do jogo...");
     // Remove event listeners
     window.removeEventListener('keydown', handleKeyDown);
     window.removeEventListener('keyup', handleKeyUp);

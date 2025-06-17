@@ -48,7 +48,7 @@ async function start() {
 
   try {
     await app.listen({ port: 4000, host: '0.0.0.0' });
-    ////console.log("✅ Auth service rodando na porta 4000");
+    ////console.logog("✅ Auth service rodando na porta 4000");
   } catch (err) {
     //console.error("❌ Erro ao iniciar o auth-service:", err);
     process.exit(1);

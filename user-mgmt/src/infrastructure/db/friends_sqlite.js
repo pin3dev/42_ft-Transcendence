@@ -6,7 +6,7 @@ const dbPath = path.join(dbFolder, "profiles.sqlite"); // usa o mesmo banco
 
 if (!fs.existsSync(dbFolder)) {
   fs.mkdirSync(dbFolder, { recursive: true });
-  //console.log("📁 Pasta 'data/' criada automaticamente.");
+  //console.logog("📁 Pasta 'data/' criada automaticamente.");
 }
 
 const db = new sqlite3.Database(dbPath);
@@ -24,7 +24,7 @@ db.serialize(() => {
   `, (err) => {
     if (!err) {
       //tratar erro melhor
-      //console.log("✅ Tabela 'friends' criada (ou já existia).");
+      //console.logog("✅ Tabela 'friends' criada (ou já existia).");
     } else {
       console.error("❌ Erro ao criar tabela 'friends':", err.message);
     }

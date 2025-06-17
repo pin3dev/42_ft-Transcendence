@@ -48,7 +48,7 @@ A função `subscribeToEvent` é usada para escutar eventos de um canal específ
 const { subscribeToEvent } = require("./pckg/redis/modules.js");
 
 subscribeToEvent("user.registered", (event) => {
-  //console.log("Evento recebido:", event);
+  //console.logog("Evento recebido:", event);
 });
 ```
 
@@ -68,7 +68,7 @@ O `event-bus` também fornece funções para gerenciar cache no Redis:
   const { getCache } = require("./pckg/redis/modules.js");
 
   const user = await getCache("user:123");
-  //console.log(user);
+  //console.logog(user);
   ```
 
 - **`deleteCache`**: Remove um valor do cache.

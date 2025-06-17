@@ -5,7 +5,7 @@ const { Match } = require("../domain/Match");
 
 function matchFinished_listener() {
   subscribeToEvent(EventTypes.MATCH_FINISHED, async (event) => {
-    console.log("🎧 Ouvindo MATCH_FINISHED...");
+  //console.logog("🎧 Ouvindo MATCH_FINISHED...");
 
     try {
       const matchData = event.data;
@@ -16,7 +16,7 @@ function matchFinished_listener() {
       }
 
       await insertMatch(match);
-      console.log(`📊 Partida ${match.id} registrada.`);
+   //console.loglog(`📊 Partida ${match.id} registrada.`);
 
       // Só atualizar ranking se não for empate
       if (!match.isDraw()) {
@@ -30,7 +30,7 @@ function matchFinished_listener() {
 
         console.log(`🏅 Ranking atualizado: ${match.winnerId} → ${newWinner}, ${match.getLoserId()} → ${newLoser}`);
       } else {
-        console.log(`🤝 Empate registrado: ${match.player1Id} vs ${match.player2Id} - ranking mantido`);
+   //console.loge.log(`🤝 Empate registrado: ${match.player1Id} vs ${match.player2Id} - ranking mantido`);
       }
     } catch (err) {
       console.error("Erro ao processar partida:", err.message);

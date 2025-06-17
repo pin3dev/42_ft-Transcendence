@@ -13,18 +13,18 @@ async function saveAvatar(file, userId) {
   const filename = `${userId}-${uuidv4()}${ext}`;
   const filepath = path.join(AVATAR_DIR, filename);
 
-  //console.log(`🖼️ Salvando avatar em: ${filepath}`);
+  //console.logog(`🖼️ Salvando avatar em: ${filepath}`);
 
   try {
     if (file.filepath) {
       await fsp.copyFile(file.filepath, filepath);
-      //console.log('✅ Copiado de arquivo temporário');
+      //console.logog('✅ Copiado de arquivo temporário');
     } else if (file.data) {
       await fsp.writeFile(filepath, file.data);
-      //console.log('✅ Escrito a partir de buffer (.data)');
+      //console.logog('✅ Escrito a partir de buffer (.data)');
     } else if (file._buf) {
       await fsp.writeFile(filepath, file._buf);
-      //console.log('✅ Escrito a partir de buffer (_buf)');
+      //console.logog('✅ Escrito a partir de buffer (_buf)');
     } else {
       throw new Error('Formato de arquivo não reconhecido');
     }

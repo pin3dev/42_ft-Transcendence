@@ -11,7 +11,7 @@ async function initializeUserStatusIfAuthenticated(): Promise<void> {
   const hasUserId = localStorage.getItem('user_id');
   
   if (hasToken && hasUserId) {
-    //console.log('🔄 Usuário autenticado encontrado - inicializando socket de status');
+    //console.logog('🔄 Usuário autenticado encontrado - inicializando socket de status');
     
     try {
       // Verifica se a sessão ainda é válida
@@ -32,19 +32,19 @@ async function initializeUserStatusIfAuthenticated(): Promise<void> {
         });
         
       } else {
-        //console.log('❌ Sessão expirou - não inicializando socket de status');
+        //console.logog('❌ Sessão expirou - não inicializando socket de status');
       }
     } catch (error) {
       console.error('Erro ao verificar autenticação para socket de status:', error);
     }
   } else {
-    //console.log('⚠️ Usuário não autenticado - socket de status não inicializado');
+    //console.logog('⚠️ Usuário não autenticado - socket de status não inicializado');
   }
 }
 
 // Inicializar o roteador quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', async () => {
-  //console.log('🚀 Iniciando aplicação...');
+  //console.logog('🚀 Iniciando aplicação...');
   
   // Valida e limpa o estado de autenticação antes de inicializar o roteador
   await validateAndCleanAuthState();
@@ -62,12 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   setInterval(async () => {
     // Só verifica se o usuário aparenta estar logado
     if (hasJWTCookie() || hasLocalToken()) {
-      //console.log('🔍 Verificação periódica de autenticação...');
+      //console.logog('🔍 Verificação periódica de autenticação...');
       
       const isValid = await validateAndCleanAuthState();
       
       if (!isValid) {
-        //console.log('❌ Sessão expirou - recarregando página');
+        //console.logog('❌ Sessão expirou - recarregando página');
         // Desconecta socket antes de recarregar
         userStatusSocket.disconnect();
         // Se a sessão expirou, recarrega a página para resetar o estado
@@ -76,5 +76,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }, 5 * 60 * 1000); // 5 minutos
   
-  //console.log('✅ Aplicação inicializada');
+  //console.logog('✅ Aplicação inicializada');
 });

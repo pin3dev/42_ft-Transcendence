@@ -36,7 +36,7 @@ export class AuthenticationHandlerAPI{
 				const authLogin = messageFromClient as MessageWithValue<AuthenticationMessage>;
 				const isAuthenticated: boolean = authenticator.makeLogin(ws, authLogin);
 				if (isAuthenticated) {
-					//console.log('AuthenticationHandlerAPI: isUserAuthenticated');
+					//console.logog('AuthenticationHandlerAPI: isUserAuthenticated');
 					this._userStatus.addUserOnline(authLogin.getValue.getUserId);
 					sender.sendMessage(new Message('OK_USER_AUTHENTICATED'));
 				} else {

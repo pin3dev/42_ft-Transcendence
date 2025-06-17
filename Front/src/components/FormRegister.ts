@@ -224,7 +224,7 @@ export class FormRegister {
   }
 
   private async sendRegisterRequest(email: string, password: string) {
-    // //console.log('Enviando dados para registro:', { email, password });
+    //console.loge.log('Enviando dados para registro:', { email, password });
     const response = await fetch('/auth/register', {
       method: 'POST',
       headers: {
@@ -244,9 +244,9 @@ export class FormRegister {
 
     const data = await response.json();
 
-    // //console.log('User ID:', data.user_id);
-    // //console.log('Message:', data.message);
-    // //console.log('QR Code:', data.qr_code);
+    //console.loge.log('User ID:', data.user_id);
+    //console.loge.log('Message:', data.message);
+    //console.loge.log('QR Code:', data.qr_code);
 
     return data;
   }

@@ -24,17 +24,17 @@ export async function isAuthenticated(): Promise<boolean> {
  * @returns Promise<boolean> - true se o usuário estiver realmente autenticado
  */
 export async function validateAndCleanAuthState(): Promise<boolean> {
-  //console.log('🔍 Validando estado de autenticação...');
+  //console.logog('🔍 Validando estado de autenticação...');
   
   const hasLocal = hasLocalToken();
   const hasJWT = hasJWTCookie();
   
-  //console.log('📱 hasLocalToken:', hasLocal);
-  //console.log('🍪 hasJWTCookie:', hasJWT);
+  //console.logog('📱 hasLocalToken:', hasLocal);
+  //console.logog('🍪 hasJWTCookie:', hasJWT);
   
   // Se não há nenhum indício de autenticação, não há nada para validar
   if (!hasLocal && !hasJWT) {
-    //console.log('❌ Nenhum token encontrado - usuário não autenticado');
+    //console.logog('❌ Nenhum token encontrado - usuário não autenticado');
     return false;
   }
   
@@ -46,16 +46,16 @@ export async function validateAndCleanAuthState(): Promise<boolean> {
     });
     
     if (response.ok) {
-      //console.log('✅ Autenticação válida confirmada pelo backend');
+      //console.logog('✅ Autenticação válida confirmada pelo backend');
       return true;
     } else {
-      //console.log('❌ Autenticação inválida - limpando dados locais');
+      //console.logog('❌ Autenticação inválida - limpando dados locais');
       // Limpa dados locais inválidos
       clearAllAuthData();
       return false;
     }
   } catch (error) {
-    //console.log('❌ Erro ao validar autenticação - limpando dados locais');
+    //console.logog('❌ Erro ao validar autenticação - limpando dados locais');
     // Em caso de erro, limpa os dados locais
     clearAllAuthData();
     return false;
@@ -66,7 +66,7 @@ export async function validateAndCleanAuthState(): Promise<boolean> {
  * Limpa todos os dados de autenticação do cliente
  */
 export function clearAllAuthData(): void {
-  //console.log('🧹 Limpando todos os dados de autenticação...');
+  //console.logog('🧹 Limpando todos os dados de autenticação...');
   
   // Remove todos os dados do localStorage relacionados à auth
   localStorage.removeItem('userToken');
@@ -83,7 +83,7 @@ export function clearAllAuthData(): void {
     }
   });
   
-  //console.log('✅ Dados de autenticação limpos');
+  //console.logog('✅ Dados de autenticação limpos');
 }
 
 /**
@@ -145,11 +145,11 @@ export function setupAuthStateListeners(): void {
   // Detecta mudanças no localStorage entre abas
   window.addEventListener('storage', (event) => {
     if (event.key === 'userToken' || event.key === 'userName' || event.key === 'userAvatar') {
-      //console.log('📡 Mudança no estado de autenticação detectada em outra aba');
+      //console.logog('📡 Mudança no estado de autenticação detectada em outra aba');
       
       // Se dados de autenticação foram removidos em outra aba
       if (!event.newValue && event.oldValue) {
-        //console.log('🔄 Dados de autenticação removidos - atualizando interface');
+        //console.logog('🔄 Dados de autenticação removidos - atualizando interface');
         window.location.reload();
       }
     }
@@ -158,13 +158,13 @@ export function setupAuthStateListeners(): void {
   // Detecta quando a aba volta a ficar visível (para verificar se sessão ainda é válida)
   document.addEventListener('visibilitychange', async () => {
     if (!document.hidden && (hasJWTCookie() || hasLocalToken())) {
-      //console.log('👁️ Aba ficou visível - verificando estado da sessão');
+      //console.logog('👁️ Aba ficou visível - verificando estado da sessão');
       
       // Pequeno delay para evitar verificações muito frequentes
       setTimeout(async () => {
         const isValid = await validateAndCleanAuthState();
         if (!isValid) {
-          //console.log('❌ Sessão inválida detectada ao retornar à aba');
+          //console.logog('❌ Sessão inválida detectada ao retornar à aba');
           window.location.reload();
         }
       }, 1000);
@@ -178,18 +178,18 @@ export function setupAuthStateListeners(): void {
  * @returns Promise<boolean> - true se o usuário ainda estiver autenticado
  */
 export async function recheckAuthenticationState(): Promise<boolean> {
-  //console.log('🔄 Reverificando estado de autenticação...');
+  //console.logog('🔄 Reverificando estado de autenticação...');
   
   const isValid = await validateAndCleanAuthState();
   
   if (!isValid) {
-    //console.log('❌ Autenticação inválida detectada - forçando reload da interface');
+    //console.logog('❌ Autenticação inválida detectada - forçando reload da interface');
     // Se a autenticação não for válida, força o reload para atualizar a interface
     window.location.reload();
     return false;
   }
   
-  //console.log('✅ Autenticação válida confirmada');
+  //console.logog('✅ Autenticação válida confirmada');
   return true;
 }
 
@@ -204,11 +204,11 @@ export async function ensureAuthDataAvailable(): Promise<boolean> {
   const hasUserId = localStorage.getItem('user_id');
   
   if (hasToken && hasUserId) {
-    //console.log('✅ Dados de autenticação já disponíveis');
+    //console.logog('✅ Dados de autenticação já disponíveis');
     return true;
   }
   
-  //console.log('🔍 Buscando dados de autenticação...');
+  //console.logog('🔍 Buscando dados de autenticação...');
   
   try {
     // Tenta buscar dados do perfil do usuário
@@ -223,7 +223,7 @@ export async function ensureAuthDataAvailable(): Promise<boolean> {
       // Armazena user_id se disponível
       if (profileData.id && !hasUserId) {
         localStorage.setItem('user_id', profileData.id.toString());
-        //console.log('✅ user_id armazenado:', profileData.id);
+        //console.logog('✅ user_id armazenado:', profileData.id);
       }
       
       // Se não temos token, tenta várias estratégias para obter o JWT
@@ -235,10 +235,10 @@ export async function ensureAuthDataAvailable(): Promise<boolean> {
         if (jwtCookie) {
           const token = jwtCookie.split('=')[1];
           localStorage.setItem('userToken', token);
-          //console.log('✅ JWT extraído do cookie');
+          //console.logog('✅ JWT extraído do cookie');
         } else {
           // Estratégia 2: Solicita um novo JWT ao servidor
-          //console.log('🔄 Tentando obter JWT do servidor...');
+          //console.logog('🔄 Tentando obter JWT do servidor...');
           try {
             const jwtResponse = await fetch('/auth/get-token', {
               method: 'GET',
@@ -249,7 +249,7 @@ export async function ensureAuthDataAvailable(): Promise<boolean> {
               const jwtData = await jwtResponse.json();
               if (jwtData.token) {
                 localStorage.setItem('userToken', jwtData.token);
-                //console.log('✅ JWT obtido do servidor');
+                //console.logog('✅ JWT obtido do servidor');
               } else {
                 console.warn('❌ Servidor não retornou token JWT');
                 return false; // Falha na autenticação

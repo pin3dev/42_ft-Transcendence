@@ -22,7 +22,7 @@ class AuthenticationHandlerAPI {
                 const authLogin = messageFromClient;
                 const isAuthenticated = authenticator.makeLogin(ws, authLogin);
                 if (isAuthenticated) {
-                    //console.log('AuthenticationHandlerAPI: isUserAuthenticated');
+                    //console.logog('AuthenticationHandlerAPI: isUserAuthenticated');
                     this._userStatus.addUserOnline(authLogin.getValue.getUserId);
                     sender.sendMessage(new Message_1.Message('OK_USER_AUTHENTICATED'));
                 }
