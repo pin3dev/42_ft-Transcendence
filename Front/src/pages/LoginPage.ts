@@ -31,7 +31,7 @@ export function renderLogin(): void {
   // Renderiza o formulário dentro do container com todos os callbacks atualizados
   renderLoginForm(formContainer, {
     onLoginSuccess: async (response) => {
-      //console.log('Resposta do backend:', response); // Verifique a resposta no console
+      //console.logog('Resposta do backend:', response); // Verifique a resposta no console
   
       if (!response) {
         console.error('Resposta de login está indefinida.');

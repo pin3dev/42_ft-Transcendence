@@ -10,7 +10,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
    
   // Se receber 401 (Unauthorized) ou 403 (Forbidden)
   if (response.status === 401 || response.status === 403) {
-    //console.log('🚨 Sessão expirada ou inválida - limpando dados de autenticação');
+    //console.logog('🚨 Sessão expirada ou inválida - limpando dados de autenticação');
     
     // Limpa automaticamente os dados de autenticação inválidos
     clearAllAuthData();

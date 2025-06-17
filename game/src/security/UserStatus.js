@@ -10,7 +10,7 @@ class UserStatus {
         this._userStatusLogin = new UserStatusLoginStrategy_1.UserStatusLoginStrategy(GameAPISingleton_1.GameAPISingleton.getTypeOfEnvironment());
     }
     addUserOnline(userId) {
-        //console.log('UserStatus: addUserOnline');
+        //console.logog('UserStatus: addUserOnline');
         const current = this._usersStatus.get(userId);
         if (current === undefined) {
             this._userStatusLogin.setUserStatus(userId, UserStatusLogin_1.Status.ONLINE);

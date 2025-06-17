@@ -5,7 +5,7 @@ const { insertTournament, insertPlayers } = require("../infrastructure/repositor
 
 function tournamentCreated_listener() {
   subscribeToEvent(EventTypes.TOURNAMENT_CREATED, async (event) => {
-    //console.log("🎧 Ouvindo TOURNAMENT_CREATED...");
+    //console.logog("🎧 Ouvindo TOURNAMENT_CREATED...");
     try {
       const tournament = new Tournament(event.data);
 
@@ -16,7 +16,7 @@ function tournamentCreated_listener() {
       await insertTournament(tournament);
       await insertPlayers(tournament.id, tournament.players);
 
-      //console.log(`🏆 Torneio ${tournament.id} inserido com ${tournament.players.length} jogadores.`);
+      //console.logog(`🏆 Torneio ${tournament.id} inserido com ${tournament.players.length} jogadores.`);
     } catch (err) {
       console.error("Erro ao processar torneio:", err.message);
     }

@@ -96,7 +96,7 @@ function render2FAInput(container?: HTMLElement): void {
       await ensureAuthDataAvailable();
 
       // Conecta o socket de status após autenticação completa
-      // //console.log('✅ 2FA concluído - conectando socket de status');
+      //console.loge.log('✅ 2FA concluído - conectando socket de status');
       userStatusSocket.connect();
 
       showToast('Autenticação concluída com sucesso!', 'success');

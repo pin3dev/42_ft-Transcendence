@@ -206,7 +206,7 @@ export class FormLogin {
     try {
       // Fazer login inicial
       const loginResponse = await this.sendLoginRequest(email, password);
-      // //console.log('Resposta do login:', loginResponse);
+      //console.loge.log('Resposta do login:', loginResponse);
   
       // Verificar se precisa de 2FA
       if (loginResponse.requires2FA) {
@@ -225,7 +225,7 @@ export class FormLogin {
   }
 
   private async sendLoginRequest(email: string, password: string): Promise<{ requires2FA: boolean; token?: string; qr_code?: string }> {
-    // //console.log('Enviando requisição de login:', { email, password });
+    //console.loge.log('Enviando requisição de login:', { email, password });
     const response = await fetch('/auth/login', {
       method: 'POST',
       headers: {
@@ -233,14 +233,14 @@ export class FormLogin {
       },
       body: JSON.stringify({ email, password }),
     });
-    // //console.log('Resposta do servidor:', response);
+    //console.loge.log('Resposta do servidor:', response);
 
     if (!response.ok) {
       throw new Error('Credenciais inválidas');
     }
 
     const data = await response.json();
-    // //console.log('Dados retornados pelo servidor:', data);
+    //console.loge.log('Dados retornados pelo servidor:', data);
 
     return data;
   }

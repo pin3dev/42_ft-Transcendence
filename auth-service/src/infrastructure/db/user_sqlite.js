@@ -7,7 +7,7 @@ const dbPath = path.join(dbFolder, "database.sqlite");
 
   if (!fs.existsSync(dbFolder)) {
     fs.mkdirSync(dbFolder, { recursive: true });
-    //console.log("📁 Pasta 'data/' criada automaticamente.");
+    //console.logog("📁 Pasta 'data/' criada automaticamente.");
   }
   
 const db = new sqlite3.Database(dbPath);

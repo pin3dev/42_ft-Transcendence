@@ -13,8 +13,8 @@ async function getFriends(userId) {
     );
 
     const profiles = await profileRepo.findManyByIds(friendIds);
-    //console.log("🧠 Perfis retornados:", profiles);
-    //console.log("📌 Tipo de profiles:", Array.isArray(profiles) ? "array" : typeof profiles);
+    //console.logog("🧠 Perfis retornados:", profiles);
+    //console.logog("📌 Tipo de profiles:", Array.isArray(profiles) ? "array" : typeof profiles);
 
     const GATEWAY = Buffer.from(process.env.LOCAL_IP_BASE64, 'base64').toString('utf-8');
 
