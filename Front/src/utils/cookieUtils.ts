@@ -103,10 +103,10 @@ export function setCookie(name: string, value: string, options: { expires?: numb
       }
   
       //console.logog('✅ Dados de autenticação extraídos e armazenados:', {
-        user_id: payload.user_id,
-        email: payload.email,
-        hasToken: !!jwtToken
-      });
+      //   user_id: payload.user_id,
+      //   email: payload.email,
+      //   hasToken: !!jwtToken
+      // });
   
       return true;
     } catch (error) {

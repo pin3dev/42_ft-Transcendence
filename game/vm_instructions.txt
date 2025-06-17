@@ -1,6 +1,0 @@
-
-
-sudo apt install build-essential dkms linux-headers-$(uname -r)
-sudo apt install libnss3-tools curl
-
-sudo mount -t vboxsf -o uid=1000,gid=1000 vboxshare /media/vboxshare

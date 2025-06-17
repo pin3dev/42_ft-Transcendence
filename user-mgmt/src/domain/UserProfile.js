@@ -35,10 +35,10 @@ class UserProfile {
     if (!file) return null;
 
     //console.logog("Validando avatar:", {
-      filename: file.filename,
-      mimetype: file.mimetype,
-      temFilePath: !!file.filepath
-    });
+    //   filename: file.filename,
+    //   mimetype: file.mimetype,
+    //   temFilePath: !!file.filepath
+    // });
 
     const allowedFormats = ['image/jpeg', 'image/png', 'image/jpg'];
     const maxSizeMB = 2;
