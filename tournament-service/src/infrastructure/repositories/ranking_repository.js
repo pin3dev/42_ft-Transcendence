@@ -18,41 +18,13 @@ async function updateRanking(playerId, newScore) {
   });
 }
 
-function calculateRating(ratingPlayer1, ratingPlayer2, winner) {
-
-	let k = 32;
-
-		const expectedA = 1 / (1 + Math.pow(10, (ratingPlayer2 - ratingPlayer1) / 400));
-		const expectedB = 1 - expectedA;
-
-		let scoreA;
-		let scoreB;
-
-		switch (winner) {
-
-			//player 1 win
-			case -1:
-				scoreA = 1;
-				scoreB = 0;
-				break;
-
-			//player 2 win
-			case 1:
-				scoreA = 0;
-				scoreB = 1;
-				break;
-
-			//was an draw
-			case 0:
-				scoreA = 0.5;
-				scoreB = 0.5;
-				break;
-		}
-
-		const newRatingPlayer1 = ratingPlayer1 + k * (scoreA - expectedA);
-		const newRatingPlayer2 = ratingPlayer2 + k * (scoreB - expectedB);
-
-		return [Math.round(newRatingPlayer1), Math.round(newRatingPlayer2)];
+function calculateElo(winnerScore, loserScore) {
+  const K = 32;
+  const expectedWinner = 1 / (1 + Math.pow(10, (loserScore - winnerScore) / 400));
+  const expectedLoser = 1 - expectedWinner;
+  const newWinner = Math.round(winnerScore + K * (1 - expectedWinner));
+  const newLoser = Math.round(loserScore + K * (0 - expectedLoser));
+  return { newWinner, newLoser };
 }
 
 async function getTopPlayers(limit = 5) {
@@ -65,6 +37,6 @@ async function getTopPlayers(limit = 5) {
 module.exports = {
   getOrCreateRanking,
   updateRanking,
-  calculateRating,
+  calculateElo,
   getTopPlayers,
 };
