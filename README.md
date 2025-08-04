@@ -116,7 +116,7 @@ Once complete, all services will be up and running in the background.
 
 1. Open the application in Google Chrome by navigate to `https://localhost`. This will open the website locally.
 
-2. Feel free to register an account and navigate through the application’s features, including chat, profile, and Pong matches.
+2. Feel free to register an account and navigate through the application’s features, including profile and Pong matches.
 
 > [!TIP]
 > To play against another player, you’ll need to use a second computer connected to the same local network, such as another 42 school machine within the same cluster.
@@ -179,3 +179,42 @@ In addition, these materials can be accessed directly via the link provided belo
   </a>
 </p>
 
+
+### 👥 Team & Contributions
+
+**@pin3dev**
+
+* Co-designed and implemented the **api-gateway** (with @clima-fr)
+* Defined schemas to the **microservices architecture**
+* Orchestrated containers with **Docker Compose**
+* Automated service workflows via **Makefile**
+* Configured **HTTPS security** across all services
+* Co-developed the **auth-service** (with @clima-fr)
+* Developed the **user-mgmt** 
+* Implemented the **tournament-service**
+* Built the internal **event-bus** for service communication
+* Developed the shared **pckg** module
+* Created the **environment generation script** (`env_generator.sh`)
+* Integrated **frontend–backend communication for user presence** (with @phrxn)
+* Wrote the **GitHub Actions CI workflow**
+
+**@clima-fr**
+
+* Designed and implemented the **api-gateway**
+* Developed the **auth-service**
+* Co-developed the **user-mgmt** (with @pin3dev)
+* Implemented **CORS and JWT validation** across all services
+* Integrated the **frontend design** with backend APIs
+* Redesigned and refactored multiple **frontend pages** for better UX
+
+**@IsabelaGenial** & **@jaqezita**
+
+* Co-designed the **home page**, **forms**, and parts of the **user profile page**
+* Collaborated(with @phrxn) to integrate the **frontend with the game API**
+
+**@phrxn**
+
+* Developed the **server-side game API**, enabling real-time communication via **WebSocket**
+* Integrated the game logic with the frontend interface
+* Implemented support for **tournament matches with up to 16 players**
+* Developed a **user presence service** using WebSocket for tracking online/offline users
