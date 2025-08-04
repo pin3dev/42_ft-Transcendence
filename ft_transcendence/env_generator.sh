@@ -135,6 +135,7 @@ EOF
 # Função: Limpa arquivos temporários sensíveis
 # ==============================
 cleanup() {
+  cp "$(mkcert -CAROOT)/rootCA.pem" ./transcendence.pem
   rm -rf secrets
   rm -rf certs
   echo "🧹 Diretórios 'secrets' e 'certs' removido por segurança."

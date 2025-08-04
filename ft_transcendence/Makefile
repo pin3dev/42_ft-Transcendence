@@ -29,30 +29,38 @@ status:
 # ============================ STOP E LIMPEZA ============================
 
 stop:
-	sudo docker compose -f docker-compose.yml down
+	docker compose -f docker-compose.yml down
 
 iclean: stop
-	sudo docker compose -f docker-compose.yml down --rmi all
+	docker compose -f docker-compose.yml down --rmi all
 
 vclean: iclean
-	sudo docker compose -f docker-compose.yml down --rmi all -v
+	docker compose -f docker-compose.yml down --rmi all -v
 
 fclean: vclean
-	sudo docker system prune -af
+	docker system prune -af
 
 # ============================ INSPEÇÃO DO DOCKER ============================
 
 dls:
-	sudo docker ps -a
+	docker ps -a
 
 vls:
-	sudo docker volume ls
+	docker volume ls
 
 ils:
-	sudo docker image ls
+	docker image ls
 
 nls:
-	sudo docker networks ls
+	docker networks ls
+
+# ============================ INSPEÇÃO DA NETWORK ============================
+
+ip:
+	@echo "🔍 Reading LOCAL_IP_BASE64 from .env..."
+	@LOCAL_IP_BASE64=$$(grep '^LOCAL_IP_BASE64=' .env | cut -d '=' -f2); \
+	DECODED_IP=$$(echo $$LOCAL_IP_BASE64 | base64 --decode); \
+	echo "🌐 LOCAL_IP = $$DECODED_IP"
 
 # ============================ FULL REBUILD ============================
 
