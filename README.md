@@ -6,7 +6,7 @@
 </p>
 
 <p align="center"> 
-  <a href="https://github.com/pin3dev/42_Cursus/tree/main/library/">
+  <a href="https://github.com/pin3dev/42_Cursus/tree/main/library/#06-ft_transcendence">
     <img src="https://img.shields.io/badge/Microservices-blue?style=for-the-badge"/>
     <img src="https://img.shields.io/badge/API-blue?style=for-the-badge"/>
     <img src="https://img.shields.io/badge/RESTful-blue?style=for-the-badge"/>
@@ -174,7 +174,7 @@ All the theoretical material used to study and carry out this project is organiz
 In addition, these materials can be accessed directly via the link provided below.  
 
 <p align="center"> 
-  <a href="https://github.com/pin3dev/42_Cursus/tree/main/library/#02-Minitalk">
+  <a href="https://github.com/pin3dev/42_Cursus/tree/main/library/#06-ft_transcendence">
     <img src="https://img.shields.io/badge/Transcendence_Theory-gray?style=for-the-badge"/>
   </a>
 </p>
