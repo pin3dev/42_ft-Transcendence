@@ -152,20 +152,31 @@ Once the certificate is trusted and the correct IP is used, the secondary device
 
 In this project, the following modules were implemented with the aim of adhering to the specifications defined in the subject document:
 
-### Majors:
-
-- Web: A backend framework was used to structure and expose the server’s API.
-- User Management: Standard user management was implemented, including authentication and user persistence across tournaments.
-- Gameplay and User Experience: Support for remote multiplayer gameplay was developed to enhance interactivity.
-- Cybersecurity: Two-Factor Authentication (2FA) and JSON Web Tokens (JWT) were integrated to ensure secure user sessions and identity verification.
-- DevOps: The backend was designed as a set of independent microservices to encourage modularity and maintainability.
-- Server-Side Pong: The traditional Pong logic was replaced with a server-controlled game engine, including a public API for interaction.
-
-### Minors:
-
-- Web: A front-end framework was used to build the client-side interface and manage application state.
-- Web: A relational database was configured for backend data persistence and user management.
-- Accessibility: Expanding browser compatibility to ensure the application works consistently across different environments.
+```mermaid
+mindmap
+  root((Project Overview))
+    🌟 Majors
+      🌐 Web
+        Backend framework for API exposure
+      👥 User Management
+        Persistent user sessions
+      🎮 Gameplay and UX
+        Remote multiplayer support
+      🔐 Cybersecurity
+        JWT Authentication
+        2FA Implementation
+      ⚙️ DevOps
+        Microservices architecture
+      🕹️ Server-Side Pong
+        Server-controlled game engine
+        Public API for gameplay interaction
+    🔹 Minors
+      🌐 Web
+        Frontend framework for UI and state management
+        Relational database for persistence
+      ♿ Accessibility
+        Cross-browser compatibility
+```
 
 
 ## 📖 Theoretical Background <a id="theoretical"></a>
