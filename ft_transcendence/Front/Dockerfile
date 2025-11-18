@@ -1,31 +1,13 @@
-# FROM node:22
-
-# # Defina o diretório de trabalho dentro do container
-# WORKDIR /frontend
-
-# COPY package.json package-lock.json* ./
-# RUN npm install
-
-# # Instalando o vite globalmente para garantir que esteja disponível
-# RUN npm install -g vite
-
-# # Cópia dos arquivos do projeto
-# COPY . .
-
-# # Expõe a porta para o servidor de desenvolvimento
-# EXPOSE 443
-
-# # Comando para iniciar o servidor de desenvolvimento
-# ENTRYPOINT ["npm", "run"]
-
-FROM node:22 AS builder
+# ─────────── STAGE 1 – BUILD ───────────
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
 
-# Compila TypeScript e gera build com Vite
+ENV NODE_ENV=production
+
 RUN npm run build

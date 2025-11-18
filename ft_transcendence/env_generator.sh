@@ -126,8 +126,17 @@ SSL_KEY_BASE64=$SSL_KEY
 
 # ===================== Network Configuration =====================
 LOCAL_IP_BASE64=$LOCAL_IP_BASE64
-EOF
 
+# ===================== PORTS =====================
+PORT_API_GATEWAY=443
+PORT_AUTH_SERVICE=4000
+PORT_EVENT_BUS=6379
+PORT_USER_MGMT=5000
+PORT_TOURNAMENT_SERVICE=8000
+PORT_GAME_SERVICE_START=3000
+PORT_GAME_SERVICE_END=3001
+
+EOF
   echo "✅ Arquivo .env criado com sucesso."
 }
 

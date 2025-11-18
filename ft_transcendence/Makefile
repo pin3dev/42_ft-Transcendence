@@ -6,25 +6,25 @@ keys:
 	[ -s .env ] || ./env_generator.sh
 
 static-frontend:
-	sudo docker compose -f docker-compose.yml --profile builder up --build frontend-builder
-	sudo docker compose -f docker-compose.yml --profile builder down
+	docker compose -f docker-compose.yml --profile builder up --build frontend-builder
+	docker compose -f docker-compose.yml --profile builder down
 
 build: static-frontend
-	sudo docker compose -f docker-compose.yml build
+	docker compose -f docker-compose.yml build
 
 run: build
-	sudo docker compose -f docker-compose.yml up -d
+	docker compose -f docker-compose.yml up -d
 
 
 # ============================ EXECUÇÃO INTERATIVA ============================
 
 exec:
 	$(eval service=$(filter-out $@,$(MAKECMDGOALS)))
-	sudo docker compose -f docker-compose.yml exec $(service) bash
+	docker compose -f docker-compose.yml exec $(service) sh
 
 status:
 	$(eval service=$(filter-out $@,$(MAKECMDGOALS)))
-	sudo docker compose -f docker-compose.yml logs $(service)
+	docker compose -f docker-compose.yml logs $(service)
 
 # ============================ STOP E LIMPEZA ============================
 

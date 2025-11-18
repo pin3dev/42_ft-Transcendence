@@ -3,6 +3,7 @@
 .sqlite
 .DS_Store
 *.b64
+*.pem
 
 # Diretórios
 npm-debug.log

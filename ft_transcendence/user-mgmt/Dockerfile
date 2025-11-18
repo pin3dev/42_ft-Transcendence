@@ -1,20 +1,15 @@
-FROM node:20.18.1
+FROM node:20.18.1-alpine3.20 
 
 WORKDIR /app
 RUN mkdir -p /app/avatars
-
-# RUN apt-get update && apt-get install -y sqlite3 
-# Instala dependências do sistema (sem cache sujo)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends sqlite3 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache sqlite sqlite-libs openssl
 
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
+
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 5000
 
-CMD ["node", "src/server.js"]
+CMD ["./entrypoint.sh"]

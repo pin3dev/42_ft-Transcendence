@@ -11,13 +11,13 @@ services:
     build:
       context: ./api-gateway
     container_name: api-gateway
+    image: trans-api-gateway:1.0.1
     environment:
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
       - SSL_CERT_BASE64=${SSL_CERT_BASE64}
       - SSL_KEY_BASE64=${SSL_KEY_BASE64}
     networks:
       - internal_network
-      # - external_network
     ports:
       - "443:443"
     depends_on:
@@ -25,9 +25,8 @@ services:
       - event-bus
       - user-mgmt
     volumes:
-      - ./user-mgmt/avatars:/app/static/avatars # acesso a avatars do user-mgmt
+      - avatars-data:/app/static/avatars # acesso a avatars do user-mgmt
       - frontend-build:/app/frontend
-      # - ./MinimalFrontend/dist:/app/frontend # acesso ao MinimalFrontend estático
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
 
 
@@ -35,6 +34,7 @@ services:
     build:
       context: ./auth-service
     container_name: auth-service
+    image: auth-service:1.0.1
     environment:
       - JWT_PRIVATE_KEY_BASE64=${JWT_PRIVATE_KEY_BASE64}
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
@@ -52,6 +52,7 @@ services:
     build:
       context: ./event-bus
     container_name: event-bus
+    image: trans-event-bus:1.0.1
     networks:
       - internal_network
     expose:
@@ -63,6 +64,7 @@ services:
     build:
       context: ./user-mgmt
     container_name: user-mgmt
+    image: trans-user-mgmt:1.0.1
     environment:
       - LOCAL_IP_BASE64=${LOCAL_IP_BASE64}
     networks:
@@ -71,20 +73,21 @@ services:
       - "5000"
     volumes:
       - user-data:/app/data # persistência de DB e avatares de perfil de usuário
-      - ./user-mgmt/avatars:/app/avatars  # acesso a avatars do user-mgmt
+      - avatars-data:/app/avatars  # acesso a avatars do user-mgmt
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
 
   tournament-service:
     build:
       context: ./tournament-service
     container_name: tournament-service
+    image: trans-tournament-service:1.0.1
     networks:
       - internal_network
     expose:
       - "8000"
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
-      - tournament-data:/app/data # persistência de DB de torneios
+      - tournament-data:/app/data
     depends_on:
       - event-bus
 
@@ -93,6 +96,7 @@ services:
       context: ./game
       dockerfile: Dockerfile
     container_name: game-server
+    image: trans-game-server:1.0.1
     environment:
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
       - SSL_CERT_BASE64=${SSL_CERT_BASE64}
@@ -105,7 +109,6 @@ services:
       - "3001"
     networks:
       - internal_network
-      # - external_network
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
     depends_on:
@@ -115,10 +118,6 @@ networks:
   internal_network:
     name: internal_network
     driver: bridge
-
-  # external_network:
-  #   name: external_network
-  #   driver: bridge
 
 volumes:
   user-data:
@@ -131,4 +130,7 @@ volumes:
     name: tournament-data
   frontend-build:
     name: frontend-build
+  avatars-data:
+    name: avatars-data
+
 
