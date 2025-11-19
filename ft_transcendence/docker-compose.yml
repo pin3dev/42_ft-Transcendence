@@ -3,6 +3,9 @@ services:
     build:
       context: ./Front
       dockerfile: Dockerfile
+    environment:
+      - PORT_HTTPS_GAME_SERVICE=${PORT_HTTPS_GAME_SERVICE}
+      - PORT_WSS_GAME_SERVICE=${PORT_WSS_GAME_SERVICE}
     volumes:
       - frontend-build:/app/dist
     profiles: ["builder"]
@@ -13,13 +16,19 @@ services:
     container_name: api-gateway
     image: trans-api-gateway:1.0.1
     environment:
+      - PORT=${PORT_API_GATEWAY}
+      - PORT_AUTH_SERVICE=${PORT_AUTH_SERVICE}
+      - PORT_USER_MGMT=${PORT_USER_MGMT}
+      - PORT_TOURNAMENT_SERVICE=${PORT_TOURNAMENT_SERVICE}
+      - PORT_HTTPS_GAME_SERVICE=${PORT_HTTPS_GAME_SERVICE}
+      - PORT_WSS_GAME_SERVICE=${PORT_WSS_GAME_SERVICE}
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
       - SSL_CERT_BASE64=${SSL_CERT_BASE64}
       - SSL_KEY_BASE64=${SSL_KEY_BASE64}
     networks:
       - internal_network
     ports:
-      - "443:443"
+      - "${PORT_API_GATEWAY}:${PORT_API_GATEWAY}"
     depends_on:
       - auth-service
       - event-bus
@@ -34,14 +43,15 @@ services:
     build:
       context: ./auth-service
     container_name: auth-service
-    image: auth-service:1.0.1
+    image: trans-auth-service:1.0.1
     environment:
+      - PORT=${PORT_AUTH_SERVICE}
       - JWT_PRIVATE_KEY_BASE64=${JWT_PRIVATE_KEY_BASE64}
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
     networks:
       - internal_network
     expose:
-      - "4000"
+      - "${PORT_AUTH_SERVICE}"
     depends_on:
       - event-bus
     volumes:
@@ -56,7 +66,7 @@ services:
     networks:
       - internal_network
     expose:
-      - "6379"
+      - "${PORT_EVENT_BUS}"
     volumes:
       - event-data:/data
 
@@ -66,11 +76,12 @@ services:
     container_name: user-mgmt
     image: trans-user-mgmt:1.0.1
     environment:
+      - PORT=${PORT_USER_MGMT}
       - LOCAL_IP_BASE64=${LOCAL_IP_BASE64}
     networks:
       - internal_network
     expose:
-      - "5000"
+      - "${PORT_USER_MGMT}"
     volumes:
       - user-data:/app/data # persistência de DB e avatares de perfil de usuário
       - avatars-data:/app/avatars  # acesso a avatars do user-mgmt
@@ -81,10 +92,12 @@ services:
       context: ./tournament-service
     container_name: tournament-service
     image: trans-tournament-service:1.0.1
+    environment:
+      - PORT=${PORT_TOURNAMENT_SERVICE}
     networks:
       - internal_network
     expose:
-      - "8000"
+      - "${PORT_TOURNAMENT_SERVICE}"
     volumes:
       - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
       - tournament-data:/app/data
@@ -98,15 +111,17 @@ services:
     container_name: game-server
     image: trans-game-server:1.0.1
     environment:
+      - PORT_HTTPS=${PORT_HTTPS_GAME_SERVICE}
+      - PORT_WSS=${PORT_WSS_GAME_SERVICE}
       - JWT_PUBLIC_KEY_BASE64=${JWT_PUBLIC_KEY_BASE64}
       - SSL_CERT_BASE64=${SSL_CERT_BASE64}
       - SSL_KEY_BASE64=${SSL_KEY_BASE64}
     ports:
-      - "3000:3000"
-      - "3001:3001"
+      - "${PORT_HTTPS_GAME_SERVICE}:${PORT_HTTPS_GAME_SERVICE}"
+      - "${PORT_WSS_GAME_SERVICE}:${PORT_WSS_GAME_SERVICE}"
     expose:
-      - "3000"
-      - "3001"
+      - "${PORT_HTTPS_GAME_SERVICE}"
+      - "${PORT_WSS_GAME_SERVICE}"
     networks:
       - internal_network
     volumes:

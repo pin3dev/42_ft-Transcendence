@@ -10,6 +10,4 @@ COPY . .
 
 RUN chmod +x /app/entrypoint.sh
 
-EXPOSE 5000
-
 CMD ["./entrypoint.sh"]

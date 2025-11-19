@@ -12,6 +12,7 @@ const friends_routes = require("./api/routes/friends_routes");
 const profileRepo = require("./infrastructure/db/profile_repository");
 const friendRepo = require("./infrastructure/db/friends_repository");
 const testProtectedRoute = require("./api/routes/test_protected_route");
+const PORT = process.env.PORT;
 
 const fastify = Fastify({ 
   logger: true,
@@ -56,7 +57,7 @@ fastify.register(profiles_routes);
 fastify.register(friends_routes);
 fastify.register(testProtectedRoute);
 
-fastify.listen({ port: 5000, host: "0.0.0.0" }, (err) => {
+fastify.listen({ port: PORT, host: "0.0.0.0" }, (err) => {
   if (err) {
     fastify.log.error(err);
     process.exit(1);

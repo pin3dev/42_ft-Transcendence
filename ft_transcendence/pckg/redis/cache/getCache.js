@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 
 const cacheCnn = new Redis({
   host: "event-bus",
-  port: 6379
+  port: 6379,
 });
 
 async function getCache(key) {

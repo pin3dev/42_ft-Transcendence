@@ -13,7 +13,12 @@ const { getCache } = require("../pckg/redis/modules.js");
 const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
 const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
 const SSLcert = Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('utf-8');
-
+const PORT = process.env.PORT;
+// const PROTOCOLSSL = "https";
+const PROTOCOL = "http";
+const AUTH_SERVICE_URL = `${PROTOCOL}://auth-service:${process.env.PORT_AUTH_SERVICE}`;
+const USER_MGMT_URL = `${PROTOCOL}://user-mgmt:${process.env.PORT_USER_MGMT}`;
+const TOURNAMENT_SERVICE_URL = `${PROTOCOL}://tournament-service:${process.env.PORT_TOURNAMENT_SERVICE}`;
 
 async function buildServer() {
   const app = Fastify({
@@ -42,6 +47,8 @@ async function buildServer() {
     prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
     decorateReply: false // <- ESSENCIAL
   });
+
+  
   
   app.setNotFoundHandler((req, reply) => {
     reply.sendFile('index.html'); // fallback para SPA simples
@@ -91,40 +98,10 @@ async function buildServer() {
     }
   });
 
-  // // Rota para validação de JWT (para serviços internos como game-service)
-  // app.post("/auth/validate-jwt", {
-  //   schema: {
-  //     headers: {
-  //       type: "object",
-  //       required: ["authorization"],
-  //       properties: {
-  //         authorization: { type: "string" }
-  //       }
-  //     }
-  //   }
-  // }, async (request, reply) => {
-  //   try {
-  //     // Reutiliza a validação existente (JWT + usuário deletado)
-  //     await app.authenticate(request, reply);
-      
-  //     // Retorna as informações do usuário do token validado
-  //     return reply.code(200).send({ 
-  //       valid: true,
-  //       user_id: request.user.user_id.toString(),
-  //     });
-  //   } catch (error) {
-  //     // O middleware authenticate já trata usuários deletados e tokens inválidos
-  //     return reply.code(401).send({ 
-  //       valid: false, 
-  //       error: error.message || "Invalid token" 
-  //     });
-  //   }
-  // });
-
   // Proxy: Auth
   app.register(createServiceProxy({
     prefix: "/auth",
-    target: "http://auth-service:4000",
+    target: AUTH_SERVICE_URL,
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
       
@@ -140,7 +117,7 @@ async function buildServer() {
   // Proxy: Teste protegido
   app.register(createServiceProxy({
     prefix: "/teste",
-    target: "http://user-mgmt:5000",
+    target: USER_MGMT_URL,
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
       await app.authenticate(request, reply);
@@ -152,7 +129,7 @@ async function buildServer() {
   // Proxy: User
   app.register(createServiceProxy({
     prefix: "/user",
-    target: "http://user-mgmt:5000",
+    target: USER_MGMT_URL,
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
       await app.authenticate(request, reply);
@@ -164,7 +141,7 @@ async function buildServer() {
     // Proxy: Teste protegido
     app.register(createServiceProxy({
       prefix: "/tournament",
-      target: "http://tournament-service:8000",
+      target: TOURNAMENT_SERVICE_URL,
       onRequest: async (request, reply) => {
         if (request.method === 'OPTIONS') return;
         await app.authenticate(request, reply);
@@ -173,8 +150,9 @@ async function buildServer() {
       }
     }));
 
+
   await app.ready();
-  await app.listen({ port: 443, host: "0.0.0.0" });
+  await app.listen({ port: PORT, host: "0.0.0.0" });
 }
 
 buildServer().catch(err => {

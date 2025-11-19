@@ -9,6 +9,7 @@ const { tournamentCreated_listener } = require("./events/tournamentCreated_liste
 
 const ranking_routes = require("./api/routes/ranking_routes");
 const match_routes = require("./api/routes/match_routes");
+const PORT = process.env.PORT;
 
 const fastify = Fastify({ 
     logger: true,
@@ -22,7 +23,7 @@ const fastify = Fastify({
   fastify.register(ranking_routes);
   fastify.register(match_routes);
 
-  fastify.listen({ port: 8000, host: "0.0.0.0" }, (err) => {
+  fastify.listen({ port: PORT, host: "0.0.0.0" }, (err) => {
     if (err) {
       fastify.log.error(err);
       process.exit(1);

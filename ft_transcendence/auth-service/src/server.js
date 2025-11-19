@@ -13,7 +13,7 @@ const { userDeleted_listener } = require("./events/userDeleted_listener");
 
 const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
 const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
-
+const PORT = process.env.PORT;
 
 async function start() {
   const app = Fastify({ logger: true });
@@ -47,7 +47,7 @@ async function start() {
   userDeleted_listener();
 
   try {
-    await app.listen({ port: 4000, host: '0.0.0.0' });
+    await app.listen({ port: PORT, host: '0.0.0.0' });
     ////console.logog("✅ Auth service rodando na porta 4000");
   } catch (err) {
     //console.error("❌ Erro ao iniciar o auth-service:", err);
