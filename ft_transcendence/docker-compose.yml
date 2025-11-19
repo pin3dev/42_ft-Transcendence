@@ -36,7 +36,7 @@ services:
     volumes:
       - avatars-data:/app/static/avatars # acesso a avatars do user-mgmt
       - frontend-build:/app/frontend
-      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - ./pckg:/app/pckg:ro # acesso ao pckges e funções auxiliares
 
 
   auth-service:
@@ -56,7 +56,7 @@ services:
       - event-bus
     volumes:
       - auth-data:/app/data  # persistência de DB de autenticação
-      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - ./pckg:/app/pckg:ro # acesso ao pckges e funções auxiliares
 
   event-bus:
     build:
@@ -85,7 +85,7 @@ services:
     volumes:
       - user-data:/app/data # persistência de DB e avatares de perfil de usuário
       - avatars-data:/app/avatars  # acesso a avatars do user-mgmt
-      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - ./pckg:/app/pckg:ro # acesso ao pckges e funções auxiliares
 
   tournament-service:
     build:
@@ -99,7 +99,7 @@ services:
     expose:
       - "${PORT_TOURNAMENT_SERVICE}"
     volumes:
-      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - ./pckg:/app/pckg:ro # acesso ao pckges e funções auxiliares
       - tournament-data:/app/data
     depends_on:
       - event-bus
@@ -125,7 +125,7 @@ services:
     networks:
       - internal_network
     volumes:
-      - ./pckg/redis:/app/pckg/redis:ro # acesso ao redis e funções auxiliares
+      - ./pckg:/app/pckg:ro # acesso ao pckges e funções auxiliares
     depends_on:
       - event-bus
 

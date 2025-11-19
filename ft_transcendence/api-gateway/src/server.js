@@ -9,6 +9,8 @@ const fastifyCookie = require("@fastify/cookie");
 const fastifyStatic = require("@fastify/static"); // Adicionado para servir arquivos estáticos
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
+const setupMetrics = require("../pckg/prometheus/metrics.js");
+
 
 const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
 const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
@@ -28,6 +30,8 @@ async function buildServer() {
     }
   });
   //console.logog("🚀 Iniciando API Gateway...");
+
+  setupMetrics(app, "api-gateway");
 
   // Plugins essenciais
   await app.register(corsPlugin);

@@ -1,9 +1,15 @@
-FROM node:20.18.1-alpine3.20 
+FROM node:20.18.1-slim
 
 WORKDIR /app
 RUN mkdir -p /app/avatars
-RUN apk add --no-cache sqlite sqlite-libs openssl
-
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    sqlite3 \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
+    
 COPY package*.json ./
 RUN npm install
 COPY . .

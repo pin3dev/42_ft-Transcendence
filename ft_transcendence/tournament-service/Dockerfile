@@ -1,12 +1,17 @@
-FROM node:20.18.1-alpine
+FROM node:20.18.1-slim
 
 WORKDIR /app
 
-RUN apk add --no-cache sqlite sqlite-libs openssl
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npx prisma generate --schema=src/infrastructure/schema.prisma

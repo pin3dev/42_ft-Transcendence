@@ -62,6 +62,20 @@ ip:
 	DECODED_IP=$$(echo $$LOCAL_IP_BASE64 | base64 --decode); \
 	echo "🌐 LOCAL_IP = $$DECODED_IP"
 
+# ============================ MONITORING ============================
+
+moni-up:
+	docker compose -f monitoring/docker-compose.monitoring.yml up -d
+
+moni-build:
+	docker compose -f monitoring/docker-compose.monitoring.yml build
+
+moni-stop:
+	docker compose -f monitoring/docker-compose.monitoring.yml down
+
+moni-clean:
+	docker compose -f monitoring/docker-compose.monitoring.yml down --rmi all -v
+
 # ============================ FULL REBUILD ============================
 
 re: fclean all

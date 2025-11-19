@@ -1,0 +1,48 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+
+  # Monitorar o próprio Prometheus
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  # Monitorar containers docker
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # Monitorar Redis
+  - job_name: "event-bus-redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+
+  # Monitorar a API Gateway
+  - job_name: "api-gateway"
+    scheme: https
+    metrics_path: "/metrics"
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets: ["api-gateway:443"]
+
+  # Monitorar Auth Service
+  - job_name: "auth-service"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["auth-service:4000"]
+
+  # Monitorar User Management
+  - job_name: "user-mgmt"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["user-mgmt:5000"]
+
+  # Monitorar Tournament Service
+  - job_name: "tournament"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["tournament-service:8000"]
+

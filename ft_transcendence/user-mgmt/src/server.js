@@ -12,6 +12,8 @@ const friends_routes = require("./api/routes/friends_routes");
 const profileRepo = require("./infrastructure/db/profile_repository");
 const friendRepo = require("./infrastructure/db/friends_repository");
 const testProtectedRoute = require("./api/routes/test_protected_route");
+const setupMetrics = require("../pckg/prometheus/metrics.js");
+
 const PORT = process.env.PORT;
 
 const fastify = Fastify({ 
@@ -19,6 +21,8 @@ const fastify = Fastify({
   // Desabilitar a serialização automática para permitir o envio de respostas binária
   disableRequestLogging: false
 });
+
+setupMetrics(fastify, "user-mgmt");
 
 // Garantir que o diretório temporário para uploads exista
 const tmpDir = path.join(__dirname, '../tmp');

@@ -9,6 +9,8 @@ const auth_routes = require("./api/routes/auth_routes");
 const userRepo = require("./infrastructure/db/user_repository");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { userDeleted_listener } = require("./events/userDeleted_listener");
+const setupMetrics = require("../pckg/prometheus/metrics.js");
+
 
 
 const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
@@ -27,6 +29,8 @@ async function start() {
     verify: { algorithms: ['RS256'], key: JWTpublicKey }
   });
   app.register(fastifyCookie);
+
+  setupMetrics(app, "auth-service");
 
   app.decorate("userRepo", userRepo);
   app.decorate("hasher", hasher);

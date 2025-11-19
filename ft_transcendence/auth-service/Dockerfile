@@ -1,8 +1,13 @@
-FROM node:20.18.1-alpine
+FROM node:20.18.1-slim
 
 WORKDIR /app
-RUN apk add --no-cache sqlite sqlite-libs
-
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+    
 COPY package*.json ./
 RUN npm install
 COPY . .
