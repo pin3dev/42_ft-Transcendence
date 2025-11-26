@@ -13,14 +13,18 @@ async function register_controller(request, reply) {
 
     //console.logog("[Auth-Service] Registro bem-sucedido:", result);
 
+    // account created metric
+    request.server.metrics.authAccountCreated.inc();
     return reply.code(201).send({
       user_id: result.user_id,
       message: "Usuário criado com sucesso",
-      qr_code: result.qr_code // considere renomear para `qr_code` no registerUser também
+      qr_code: result.qr_code 
     });
 
   } catch (err) {
     console.error("[Auth-Service] Erro no registro:", err.message);
+    // account create failed metric
+    request.server.metrics.authAccountCreateFailed.inc();
     return reply.code(400).send({ error: err.message });
   }
 }

@@ -25,7 +25,7 @@ module.exports = async function (fastify) {
     handler: logout_controller
   });
 
-  // Rota protegida para obter JWT token (para WebSocket)
+  // route to get JWT token (WebSocket)
   fastify.get("/auth/get-token", {
     handler: getToken_controller
   });

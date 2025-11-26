@@ -5,6 +5,8 @@ async function searchProfile_controller(request, reply) {
 
   try {
     const results = await searchProfile({ name, id });
+    // user search metric 
+    request.server.metrics.userSearched.inc();
     return reply.code(200).send(results);
   } catch (err) {
     const status = err.statusCode || 500;

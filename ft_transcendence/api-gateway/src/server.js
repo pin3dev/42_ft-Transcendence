@@ -1,16 +1,16 @@
 require("dotenv").config();
 const Fastify = require("fastify");
-const fs = require("fs");
+// const fs = require("fs");
 const path = require("path");
 
 const corsPlugin = require("./plugins/cors");
 const jwt = require("@fastify/jwt");
 const fastifyCookie = require("@fastify/cookie");
-const fastifyStatic = require("@fastify/static"); // Adicionado para servir arquivos estáticos
+const fastifyStatic = require("@fastify/static"); // to serve static files
 const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 const setupMetrics = require("../pckg/prometheus/metrics.js");
-
+const gatewayMetrics = require("./infrastructure/monitoring/metrics.js");
 
 const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
 const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
@@ -31,9 +31,10 @@ async function buildServer() {
   });
   //console.logog("🚀 Iniciando API Gateway...");
 
-  setupMetrics(app, "api-gateway");
+  const metrics = setupMetrics(app, "api-gateway", gatewayMetrics);
+  app.decorate("metrics", metrics);
 
-  // Plugins essenciais
+  //  Plugins
   await app.register(corsPlugin);
   await app.register(fastifyCookie);
 
@@ -45,7 +46,7 @@ async function buildServer() {
     index: 'index.html'
   });
   
-  // Servir arquivos estáticos (avatares)
+  // to serve avatar images
   await app.register(fastifyStatic, {
     root: path.join(__dirname, '../static/avatars'),
     prefix: '/static/avatars/', // Servirá via http://localhost:1025/static/avatars/...
@@ -55,7 +56,7 @@ async function buildServer() {
   
   
   app.setNotFoundHandler((req, reply) => {
-    reply.sendFile('index.html'); // fallback para SPA simples
+    reply.sendFile('index.html'); // fallback to index.html (SPA)
   });
 
   app.addHook("onRequest", async (request, reply) => {
@@ -67,7 +68,7 @@ async function buildServer() {
     //console.logog(`[API Gateway] Headers:`, request.headers);
   });
 
-  // Headers CORS para todas as respostas
+  // Headers CORS to all responses
   app.addHook("onSend", async (request, reply, payload) => {
     reply.header("Access-Control-Allow-Origin", "https://localhost"); //request.headers.origin || ""
     reply.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
@@ -83,21 +84,24 @@ async function buildServer() {
     sign: false
   });
 
-  // Middleware de autenticação
+  // auth Middleware 
   app.decorate("authenticate", async function (request, reply) {
     try {
       await request.jwtVerify();
 
       const { user_id } = request.user;
       if (!user_id) {
+        app.metrics.gatewayDenied.inc();
         return reply.code(401).send({ error: "Token inválido: user_id ausente" });
       }
 
       const isDeleted = await getCache(`delUser:${user_id}`);
       if (isDeleted) {
+        app.metrics.gatewayDenied.inc();
         return reply.code(401).send({ error: "Usuário excluído" });
       }
     } catch (err) {
+      app.metrics.gatewayDenied.inc();
       reply.code(401).send(err);
     }
   });
@@ -109,6 +113,9 @@ async function buildServer() {
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
       
+      // proxy routing metric to auth-service
+        app.metrics.gatewayRouted.inc({ target: "auth-service" });
+
       // Apenas protege a rota /auth/get-token
       if (request.url === '/auth/get-token') {
         await app.authenticate(request, reply);
@@ -124,6 +131,10 @@ async function buildServer() {
     target: USER_MGMT_URL,
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
+
+      // proxy routing metric to teste
+      app.metrics.gatewayRouted.inc({ target: "teste" });
+
       await app.authenticate(request, reply);
       request.headers['x-user-id'] = request.user.user_id;
       request.headers['x-user-email'] = request.user.email;
@@ -136,18 +147,26 @@ async function buildServer() {
     target: USER_MGMT_URL,
     onRequest: async (request, reply) => {
       if (request.method === 'OPTIONS') return;
+
+      // proxy routing metric to user-mgmt
+      app.metrics.gatewayRouted.inc({ target: "user-mgmt" });
+
       await app.authenticate(request, reply);
       request.headers['x-user-id'] = request.user.user_id;
       request.headers['x-user-email'] = request.user.email;
     }
   }));
 
-    // Proxy: Teste protegido
+    // Proxy: tournament
     app.register(createServiceProxy({
       prefix: "/tournament",
       target: TOURNAMENT_SERVICE_URL,
       onRequest: async (request, reply) => {
         if (request.method === 'OPTIONS') return;
+
+        // proxy routing metric to tournament
+        app.metrics.gatewayRouted.inc({ target: "tournament" });
+
         await app.authenticate(request, reply);
         request.headers['x-user-id'] = request.user.user_id;
         request.headers['x-user-email'] = request.user.email;

@@ -11,7 +11,7 @@ async function getUser_controller(request, reply) {
     const profile = await getUserProfile(user_id);
     return reply.send(profile);
   } catch (err) {
-    console.error("Error in getUser_controller:", err);
+    // console.error("Error in getUser_controller:", err);
     const status = err.statusCode || 500;
     return reply.code(status).send({ error: err.message });
   }

@@ -6,8 +6,12 @@ async function rejectFriend_controller(request, reply) {
 
   try {
     await rejectFriend(user_id, sender_id);
+    // friend rejected metric
+    request.server.metrics.friendshipRejected.inc();
     reply.code(200).send({ message: "Solicitação rejeitada com sucesso." });
   } catch (err) {
+    // friend error metric
+    request.server.metrics.friendshipError.inc();
     reply.code(400).send({ error: err.message });
   }
 }

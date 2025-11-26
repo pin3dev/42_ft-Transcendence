@@ -1,6 +1,6 @@
 const Fastify = require("fastify");
-const path = require("path");
-const fs = require("fs");
+// const path = require("path");
+// const fs = require("fs");
 const fastifyJwt = require("@fastify/jwt");
 const fastifyCookie = require('@fastify/cookie');
 
@@ -10,15 +10,14 @@ const userRepo = require("./infrastructure/db/user_repository");
 const hasher = require("./infrastructure/crypto/bcryptHasher");
 const { userDeleted_listener } = require("./events/userDeleted_listener");
 const setupMetrics = require("../pckg/prometheus/metrics.js");
+const authMetrics = require("./infrastructure/monitoring/metrics.js");
 
-
-
-const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8'); // key nova
-const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8'); // key nova
+const JWTprivateKey = Buffer.from(process.env.JWT_PRIVATE_KEY_BASE64, 'base64').toString('utf-8');
+const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
 const PORT = process.env.PORT;
 
 async function start() {
-  const app = Fastify({ logger: true });
+  const app = Fastify(/* { logger: true } */);
 
   app.register(fastifyJwt, {
     secret: {
@@ -30,31 +29,20 @@ async function start() {
   });
   app.register(fastifyCookie);
 
-  setupMetrics(app, "auth-service");
+  const metrics = setupMetrics(app, "auth-service", authMetrics);
+  app.decorate("metrics", metrics);
 
   app.decorate("userRepo", userRepo);
   app.decorate("hasher", hasher);
 
-  // app.options("/*", (request, reply) => {
-  //   reply
-  //     .header("Access-Control-Allow-Origin", "http://localhost:3000")
-  //     .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-  //     .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-  //     .header("Access-Control-Allow-Credentials", "true")
-  //     .send();
-  // });
 
   app.register(auth_routes);
-  // app.register(loginRoutes);
-  // app.register(twoFARoutes);
-  // app.register(testeRoutes);
   userDeleted_listener();
 
   try {
     await app.listen({ port: PORT, host: '0.0.0.0' });
-    ////console.logog("✅ Auth service rodando na porta 4000");
   } catch (err) {
-    //console.error("❌ Erro ao iniciar o auth-service:", err);
+    // console.error("❌ Erro ao iniciar o auth-service:", err);
     process.exit(1);
   }
 }

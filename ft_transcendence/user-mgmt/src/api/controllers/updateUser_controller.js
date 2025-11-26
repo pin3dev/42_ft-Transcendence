@@ -29,6 +29,9 @@ async function updateUser_controller(request, reply) {
 
   try {
     const result = await updateUserProfile(userId, request.body);
+    // update profile metric
+    request.server.metrics.profileUploaded.inc();
+
     return reply.send(result);
   } catch (err) {
     console.error("Erro ao atualizar perfil:", err);

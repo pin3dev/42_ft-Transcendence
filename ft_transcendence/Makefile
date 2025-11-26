@@ -64,10 +64,10 @@ ip:
 
 # ============================ MONITORING ============================
 
-moni-up:
+moni-up: moni-build
 	docker compose -f monitoring/docker-compose.monitoring.yml up -d
 
-moni-build:
+moni-build: 
 	docker compose -f monitoring/docker-compose.monitoring.yml build
 
 moni-stop:

@@ -1,6 +1,3 @@
-// File: src/server.js
-// Description: This file sets up a Fastify server and registers the profile routes.
-
 const { userRegistered_listener } = require("./events/userRegistered_listener");
 const Fastify = require("fastify");
 const fastifyMultipart = require("@fastify/multipart");
@@ -13,6 +10,7 @@ const profileRepo = require("./infrastructure/db/profile_repository");
 const friendRepo = require("./infrastructure/db/friends_repository");
 const testProtectedRoute = require("./api/routes/test_protected_route");
 const setupMetrics = require("../pckg/prometheus/metrics.js");
+const userMetrics = require("./infrastructure/monitoring/metrics.js");
 
 const PORT = process.env.PORT;
 
@@ -22,23 +20,14 @@ const fastify = Fastify({
   disableRequestLogging: false
 });
 
-setupMetrics(fastify, "user-mgmt");
+const metrics = setupMetrics(fastify, "user-mgmt", userMetrics);
+fastify.decorate("metrics", metrics);
 
 // Garantir que o diretório temporário para uploads exista
 const tmpDir = path.join(__dirname, '../tmp');
 if (!fs.existsSync(tmpDir)) {
   fs.mkdirSync(tmpDir, { recursive: true });
 }
-
-// fastify.options('/*', (request, reply) => {
-//   reply
-//     .code(204)
-//     .header("Access-Control-Allow-Origin", "http://localhost:3000")
-//     .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-//     .header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-//     .header("Access-Control-Allow-Credentials", "true")
-//     .send();
-// });
 
 // Configurar o plugin multipart para lidar com upload de arquivos
 fastify.register(fastifyMultipart, {
@@ -68,4 +57,4 @@ fastify.listen({ port: PORT, host: "0.0.0.0" }, (err) => {
   }
 });
 
-userRegistered_listener();
+userRegistered_listener(fastify);

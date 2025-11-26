@@ -6,8 +6,8 @@ tRepo = require("./infrastructure/repositories/tournament_repository.js");
 
 const { matchFinished_listener } = require("./events/matchFinished_listener");
 const { tournamentCreated_listener } = require("./events/tournamentCreated_listener");
-const setupMetrics = require("../pckg/prometheus/metrics.js");
-
+// const setupMetrics = require("../pckg/prometheus/metrics.js");
+// const tournamentMetrics = require("./infrastructure/monitoring/metrics.js");
 
 const ranking_routes = require("./api/routes/ranking_routes");
 const match_routes = require("./api/routes/match_routes");
@@ -18,7 +18,8 @@ const fastify = Fastify({
   });
   
 
-  setupMetrics(fastify, "tournament");
+  // const metrics = setupMetrics(app, "tournament", authMetrics);
+  // app.decorate("metrics", metrics);
 
   fastify.decorate("mRepo", mRepo);
   fastify.decorate("rRepo", rRepo);

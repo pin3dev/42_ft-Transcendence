@@ -7,7 +7,6 @@ function userDeleted_listener() {
     const { user_id, email } = event.data;
 
     try {
-      // você pode também logar o email se quiser confirmar identidade
       await userRepo.deleteById(user_id, email);
       //console.logog(`[user-mgmt] Perfil deletado para userId=${user_id}`);
     } catch (err) {

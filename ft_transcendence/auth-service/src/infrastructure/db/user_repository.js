@@ -29,7 +29,7 @@ async function deleteById(userId) {
   return run(`DELETE FROM users WHERE id = ?`, [userId]);
 }
 
-// Marca que o QR já foi entregue
+// flag first2FALoginDone as true
 async function markFirst2FALoginDone(userId) {
   return await run(
     "UPDATE users SET first2FALoginDone = 1 WHERE id = ?",

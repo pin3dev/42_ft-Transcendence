@@ -1,4 +1,4 @@
-// 🔐 Headers definidos pelo API Gateway depois de autenticar JWT
+// headers defined for comunicação via API Gateway
 const gateway_headers = {
     type: "object",
     required: ["x-user-id"],
@@ -7,7 +7,7 @@ const gateway_headers = {
     }
   };
 
-// Schemas gerais para erros HTTP
+// generic error response schemas
 const error_responses = {
     400: {
       type: "object",

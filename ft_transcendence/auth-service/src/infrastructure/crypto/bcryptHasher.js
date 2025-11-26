@@ -1,6 +1,6 @@
 
 const bcrypt = require("bcrypt"); 
-const SALT_ROUNDS = 10; // Define o número de rounds de sal — quanto maior, mais seguro (e lento)
+const SALT_ROUNDS = 10; // define the rounds of salt (amount of hashing iterations)
 
 async function hashPassword(password) {
   return await bcrypt.hash(password, SALT_ROUNDS);
