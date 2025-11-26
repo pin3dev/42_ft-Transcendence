@@ -11,6 +11,8 @@ const createServiceProxy = require("./proxy/serviceProxy");
 const { getCache } = require("../pckg/redis/modules.js");
 const setupMetrics = require("../pckg/prometheus/metrics.js");
 const gatewayMetrics = require("./infrastructure/monitoring/metrics.js");
+const metricsAggregator = require("../pckg/prometheus/aggregatorExpositor.js");
+
 
 const JWTpublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY_BASE64, 'base64').toString('utf-8');
 const SSLkey = Buffer.from(process.env.SSL_KEY_BASE64, 'base64').toString('utf-8');
@@ -31,8 +33,14 @@ async function buildServer() {
   });
   //console.logog("🚀 Iniciando API Gateway...");
 
-  const metrics = setupMetrics(app, "api-gateway", gatewayMetrics);
+  const metrics = setupMetrics(app, "api-gateway", gatewayMetrics, {
+    skipRegisterRoute: true
+  });
+
   app.decorate("metrics", metrics);
+
+  // expositor metrics
+  metricsAggregator(app, metrics);
 
   //  Plugins
   await app.register(corsPlugin);
